@@ -5,6 +5,8 @@ export default function ProductsView() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<Record<number, File | null>>({});
+  const [uploading, setUploading] = useState<Record<number, boolean>>({});
 
   const [form, setForm] = useState({ name: '', description: '', category: '', price: 0, stock: 0 });
 
@@ -57,6 +59,25 @@ export default function ProductsView() {
     }
   }
 
+  async function onUploadImage(id: number) {
+    const file = selectedFiles[id];
+    if (!file) {
+      setError('Please select an image first.');
+      return;
+    }
+    setError(null);
+    setUploading(prev => ({ ...prev, [id]: true }));
+    try {
+      await api.uploadProductImage(id, file);
+      setSelectedFiles(prev => ({ ...prev, [id]: null }));
+      await load();
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setUploading(prev => ({ ...prev, [id]: false }));
+    }
+  }
+
   return (
     <div className="view">
       <h2>Products</h2>
@@ -93,6 +114,7 @@ export default function ProductsView() {
             <thead>
               <tr>
                 <th>ID</th>
+                <th>Image</th>
                 <th>Name</th>
                 <th>Category</th>
                 <th>Price</th>
@@ -104,11 +126,36 @@ export default function ProductsView() {
               {products?.map((p: any) => (
                 <tr key={p.id}>
                   <td>{p.id}</td>
+                  <td>
+                    {p.image ? (
+                      <img src={p.image} alt={p.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />
+                    ) : (
+                      <span className="muted">No image</span>
+                    )}
+                  </td>
                   <td>{p.name}</td>
                   <td>{p.category}</td>
                   <td>{p.price}</td>
                   <td>{p.stock}</td>
-                  <td><button className="danger" onClick={() => onDelete(p.id)}>Delete</button></td>
+                  <td>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={e => {
+                          const file = e.target.files?.[0] ?? null;
+                          setSelectedFiles(prev => ({ ...prev, [p.id]: file }));
+                        }}
+                      />
+                      <button
+                        onClick={() => onUploadImage(p.id)}
+                        disabled={!!uploading[p.id]}
+                      >
+                        {uploading[p.id] ? 'Uploading…' : 'Upload Image'}
+                      </button>
+                      <button className="danger" onClick={() => onDelete(p.id)}>Delete</button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

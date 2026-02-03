@@ -54,6 +54,16 @@ export default function UsersView() {
     }
   }
 
+  async function onRoleChange(id: number, role: string) {
+    setError(null);
+    try {
+      await api.updateUser(id, { role });
+      await load();
+    } catch (e: any) {
+      setError(e.message);
+    }
+  }
+
   return (
     <div className="view">
       <h2>Users</h2>
@@ -84,6 +94,7 @@ export default function UsersView() {
                 <th>ID</th>
                 <th>Username</th>
                 <th>Email</th>
+                <th>Role</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -93,6 +104,16 @@ export default function UsersView() {
                   <td>{u.id}</td>
                   <td>{u.username}</td>
                   <td>{u.email}</td>
+                  <td>
+                    <select 
+                      value={u.role || 'USER'} 
+                      onChange={(e) => onRoleChange(u.id, e.target.value)}
+                      disabled={loading}
+                    >
+                      <option value="USER">USER</option>
+                      <option value="ADMIN">ADMIN</option>
+                    </select>
+                  </td>
                   <td>
                     <button className="danger" onClick={() => onDelete(u.id)}>Delete</button>
                   </td>
