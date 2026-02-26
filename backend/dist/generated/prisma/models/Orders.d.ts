@@ -1,4 +1,5 @@
 import type * as runtime from "@prisma/client/runtime/library";
+import type * as $Enums from "../enums.js";
 import type * as Prisma from "../internal/prismaNamespace.js";
 export type OrdersModel = runtime.Types.Result.DefaultSelection<Prisma.$OrdersPayload>;
 export type AggregateOrders = {
@@ -23,14 +24,20 @@ export type OrdersMinAggregateOutputType = {
     userId: number | null;
     totalPrice: number | null;
     createdAt: Date | null;
-    status: boolean | null;
+    status: $Enums.OrderStatus | null;
+    courier: $Enums.CourierService | null;
+    shippingAddress: string | null;
+    trackingNumber: string | null;
 };
 export type OrdersMaxAggregateOutputType = {
     id: number | null;
     userId: number | null;
     totalPrice: number | null;
     createdAt: Date | null;
-    status: boolean | null;
+    status: $Enums.OrderStatus | null;
+    courier: $Enums.CourierService | null;
+    shippingAddress: string | null;
+    trackingNumber: string | null;
 };
 export type OrdersCountAggregateOutputType = {
     id: number;
@@ -38,6 +45,9 @@ export type OrdersCountAggregateOutputType = {
     totalPrice: number;
     createdAt: number;
     status: number;
+    courier: number;
+    shippingAddress: number;
+    trackingNumber: number;
     _all: number;
 };
 export type OrdersAvgAggregateInputType = {
@@ -56,6 +66,9 @@ export type OrdersMinAggregateInputType = {
     totalPrice?: true;
     createdAt?: true;
     status?: true;
+    courier?: true;
+    shippingAddress?: true;
+    trackingNumber?: true;
 };
 export type OrdersMaxAggregateInputType = {
     id?: true;
@@ -63,6 +76,9 @@ export type OrdersMaxAggregateInputType = {
     totalPrice?: true;
     createdAt?: true;
     status?: true;
+    courier?: true;
+    shippingAddress?: true;
+    trackingNumber?: true;
 };
 export type OrdersCountAggregateInputType = {
     id?: true;
@@ -70,6 +86,9 @@ export type OrdersCountAggregateInputType = {
     totalPrice?: true;
     createdAt?: true;
     status?: true;
+    courier?: true;
+    shippingAddress?: true;
+    trackingNumber?: true;
     _all?: true;
 };
 export type OrdersAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -105,7 +124,10 @@ export type OrdersGroupByOutputType = {
     userId: number;
     totalPrice: number;
     createdAt: Date;
-    status: boolean;
+    status: $Enums.OrderStatus;
+    courier: $Enums.CourierService;
+    shippingAddress: string | null;
+    trackingNumber: string | null;
     _count: OrdersCountAggregateOutputType | null;
     _avg: OrdersAvgAggregateOutputType | null;
     _sum: OrdersSumAggregateOutputType | null;
@@ -123,7 +145,10 @@ export type OrdersWhereInput = {
     userId?: Prisma.IntFilter<"Orders"> | number;
     totalPrice?: Prisma.FloatFilter<"Orders"> | number;
     createdAt?: Prisma.DateTimeFilter<"Orders"> | Date | string;
-    status?: Prisma.BoolFilter<"Orders"> | boolean;
+    status?: Prisma.EnumOrderStatusFilter<"Orders"> | $Enums.OrderStatus;
+    courier?: Prisma.EnumCourierServiceFilter<"Orders"> | $Enums.CourierService;
+    shippingAddress?: Prisma.StringNullableFilter<"Orders"> | string | null;
+    trackingNumber?: Prisma.StringNullableFilter<"Orders"> | string | null;
     user?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.UsersWhereInput>;
     orderItems?: Prisma.OrderItemsListRelationFilter;
 };
@@ -133,8 +158,12 @@ export type OrdersOrderByWithRelationInput = {
     totalPrice?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
+    courier?: Prisma.SortOrder;
+    shippingAddress?: Prisma.SortOrderInput | Prisma.SortOrder;
+    trackingNumber?: Prisma.SortOrderInput | Prisma.SortOrder;
     user?: Prisma.UsersOrderByWithRelationInput;
     orderItems?: Prisma.OrderItemsOrderByRelationAggregateInput;
+    _relevance?: Prisma.OrdersOrderByRelevanceInput;
 };
 export type OrdersWhereUniqueInput = Prisma.AtLeast<{
     id?: number;
@@ -144,7 +173,10 @@ export type OrdersWhereUniqueInput = Prisma.AtLeast<{
     userId?: Prisma.IntFilter<"Orders"> | number;
     totalPrice?: Prisma.FloatFilter<"Orders"> | number;
     createdAt?: Prisma.DateTimeFilter<"Orders"> | Date | string;
-    status?: Prisma.BoolFilter<"Orders"> | boolean;
+    status?: Prisma.EnumOrderStatusFilter<"Orders"> | $Enums.OrderStatus;
+    courier?: Prisma.EnumCourierServiceFilter<"Orders"> | $Enums.CourierService;
+    shippingAddress?: Prisma.StringNullableFilter<"Orders"> | string | null;
+    trackingNumber?: Prisma.StringNullableFilter<"Orders"> | string | null;
     user?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.UsersWhereInput>;
     orderItems?: Prisma.OrderItemsListRelationFilter;
 }, "id">;
@@ -154,6 +186,9 @@ export type OrdersOrderByWithAggregationInput = {
     totalPrice?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
+    courier?: Prisma.SortOrder;
+    shippingAddress?: Prisma.SortOrderInput | Prisma.SortOrder;
+    trackingNumber?: Prisma.SortOrderInput | Prisma.SortOrder;
     _count?: Prisma.OrdersCountOrderByAggregateInput;
     _avg?: Prisma.OrdersAvgOrderByAggregateInput;
     _max?: Prisma.OrdersMaxOrderByAggregateInput;
@@ -168,12 +203,18 @@ export type OrdersScalarWhereWithAggregatesInput = {
     userId?: Prisma.IntWithAggregatesFilter<"Orders"> | number;
     totalPrice?: Prisma.FloatWithAggregatesFilter<"Orders"> | number;
     createdAt?: Prisma.DateTimeWithAggregatesFilter<"Orders"> | Date | string;
-    status?: Prisma.BoolWithAggregatesFilter<"Orders"> | boolean;
+    status?: Prisma.EnumOrderStatusWithAggregatesFilter<"Orders"> | $Enums.OrderStatus;
+    courier?: Prisma.EnumCourierServiceWithAggregatesFilter<"Orders"> | $Enums.CourierService;
+    shippingAddress?: Prisma.StringNullableWithAggregatesFilter<"Orders"> | string | null;
+    trackingNumber?: Prisma.StringNullableWithAggregatesFilter<"Orders"> | string | null;
 };
 export type OrdersCreateInput = {
     totalPrice: number;
     createdAt?: Date | string;
-    status?: boolean;
+    status?: $Enums.OrderStatus;
+    courier?: $Enums.CourierService;
+    shippingAddress?: string | null;
+    trackingNumber?: string | null;
     user: Prisma.UsersCreateNestedOneWithoutOrdersInput;
     orderItems?: Prisma.OrderItemsCreateNestedManyWithoutOrderInput;
 };
@@ -182,13 +223,19 @@ export type OrdersUncheckedCreateInput = {
     userId: number;
     totalPrice: number;
     createdAt?: Date | string;
-    status?: boolean;
+    status?: $Enums.OrderStatus;
+    courier?: $Enums.CourierService;
+    shippingAddress?: string | null;
+    trackingNumber?: string | null;
     orderItems?: Prisma.OrderItemsUncheckedCreateNestedManyWithoutOrderInput;
 };
 export type OrdersUpdateInput = {
     totalPrice?: Prisma.FloatFieldUpdateOperationsInput | number;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    status?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
+    shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     user?: Prisma.UsersUpdateOneRequiredWithoutOrdersNestedInput;
     orderItems?: Prisma.OrderItemsUpdateManyWithoutOrderNestedInput;
 };
@@ -197,7 +244,10 @@ export type OrdersUncheckedUpdateInput = {
     userId?: Prisma.IntFieldUpdateOperationsInput | number;
     totalPrice?: Prisma.FloatFieldUpdateOperationsInput | number;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    status?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
+    shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     orderItems?: Prisma.OrderItemsUncheckedUpdateManyWithoutOrderNestedInput;
 };
 export type OrdersCreateManyInput = {
@@ -205,19 +255,28 @@ export type OrdersCreateManyInput = {
     userId: number;
     totalPrice: number;
     createdAt?: Date | string;
-    status?: boolean;
+    status?: $Enums.OrderStatus;
+    courier?: $Enums.CourierService;
+    shippingAddress?: string | null;
+    trackingNumber?: string | null;
 };
 export type OrdersUpdateManyMutationInput = {
     totalPrice?: Prisma.FloatFieldUpdateOperationsInput | number;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    status?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
+    shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type OrdersUncheckedUpdateManyInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
     userId?: Prisma.IntFieldUpdateOperationsInput | number;
     totalPrice?: Prisma.FloatFieldUpdateOperationsInput | number;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    status?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
+    shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type OrdersListRelationFilter = {
     every?: Prisma.OrdersWhereInput;
@@ -227,12 +286,20 @@ export type OrdersListRelationFilter = {
 export type OrdersOrderByRelationAggregateInput = {
     _count?: Prisma.SortOrder;
 };
+export type OrdersOrderByRelevanceInput = {
+    fields: Prisma.OrdersOrderByRelevanceFieldEnum | Prisma.OrdersOrderByRelevanceFieldEnum[];
+    sort: Prisma.SortOrder;
+    search: string;
+};
 export type OrdersCountOrderByAggregateInput = {
     id?: Prisma.SortOrder;
     userId?: Prisma.SortOrder;
     totalPrice?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
+    courier?: Prisma.SortOrder;
+    shippingAddress?: Prisma.SortOrder;
+    trackingNumber?: Prisma.SortOrder;
 };
 export type OrdersAvgOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -245,6 +312,9 @@ export type OrdersMaxOrderByAggregateInput = {
     totalPrice?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
+    courier?: Prisma.SortOrder;
+    shippingAddress?: Prisma.SortOrder;
+    trackingNumber?: Prisma.SortOrder;
 };
 export type OrdersMinOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -252,6 +322,9 @@ export type OrdersMinOrderByAggregateInput = {
     totalPrice?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
+    courier?: Prisma.SortOrder;
+    shippingAddress?: Prisma.SortOrder;
+    trackingNumber?: Prisma.SortOrder;
 };
 export type OrdersSumOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -300,11 +373,11 @@ export type OrdersUncheckedUpdateManyWithoutUserNestedInput = {
     updateMany?: Prisma.OrdersUpdateManyWithWhereWithoutUserInput | Prisma.OrdersUpdateManyWithWhereWithoutUserInput[];
     deleteMany?: Prisma.OrdersScalarWhereInput | Prisma.OrdersScalarWhereInput[];
 };
-export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string;
+export type EnumOrderStatusFieldUpdateOperationsInput = {
+    set?: $Enums.OrderStatus;
 };
-export type BoolFieldUpdateOperationsInput = {
-    set?: boolean;
+export type EnumCourierServiceFieldUpdateOperationsInput = {
+    set?: $Enums.CourierService;
 };
 export type OrdersCreateNestedOneWithoutOrderItemsInput = {
     create?: Prisma.XOR<Prisma.OrdersCreateWithoutOrderItemsInput, Prisma.OrdersUncheckedCreateWithoutOrderItemsInput>;
@@ -321,14 +394,20 @@ export type OrdersUpdateOneRequiredWithoutOrderItemsNestedInput = {
 export type OrdersCreateWithoutUserInput = {
     totalPrice: number;
     createdAt?: Date | string;
-    status?: boolean;
+    status?: $Enums.OrderStatus;
+    courier?: $Enums.CourierService;
+    shippingAddress?: string | null;
+    trackingNumber?: string | null;
     orderItems?: Prisma.OrderItemsCreateNestedManyWithoutOrderInput;
 };
 export type OrdersUncheckedCreateWithoutUserInput = {
     id?: number;
     totalPrice: number;
     createdAt?: Date | string;
-    status?: boolean;
+    status?: $Enums.OrderStatus;
+    courier?: $Enums.CourierService;
+    shippingAddress?: string | null;
+    trackingNumber?: string | null;
     orderItems?: Prisma.OrderItemsUncheckedCreateNestedManyWithoutOrderInput;
 };
 export type OrdersCreateOrConnectWithoutUserInput = {
@@ -360,12 +439,18 @@ export type OrdersScalarWhereInput = {
     userId?: Prisma.IntFilter<"Orders"> | number;
     totalPrice?: Prisma.FloatFilter<"Orders"> | number;
     createdAt?: Prisma.DateTimeFilter<"Orders"> | Date | string;
-    status?: Prisma.BoolFilter<"Orders"> | boolean;
+    status?: Prisma.EnumOrderStatusFilter<"Orders"> | $Enums.OrderStatus;
+    courier?: Prisma.EnumCourierServiceFilter<"Orders"> | $Enums.CourierService;
+    shippingAddress?: Prisma.StringNullableFilter<"Orders"> | string | null;
+    trackingNumber?: Prisma.StringNullableFilter<"Orders"> | string | null;
 };
 export type OrdersCreateWithoutOrderItemsInput = {
     totalPrice: number;
     createdAt?: Date | string;
-    status?: boolean;
+    status?: $Enums.OrderStatus;
+    courier?: $Enums.CourierService;
+    shippingAddress?: string | null;
+    trackingNumber?: string | null;
     user: Prisma.UsersCreateNestedOneWithoutOrdersInput;
 };
 export type OrdersUncheckedCreateWithoutOrderItemsInput = {
@@ -373,7 +458,10 @@ export type OrdersUncheckedCreateWithoutOrderItemsInput = {
     userId: number;
     totalPrice: number;
     createdAt?: Date | string;
-    status?: boolean;
+    status?: $Enums.OrderStatus;
+    courier?: $Enums.CourierService;
+    shippingAddress?: string | null;
+    trackingNumber?: string | null;
 };
 export type OrdersCreateOrConnectWithoutOrderItemsInput = {
     where: Prisma.OrdersWhereUniqueInput;
@@ -391,7 +479,10 @@ export type OrdersUpdateToOneWithWhereWithoutOrderItemsInput = {
 export type OrdersUpdateWithoutOrderItemsInput = {
     totalPrice?: Prisma.FloatFieldUpdateOperationsInput | number;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    status?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
+    shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     user?: Prisma.UsersUpdateOneRequiredWithoutOrdersNestedInput;
 };
 export type OrdersUncheckedUpdateWithoutOrderItemsInput = {
@@ -399,32 +490,47 @@ export type OrdersUncheckedUpdateWithoutOrderItemsInput = {
     userId?: Prisma.IntFieldUpdateOperationsInput | number;
     totalPrice?: Prisma.FloatFieldUpdateOperationsInput | number;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    status?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
+    shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type OrdersCreateManyUserInput = {
     id?: number;
     totalPrice: number;
     createdAt?: Date | string;
-    status?: boolean;
+    status?: $Enums.OrderStatus;
+    courier?: $Enums.CourierService;
+    shippingAddress?: string | null;
+    trackingNumber?: string | null;
 };
 export type OrdersUpdateWithoutUserInput = {
     totalPrice?: Prisma.FloatFieldUpdateOperationsInput | number;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    status?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
+    shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     orderItems?: Prisma.OrderItemsUpdateManyWithoutOrderNestedInput;
 };
 export type OrdersUncheckedUpdateWithoutUserInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
     totalPrice?: Prisma.FloatFieldUpdateOperationsInput | number;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    status?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
+    shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     orderItems?: Prisma.OrderItemsUncheckedUpdateManyWithoutOrderNestedInput;
 };
 export type OrdersUncheckedUpdateManyWithoutUserInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
     totalPrice?: Prisma.FloatFieldUpdateOperationsInput | number;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
-    status?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus;
+    courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
+    shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type OrdersCountOutputType = {
     orderItems: number;
@@ -444,6 +550,9 @@ export type OrdersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     totalPrice?: boolean;
     createdAt?: boolean;
     status?: boolean;
+    courier?: boolean;
+    shippingAddress?: boolean;
+    trackingNumber?: boolean;
     user?: boolean | Prisma.UsersDefaultArgs<ExtArgs>;
     orderItems?: boolean | Prisma.Orders$orderItemsArgs<ExtArgs>;
     _count?: boolean | Prisma.OrdersCountOutputTypeDefaultArgs<ExtArgs>;
@@ -454,8 +563,11 @@ export type OrdersSelectScalar = {
     totalPrice?: boolean;
     createdAt?: boolean;
     status?: boolean;
+    courier?: boolean;
+    shippingAddress?: boolean;
+    trackingNumber?: boolean;
 };
-export type OrdersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "totalPrice" | "createdAt" | "status", ExtArgs["result"]["orders"]>;
+export type OrdersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "totalPrice" | "createdAt" | "status" | "courier" | "shippingAddress" | "trackingNumber", ExtArgs["result"]["orders"]>;
 export type OrdersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     user?: boolean | Prisma.UsersDefaultArgs<ExtArgs>;
     orderItems?: boolean | Prisma.Orders$orderItemsArgs<ExtArgs>;
@@ -472,7 +584,10 @@ export type $OrdersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
         userId: number;
         totalPrice: number;
         createdAt: Date;
-        status: boolean;
+        status: $Enums.OrderStatus;
+        courier: $Enums.CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
     }, ExtArgs["result"]["orders"]>;
     composites: {};
 };
@@ -534,7 +649,10 @@ export interface OrdersFieldRefs {
     readonly userId: Prisma.FieldRef<"Orders", 'Int'>;
     readonly totalPrice: Prisma.FieldRef<"Orders", 'Float'>;
     readonly createdAt: Prisma.FieldRef<"Orders", 'DateTime'>;
-    readonly status: Prisma.FieldRef<"Orders", 'Boolean'>;
+    readonly status: Prisma.FieldRef<"Orders", 'OrderStatus'>;
+    readonly courier: Prisma.FieldRef<"Orders", 'CourierService'>;
+    readonly shippingAddress: Prisma.FieldRef<"Orders", 'String'>;
+    readonly trackingNumber: Prisma.FieldRef<"Orders", 'String'>;
 }
 export type OrdersFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.OrdersSelect<ExtArgs> | null;

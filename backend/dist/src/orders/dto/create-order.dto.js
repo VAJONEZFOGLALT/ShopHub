@@ -9,12 +9,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OrderItemInput = exports.CreateOrderDto = void 0;
+exports.OrderItemInput = exports.CreateOrderDto = exports.CourierService = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
+var CourierService;
+(function (CourierService) {
+    CourierService["UPS"] = "UPS";
+    CourierService["PACKETA"] = "PACKETA";
+    CourierService["DPD"] = "DPD";
+    CourierService["INPOST"] = "INPOST";
+})(CourierService || (exports.CourierService = CourierService = {}));
 class CreateOrderDto {
     userId;
     items;
+    courier;
+    shippingAddress;
 }
 exports.CreateOrderDto = CreateOrderDto;
 __decorate([
@@ -27,6 +36,16 @@ __decorate([
     (0, class_transformer_1.Type)(() => OrderItemInput),
     __metadata("design:type", Array)
 ], CreateOrderDto.prototype, "items", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(CourierService),
+    __metadata("design:type", String)
+], CreateOrderDto.prototype, "courier", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateOrderDto.prototype, "shippingAddress", void 0);
 class OrderItemInput {
     productId;
     quantity;

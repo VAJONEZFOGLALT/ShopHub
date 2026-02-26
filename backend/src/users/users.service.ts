@@ -2,15 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto) {
     const { password, ...rest } = createUserDto;
-    // In a real app hash the password before saving; using plain for placeholder
-    return this.prisma.users.create({ data: { ...rest, password_hash: password } });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    return this.prisma.users.create({ data: { ...rest, password_hash: hashedPassword } });
   }
 
   findAll() {
@@ -21,10 +22,13 @@ export class UsersService {
     return this.prisma.users.findUnique({ where: { id } });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto) {
     const { password, ...rest } = updateUserDto;
-    const data = password ? { ...rest, password_hash: password } : rest;
-    return this.prisma.users.update({ where: { id }, data });
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      return this.prisma.users.update({ where: { id }, data: { ...rest, password_hash: hashedPassword } });
+    }
+    return this.prisma.users.update({ where: { id }, data: rest });
   }
 
   remove(id: number) {

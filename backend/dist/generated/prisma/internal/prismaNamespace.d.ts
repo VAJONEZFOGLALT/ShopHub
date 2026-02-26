@@ -178,8 +178,13 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export declare const ModelName: {
     readonly Users: "Users";
     readonly Products: "Products";
+    readonly Reviews: "Reviews";
+    readonly Wishlist: "Wishlist";
+    readonly RecentlyViewed: "RecentlyViewed";
+    readonly CompareItems: "CompareItems";
     readonly Orders: "Orders";
     readonly OrderItems: "OrderItems";
+    readonly Address: "Address";
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 export interface TypeMapCb<GlobalOmitOptions = {}> extends runtime.Types.Utils.Fn<{
@@ -192,7 +197,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "users" | "products" | "orders" | "orderItems";
+        modelProps: "users" | "products" | "reviews" | "wishlist" | "recentlyViewed" | "compareItems" | "orders" | "orderItems" | "address";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
@@ -328,6 +333,270 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 };
             };
         };
+        Reviews: {
+            payload: Prisma.$ReviewsPayload<ExtArgs>;
+            fields: Prisma.ReviewsFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.ReviewsFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewsPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.ReviewsFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewsPayload>;
+                };
+                findFirst: {
+                    args: Prisma.ReviewsFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewsPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.ReviewsFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewsPayload>;
+                };
+                findMany: {
+                    args: Prisma.ReviewsFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewsPayload>[];
+                };
+                create: {
+                    args: Prisma.ReviewsCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewsPayload>;
+                };
+                createMany: {
+                    args: Prisma.ReviewsCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                delete: {
+                    args: Prisma.ReviewsDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewsPayload>;
+                };
+                update: {
+                    args: Prisma.ReviewsUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewsPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.ReviewsDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.ReviewsUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                upsert: {
+                    args: Prisma.ReviewsUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$ReviewsPayload>;
+                };
+                aggregate: {
+                    args: Prisma.ReviewsAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateReviews>;
+                };
+                groupBy: {
+                    args: Prisma.ReviewsGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.ReviewsGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.ReviewsCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.ReviewsCountAggregateOutputType> | number;
+                };
+            };
+        };
+        Wishlist: {
+            payload: Prisma.$WishlistPayload<ExtArgs>;
+            fields: Prisma.WishlistFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.WishlistFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$WishlistPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.WishlistFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$WishlistPayload>;
+                };
+                findFirst: {
+                    args: Prisma.WishlistFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$WishlistPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.WishlistFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$WishlistPayload>;
+                };
+                findMany: {
+                    args: Prisma.WishlistFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$WishlistPayload>[];
+                };
+                create: {
+                    args: Prisma.WishlistCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$WishlistPayload>;
+                };
+                createMany: {
+                    args: Prisma.WishlistCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                delete: {
+                    args: Prisma.WishlistDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$WishlistPayload>;
+                };
+                update: {
+                    args: Prisma.WishlistUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$WishlistPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.WishlistDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.WishlistUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                upsert: {
+                    args: Prisma.WishlistUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$WishlistPayload>;
+                };
+                aggregate: {
+                    args: Prisma.WishlistAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateWishlist>;
+                };
+                groupBy: {
+                    args: Prisma.WishlistGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.WishlistGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.WishlistCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.WishlistCountAggregateOutputType> | number;
+                };
+            };
+        };
+        RecentlyViewed: {
+            payload: Prisma.$RecentlyViewedPayload<ExtArgs>;
+            fields: Prisma.RecentlyViewedFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.RecentlyViewedFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentlyViewedPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.RecentlyViewedFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentlyViewedPayload>;
+                };
+                findFirst: {
+                    args: Prisma.RecentlyViewedFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentlyViewedPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.RecentlyViewedFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentlyViewedPayload>;
+                };
+                findMany: {
+                    args: Prisma.RecentlyViewedFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentlyViewedPayload>[];
+                };
+                create: {
+                    args: Prisma.RecentlyViewedCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentlyViewedPayload>;
+                };
+                createMany: {
+                    args: Prisma.RecentlyViewedCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                delete: {
+                    args: Prisma.RecentlyViewedDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentlyViewedPayload>;
+                };
+                update: {
+                    args: Prisma.RecentlyViewedUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentlyViewedPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.RecentlyViewedDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.RecentlyViewedUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                upsert: {
+                    args: Prisma.RecentlyViewedUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentlyViewedPayload>;
+                };
+                aggregate: {
+                    args: Prisma.RecentlyViewedAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateRecentlyViewed>;
+                };
+                groupBy: {
+                    args: Prisma.RecentlyViewedGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.RecentlyViewedGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.RecentlyViewedCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.RecentlyViewedCountAggregateOutputType> | number;
+                };
+            };
+        };
+        CompareItems: {
+            payload: Prisma.$CompareItemsPayload<ExtArgs>;
+            fields: Prisma.CompareItemsFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.CompareItemsFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$CompareItemsPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.CompareItemsFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$CompareItemsPayload>;
+                };
+                findFirst: {
+                    args: Prisma.CompareItemsFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$CompareItemsPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.CompareItemsFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$CompareItemsPayload>;
+                };
+                findMany: {
+                    args: Prisma.CompareItemsFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$CompareItemsPayload>[];
+                };
+                create: {
+                    args: Prisma.CompareItemsCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$CompareItemsPayload>;
+                };
+                createMany: {
+                    args: Prisma.CompareItemsCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                delete: {
+                    args: Prisma.CompareItemsDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$CompareItemsPayload>;
+                };
+                update: {
+                    args: Prisma.CompareItemsUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$CompareItemsPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.CompareItemsDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.CompareItemsUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                upsert: {
+                    args: Prisma.CompareItemsUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$CompareItemsPayload>;
+                };
+                aggregate: {
+                    args: Prisma.CompareItemsAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateCompareItems>;
+                };
+                groupBy: {
+                    args: Prisma.CompareItemsGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.CompareItemsGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.CompareItemsCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.CompareItemsCountAggregateOutputType> | number;
+                };
+            };
+        };
         Orders: {
             payload: Prisma.$OrdersPayload<ExtArgs>;
             fields: Prisma.OrdersFieldRefs;
@@ -460,6 +729,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 };
             };
         };
+        Address: {
+            payload: Prisma.$AddressPayload<ExtArgs>;
+            fields: Prisma.AddressFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.AddressFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AddressPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.AddressFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AddressPayload>;
+                };
+                findFirst: {
+                    args: Prisma.AddressFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AddressPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.AddressFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AddressPayload>;
+                };
+                findMany: {
+                    args: Prisma.AddressFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AddressPayload>[];
+                };
+                create: {
+                    args: Prisma.AddressCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AddressPayload>;
+                };
+                createMany: {
+                    args: Prisma.AddressCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                delete: {
+                    args: Prisma.AddressDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AddressPayload>;
+                };
+                update: {
+                    args: Prisma.AddressUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AddressPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.AddressDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.AddressUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                upsert: {
+                    args: Prisma.AddressUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AddressPayload>;
+                };
+                aggregate: {
+                    args: Prisma.AddressAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateAddress>;
+                };
+                groupBy: {
+                    args: Prisma.AddressGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AddressGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.AddressCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AddressCountAggregateOutputType> | number;
+                };
+            };
+        };
     };
 } & {
     other: {
@@ -497,6 +832,7 @@ export declare const UsersScalarFieldEnum: {
     readonly email: "email";
     readonly password_hash: "password_hash";
     readonly name: "name";
+    readonly avatar: "avatar";
     readonly role: "role";
 };
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum];
@@ -510,12 +846,46 @@ export declare const ProductsScalarFieldEnum: {
     readonly image: "image";
 };
 export type ProductsScalarFieldEnum = (typeof ProductsScalarFieldEnum)[keyof typeof ProductsScalarFieldEnum];
+export declare const ReviewsScalarFieldEnum: {
+    readonly id: "id";
+    readonly userId: "userId";
+    readonly productId: "productId";
+    readonly rating: "rating";
+    readonly title: "title";
+    readonly comment: "comment";
+    readonly createdAt: "createdAt";
+};
+export type ReviewsScalarFieldEnum = (typeof ReviewsScalarFieldEnum)[keyof typeof ReviewsScalarFieldEnum];
+export declare const WishlistScalarFieldEnum: {
+    readonly id: "id";
+    readonly userId: "userId";
+    readonly productId: "productId";
+    readonly createdAt: "createdAt";
+};
+export type WishlistScalarFieldEnum = (typeof WishlistScalarFieldEnum)[keyof typeof WishlistScalarFieldEnum];
+export declare const RecentlyViewedScalarFieldEnum: {
+    readonly id: "id";
+    readonly userId: "userId";
+    readonly productId: "productId";
+    readonly viewedAt: "viewedAt";
+};
+export type RecentlyViewedScalarFieldEnum = (typeof RecentlyViewedScalarFieldEnum)[keyof typeof RecentlyViewedScalarFieldEnum];
+export declare const CompareItemsScalarFieldEnum: {
+    readonly id: "id";
+    readonly userId: "userId";
+    readonly productId: "productId";
+    readonly createdAt: "createdAt";
+};
+export type CompareItemsScalarFieldEnum = (typeof CompareItemsScalarFieldEnum)[keyof typeof CompareItemsScalarFieldEnum];
 export declare const OrdersScalarFieldEnum: {
     readonly id: "id";
     readonly userId: "userId";
     readonly totalPrice: "totalPrice";
     readonly createdAt: "createdAt";
     readonly status: "status";
+    readonly courier: "courier";
+    readonly shippingAddress: "shippingAddress";
+    readonly trackingNumber: "trackingNumber";
 };
 export type OrdersScalarFieldEnum = (typeof OrdersScalarFieldEnum)[keyof typeof OrdersScalarFieldEnum];
 export declare const OrderItemsScalarFieldEnum: {
@@ -526,24 +896,39 @@ export declare const OrderItemsScalarFieldEnum: {
     readonly price: "price";
 };
 export type OrderItemsScalarFieldEnum = (typeof OrderItemsScalarFieldEnum)[keyof typeof OrderItemsScalarFieldEnum];
+export declare const AddressScalarFieldEnum: {
+    readonly id: "id";
+    readonly userId: "userId";
+    readonly label: "label";
+    readonly fullName: "fullName";
+    readonly street: "street";
+    readonly city: "city";
+    readonly state: "state";
+    readonly zipCode: "zipCode";
+    readonly country: "country";
+    readonly isDefault: "isDefault";
+    readonly createdAt: "createdAt";
+};
+export type AddressScalarFieldEnum = (typeof AddressScalarFieldEnum)[keyof typeof AddressScalarFieldEnum];
 export declare const SortOrder: {
     readonly asc: "asc";
     readonly desc: "desc";
 };
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder];
-export declare const UsersOrderByRelevanceFieldEnum: {
-    readonly username: "username";
-    readonly email: "email";
-    readonly password_hash: "password_hash";
-    readonly name: "name";
-    readonly role: "role";
-};
-export type UsersOrderByRelevanceFieldEnum = (typeof UsersOrderByRelevanceFieldEnum)[keyof typeof UsersOrderByRelevanceFieldEnum];
 export declare const NullsOrder: {
     readonly first: "first";
     readonly last: "last";
 };
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder];
+export declare const UsersOrderByRelevanceFieldEnum: {
+    readonly username: "username";
+    readonly email: "email";
+    readonly password_hash: "password_hash";
+    readonly name: "name";
+    readonly avatar: "avatar";
+    readonly role: "role";
+};
+export type UsersOrderByRelevanceFieldEnum = (typeof UsersOrderByRelevanceFieldEnum)[keyof typeof UsersOrderByRelevanceFieldEnum];
 export declare const ProductsOrderByRelevanceFieldEnum: {
     readonly name: "name";
     readonly description: "description";
@@ -551,10 +936,32 @@ export declare const ProductsOrderByRelevanceFieldEnum: {
     readonly image: "image";
 };
 export type ProductsOrderByRelevanceFieldEnum = (typeof ProductsOrderByRelevanceFieldEnum)[keyof typeof ProductsOrderByRelevanceFieldEnum];
+export declare const ReviewsOrderByRelevanceFieldEnum: {
+    readonly title: "title";
+    readonly comment: "comment";
+};
+export type ReviewsOrderByRelevanceFieldEnum = (typeof ReviewsOrderByRelevanceFieldEnum)[keyof typeof ReviewsOrderByRelevanceFieldEnum];
+export declare const OrdersOrderByRelevanceFieldEnum: {
+    readonly shippingAddress: "shippingAddress";
+    readonly trackingNumber: "trackingNumber";
+};
+export type OrdersOrderByRelevanceFieldEnum = (typeof OrdersOrderByRelevanceFieldEnum)[keyof typeof OrdersOrderByRelevanceFieldEnum];
+export declare const AddressOrderByRelevanceFieldEnum: {
+    readonly label: "label";
+    readonly fullName: "fullName";
+    readonly street: "street";
+    readonly city: "city";
+    readonly state: "state";
+    readonly zipCode: "zipCode";
+    readonly country: "country";
+};
+export type AddressOrderByRelevanceFieldEnum = (typeof AddressOrderByRelevanceFieldEnum)[keyof typeof AddressOrderByRelevanceFieldEnum];
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>;
 export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>;
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>;
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>;
+export type EnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus'>;
+export type EnumCourierServiceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CourierService'>;
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>;
 export type BatchPayload = {
     count: number;
@@ -584,8 +991,13 @@ export interface PrismaClientOptions {
 export type GlobalOmitConfig = {
     users?: Prisma.UsersOmit;
     products?: Prisma.ProductsOmit;
+    reviews?: Prisma.ReviewsOmit;
+    wishlist?: Prisma.WishlistOmit;
+    recentlyViewed?: Prisma.RecentlyViewedOmit;
+    compareItems?: Prisma.CompareItemsOmit;
     orders?: Prisma.OrdersOmit;
     orderItems?: Prisma.OrderItemsOmit;
+    address?: Prisma.AddressOmit;
 };
 export type LogLevel = 'info' | 'query' | 'warn' | 'error';
 export type LogDefinition = {

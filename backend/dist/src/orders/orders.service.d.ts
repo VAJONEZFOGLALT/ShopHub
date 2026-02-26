@@ -16,7 +16,10 @@ export declare class OrdersService {
         id: number;
         totalPrice: number;
         createdAt: Date;
-        status: boolean;
+        status: import("../../generated/prisma/enums").OrderStatus;
+        courier: import("../../generated/prisma/enums").CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
         userId: number;
     }>;
     findAll(): import("../../generated/prisma/internal/prismaNamespace").PrismaPromise<({
@@ -31,7 +34,10 @@ export declare class OrdersService {
         id: number;
         totalPrice: number;
         createdAt: Date;
-        status: boolean;
+        status: import("../../generated/prisma/enums").OrderStatus;
+        courier: import("../../generated/prisma/enums").CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
         userId: number;
     })[]>;
     findOne(id: number): import("../../generated/prisma/models").Prisma__OrdersClient<({
@@ -46,7 +52,10 @@ export declare class OrdersService {
         id: number;
         totalPrice: number;
         createdAt: Date;
-        status: boolean;
+        status: import("../../generated/prisma/enums").OrderStatus;
+        courier: import("../../generated/prisma/enums").CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
         userId: number;
     }) | null, null, import("@prisma/client/runtime/library").DefaultArgs, {
         omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
@@ -63,7 +72,10 @@ export declare class OrdersService {
         id: number;
         totalPrice: number;
         createdAt: Date;
-        status: boolean;
+        status: import("../../generated/prisma/enums").OrderStatus;
+        courier: import("../../generated/prisma/enums").CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
         userId: number;
     }, never, import("@prisma/client/runtime/library").DefaultArgs, {
         omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
@@ -72,7 +84,10 @@ export declare class OrdersService {
         id: number;
         totalPrice: number;
         createdAt: Date;
-        status: boolean;
+        status: import("../../generated/prisma/enums").OrderStatus;
+        courier: import("../../generated/prisma/enums").CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
         userId: number;
     }, never, import("@prisma/client/runtime/library").DefaultArgs, {
         omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;

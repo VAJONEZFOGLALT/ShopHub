@@ -10,6 +10,10 @@ generator client {
   moduleFormat = "cjs"
 }
 
+generator client_default {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -21,8 +25,14 @@ model Users {
   email         String   @unique
   password_hash String
   name          String   @default("")
+  avatar        String?
   role          String   @default("USER")
   orders        Orders[]
+  reviews       Reviews[]
+  wishlist      Wishlist[]
+  recentlyViewed RecentlyViewed[]
+  compareItems  CompareItems[]
+  addresses     Address[]
 }
 
 model Products {
@@ -34,16 +44,98 @@ model Products {
   stock       Int          @default(0)
   image       String?
   orderItems  OrderItems[]
+  reviews     Reviews[]
+  wishlist    Wishlist[]
+  recentlyViewed RecentlyViewed[]
+  compareItems CompareItems[]
+
+  @@index([category])
+}
+
+model Reviews {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  rating    Int
+  title     String
+  comment   String
+  createdAt DateTime @default(now())
+
+  user     Users    @relation(fields: [userId], references: [id])
+  product  Products @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+  @@index([productId])
+}
+
+model Wishlist {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  createdAt DateTime @default(now())
+
+  user     Users    @relation(fields: [userId], references: [id])
+  product  Products @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+model RecentlyViewed {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  viewedAt  DateTime @default(now())
+
+  user     Users    @relation(fields: [userId], references: [id])
+  product  Products @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+  @@index([userId, viewedAt])
+}
+
+model CompareItems {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  createdAt DateTime @default(now())
+
+  user     Users    @relation(fields: [userId], references: [id])
+  product  Products @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum CourierService {
+  UPS
+  PACKETA
+  DPD
+  INPOST
 }
 
 model Orders {
-  id         Int          @id @default(autoincrement())
-  userId     Int
-  totalPrice Float
-  createdAt  DateTime     @default(now())
-  status     Boolean      @default(false)
-  user       Users        @relation(fields: [userId], references: [id])
-  orderItems OrderItems[]
+  id              Int            @id @default(autoincrement())
+  userId          Int
+  totalPrice      Float
+  createdAt       DateTime       @default(now())
+  status          OrderStatus    @default(PENDING)
+  courier         CourierService @default(UPS)
+  shippingAddress String?
+  trackingNumber  String?
+  user            Users          @relation(fields: [userId], references: [id])
+  orderItems      OrderItems[]
+
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model OrderItems {
@@ -55,4 +147,25 @@ model OrderItems {
 
   order   Orders   @relation(fields: [orderId], references: [id])
   product Products @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Address {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  label      String   // e.g., "Home", "Work"
+  fullName   String
+  street     String
+  city       String
+  state      String
+  zipCode    String
+  country    String   @default("USA")
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  user Users @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }

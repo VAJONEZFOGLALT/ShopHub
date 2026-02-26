@@ -8,7 +8,7 @@ export class OrdersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createOrderDto: CreateOrderDto) {
-    const { userId, items } = createOrderDto;
+    const { userId, items, courier, shippingAddress } = createOrderDto;
 
     // fetch product prices for items
     const productIds = Array.from(new Set(items.map((i) => i.productId)));
@@ -36,6 +36,8 @@ export class OrdersService {
       data: {
         userId,
         totalPrice,
+        courier: courier || 'UPS',
+        shippingAddress,
         orderItems: { create: orderItemsData },
       },
       include: { orderItems: true },

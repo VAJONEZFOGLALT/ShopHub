@@ -53,6 +53,26 @@ export type Users = Prisma.UsersModel
  */
 export type Products = Prisma.ProductsModel
 /**
+ * Model Reviews
+ * 
+ */
+export type Reviews = Prisma.ReviewsModel
+/**
+ * Model Wishlist
+ * 
+ */
+export type Wishlist = Prisma.WishlistModel
+/**
+ * Model RecentlyViewed
+ * 
+ */
+export type RecentlyViewed = Prisma.RecentlyViewedModel
+/**
+ * Model CompareItems
+ * 
+ */
+export type CompareItems = Prisma.CompareItemsModel
+/**
  * Model Orders
  * 
  */
@@ -62,3 +82,8 @@ export type Orders = Prisma.OrdersModel
  * 
  */
 export type OrderItems = Prisma.OrderItemsModel
+/**
+ * Model Address
+ * 
+ */
+export type Address = Prisma.AddressModel

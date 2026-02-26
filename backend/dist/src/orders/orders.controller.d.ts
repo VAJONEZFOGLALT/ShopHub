@@ -16,7 +16,10 @@ export declare class OrdersController {
         id: number;
         totalPrice: number;
         createdAt: Date;
-        status: boolean;
+        status: import("../../generated/prisma/enums").OrderStatus;
+        courier: import("../../generated/prisma/enums").CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
         userId: number;
     }>;
     findAll(): import("../../generated/prisma/internal/prismaNamespace").PrismaPromise<({
@@ -31,7 +34,10 @@ export declare class OrdersController {
         id: number;
         totalPrice: number;
         createdAt: Date;
-        status: boolean;
+        status: import("../../generated/prisma/enums").OrderStatus;
+        courier: import("../../generated/prisma/enums").CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
         userId: number;
     })[]>;
     findOne(id: string): import("../../generated/prisma/models").Prisma__OrdersClient<({
@@ -46,7 +52,10 @@ export declare class OrdersController {
         id: number;
         totalPrice: number;
         createdAt: Date;
-        status: boolean;
+        status: import("../../generated/prisma/enums").OrderStatus;
+        courier: import("../../generated/prisma/enums").CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
         userId: number;
     }) | null, null, import("@prisma/client/runtime/library").DefaultArgs, {
         omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
@@ -63,7 +72,32 @@ export declare class OrdersController {
         id: number;
         totalPrice: number;
         createdAt: Date;
-        status: boolean;
+        status: import("../../generated/prisma/enums").OrderStatus;
+        courier: import("../../generated/prisma/enums").CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
+        userId: number;
+    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
+        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
+    }>;
+    updateStatus(id: string, body: {
+        status: string;
+    }): import("../../generated/prisma/models").Prisma__OrdersClient<{
+        orderItems: {
+            id: number;
+            price: number;
+            quantity: number;
+            productId: number;
+            orderId: number;
+        }[];
+    } & {
+        id: number;
+        totalPrice: number;
+        createdAt: Date;
+        status: import("../../generated/prisma/enums").OrderStatus;
+        courier: import("../../generated/prisma/enums").CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
         userId: number;
     }, never, import("@prisma/client/runtime/library").DefaultArgs, {
         omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
@@ -72,7 +106,10 @@ export declare class OrdersController {
         id: number;
         totalPrice: number;
         createdAt: Date;
-        status: boolean;
+        status: import("../../generated/prisma/enums").OrderStatus;
+        courier: import("../../generated/prisma/enums").CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
         userId: number;
     }, never, import("@prisma/client/runtime/library").DefaultArgs, {
         omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;

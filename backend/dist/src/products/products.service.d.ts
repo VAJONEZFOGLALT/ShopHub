@@ -5,8 +5,8 @@ export declare class ProductsService {
     private readonly prisma;
     constructor(prisma: PrismaService);
     create(createProductDto: CreateProductDto): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
@@ -16,8 +16,8 @@ export declare class ProductsService {
         omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
     findAll(): import("../../generated/prisma/internal/prismaNamespace").PrismaPromise<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
@@ -25,8 +25,8 @@ export declare class ProductsService {
         image: string | null;
     }[]>;
     findOne(id: number): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
@@ -36,8 +36,8 @@ export declare class ProductsService {
         omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
     update(id: number, updateProductDto: UpdateProductDto): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
@@ -47,8 +47,8 @@ export declare class ProductsService {
         omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
     remove(id: number): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;

@@ -1,5 +1,12 @@
-import { IsArray, IsInt, IsNotEmpty, IsPositive, ValidateNested } from 'class-validator';
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsOptional, IsPositive, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+
+export enum CourierService {
+  UPS = 'UPS',
+  PACKETA = 'PACKETA',
+  DPD = 'DPD',
+  INPOST = 'INPOST',
+}
 
 export class CreateOrderDto {
   @IsInt()
@@ -9,6 +16,14 @@ export class CreateOrderDto {
   @ValidateNested({ each: true })
   @Type(() => OrderItemInput)
   items: OrderItemInput[];
+
+  @IsOptional()
+  @IsEnum(CourierService)
+  courier?: CourierService;
+
+  @IsOptional()
+  @IsString()
+  shippingAddress?: string;
 }
 
 export class OrderItemInput {

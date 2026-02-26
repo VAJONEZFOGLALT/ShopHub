@@ -18,7 +18,7 @@ let OrdersService = class OrdersService {
         this.prisma = prisma;
     }
     async create(createOrderDto) {
-        const { userId, items } = createOrderDto;
+        const { userId, items, courier, shippingAddress } = createOrderDto;
         const productIds = Array.from(new Set(items.map((i) => i.productId)));
         const products = await this.prisma.products.findMany({
             where: { id: { in: productIds } },
@@ -38,6 +38,8 @@ let OrdersService = class OrdersService {
             data: {
                 userId,
                 totalPrice,
+                courier: courier || 'UPS',
+                shippingAddress,
                 orderItems: { create: orderItemsData },
             },
             include: { orderItems: true },

@@ -7,8 +7,8 @@ export declare class ProductsController {
     private readonly cloudinaryService;
     constructor(productsService: ProductsService, cloudinaryService: CloudinaryService);
     create(createProductDto: CreateProductDto): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
@@ -18,8 +18,8 @@ export declare class ProductsController {
         omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
     findAll(): import("../../generated/prisma/internal/prismaNamespace").PrismaPromise<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
@@ -27,8 +27,8 @@ export declare class ProductsController {
         image: string | null;
     }[]>;
     findOne(id: string): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
@@ -38,8 +38,8 @@ export declare class ProductsController {
         omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
     update(id: string, updateProductDto: UpdateProductDto): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
@@ -49,8 +49,8 @@ export declare class ProductsController {
         omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
     uploadImage(id: string, file: Express.Multer.File): Promise<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
@@ -58,8 +58,8 @@ export declare class ProductsController {
         image: string | null;
     }>;
     remove(id: string): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;

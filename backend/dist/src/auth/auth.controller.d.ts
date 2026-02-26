@@ -14,9 +14,10 @@ export declare class AuthController {
         name: string;
         role: string;
         token: string;
+        refreshToken: string;
     }>;
     login(body: {
-        email: string;
+        identifier: string;
         password: string;
     }): Promise<{
         id: number;
@@ -25,5 +26,17 @@ export declare class AuthController {
         name: string;
         role: string;
         token: string;
+        refreshToken: string;
+    }>;
+    refresh(body: {
+        refreshToken: string;
+    }): Promise<{
+        id: number;
+        email: string;
+        username: string;
+        name: string;
+        role: string;
+        token: string;
+        refreshToken: string;
     }>;
 }

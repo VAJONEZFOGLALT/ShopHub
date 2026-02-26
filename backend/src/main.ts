@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import path from 'node:path';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
@@ -9,19 +8,21 @@ async function bootstrap() {
     AppModule,
   );
 
+  const origins = [
+    process.env.FRONTEND_URL,
+    'http://localhost:5173',
+    'http://localhost:5174',
+  ].filter((origin): origin is string => Boolean(origin));
+
   app.enableCors({
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
+    origin: origins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200,
   });
 
   app.useGlobalPipes(new ValidationPipe());
-
-  app.useStaticAssets(path.join(__dirname, '..', '..', 'public'));
-  app.setBaseViewsDir(path.join(__dirname, '..', '..', 'views'));
-
-  app.setViewEngine('ejs');
 
   await app.listen(process.env.PORT ?? 3000);
 }
