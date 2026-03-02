@@ -17,6 +17,12 @@ export default function HomePage() {
       try {
         const prods = await api.getProducts();
 
+        // Safety check: ensure prods is an array
+        if (!Array.isArray(prods)) {
+          showToast('Failed to load products', 'error');
+          return;
+        }
+
         const featured = prods.slice(0, 12); // Show first 12 products for carousel
         setProducts(featured);
 
