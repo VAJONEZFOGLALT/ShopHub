@@ -35,13 +35,13 @@ export function useWishlist() {
     try {
       if (isCurrentlyWishlisted) {
         await api.removeFromWishlistByProduct(user.id, productId);
+        setWishlistIds((prev) => prev.filter((id) => id !== productId));
         showToast(`💔 ${productName ? `"${productName}"` : 'Item'} removed from wishlist`, 'info');
       } else {
         await api.addToWishlist({ userId: user.id, productId });
+        setWishlistIds((prev) => (prev.includes(productId) ? prev : [...prev, productId]));
         showToast(`❤️ ${productName ? `"${productName}"` : 'Item'} added to wishlist!`, 'success');
       }
-      const updated = await api.getWishlist(user.id);
-      setWishlistIds(updated.map((item: WishlistItem) => item.productId));
     } catch {
       showToast('Failed to update wishlist', 'error');
     }
@@ -55,8 +55,7 @@ export function useWishlist() {
 
     try {
       await api.removeFromWishlistByProduct(user.id, productId);
-      const updated = await api.getWishlist(user.id);
-      setWishlistIds(updated.map((item: WishlistItem) => item.productId));
+      setWishlistIds((prev) => prev.filter((id) => id !== productId));
       showToast(`💔 ${productName ? `"${productName}"` : 'Item'} removed from wishlist`, 'info');
     } catch {
       showToast('Failed to remove from wishlist', 'error');

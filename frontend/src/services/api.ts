@@ -17,6 +17,12 @@ if (storedRefresh) {
 
 let isRefreshing = false;
 let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: Error) => void }> = [];
+let productsCache: any[] | null = null;
+let productsCacheExpiresAt = 0;
+let productsRequestInFlight: Promise<any[]> | null = null;
+
+const PRODUCTS_CACHE_KEY = 'shophub_products_cache_v1';
+const PRODUCTS_CACHE_TTL_MS = 60 * 1000;
 
 const processQueue = (err: Error | null, token: string | null) => {
   failedQueue.forEach(p => {
@@ -43,6 +49,53 @@ const clearTokens = () => {
   refreshToken = '';
   localStorage.removeItem('authToken');
   localStorage.removeItem('refreshToken');
+};
+
+const loadProductsFromStorage = () => {
+  if (productsCache && Date.now() < productsCacheExpiresAt) {
+    return productsCache;
+  }
+  try {
+    const raw = localStorage.getItem(PRODUCTS_CACHE_KEY);
+    if (!raw) {
+      return null;
+    }
+    const parsed = JSON.parse(raw) as { data?: any[]; expiresAt?: number };
+    if (!parsed || !Array.isArray(parsed.data) || typeof parsed.expiresAt !== 'number') {
+      localStorage.removeItem(PRODUCTS_CACHE_KEY);
+      return null;
+    }
+    if (Date.now() >= parsed.expiresAt) {
+      localStorage.removeItem(PRODUCTS_CACHE_KEY);
+      return null;
+    }
+    productsCache = parsed.data;
+    productsCacheExpiresAt = parsed.expiresAt;
+    return productsCache;
+  } catch {
+    localStorage.removeItem(PRODUCTS_CACHE_KEY);
+    return null;
+  }
+};
+
+const saveProductsToStorage = (data: any[]) => {
+  productsCache = data;
+  productsCacheExpiresAt = Date.now() + PRODUCTS_CACHE_TTL_MS;
+  try {
+    localStorage.setItem(
+      PRODUCTS_CACHE_KEY,
+      JSON.stringify({ data, expiresAt: productsCacheExpiresAt }),
+    );
+  } catch {
+    // best effort cache
+  }
+};
+
+const invalidateProductsCache = () => {
+  productsCache = null;
+  productsCacheExpiresAt = 0;
+  productsRequestInFlight = null;
+  localStorage.removeItem(PRODUCTS_CACHE_KEY);
 };
 
 async function refreshAccessToken(): Promise<string> {
@@ -133,7 +186,7 @@ async function request<T>(path: string, init?: RequestInit, retry = true) {
 export const api = {
   // Auth
   register: async (data: { email: string; password: string; username: string; name?: string }) => {
-    const res = await request<{ id: number; email: string; username: string; name: string; token: string; refreshToken: string }>('/auth/register', {
+    const res = await request<{ id: number; email: string; username: string; name: string; role: string; token: string; refreshToken: string }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -142,7 +195,7 @@ export const api = {
   },
 
   login: async (data: { identifier: string; password: string }) => {
-    const res = await request<{ id: number; email: string; username: string; name: string; token: string; refreshToken: string }>('/auth/login', {
+    const res = await request<{ id: number; email: string; username: string; name: string; role: string; token: string; refreshToken: string }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -189,21 +242,44 @@ export const api = {
 
   // Products
   getProducts: async () => {
-    const data = await request<any[]>('/products');
-    return data;
+    const inMemory = productsCache && Date.now() < productsCacheExpiresAt ? productsCache : null;
+    if (inMemory) {
+      return inMemory;
+    }
+
+    const fromStorage = loadProductsFromStorage();
+    if (fromStorage) {
+      return fromStorage;
+    }
+
+    if (!productsRequestInFlight) {
+      productsRequestInFlight = request<any[]>('/products')
+        .then((data) => {
+          saveProductsToStorage(data);
+          return data;
+        })
+        .finally(() => {
+          productsRequestInFlight = null;
+        });
+    }
+
+    return productsRequestInFlight;
   },
   createProduct: async (data: { name: string; description?: string; category: string; price: number; stock: number }) => {
     const created = await request<any>('/products', { method: 'POST', body: JSON.stringify(data) });
+    invalidateProductsCache();
     return created;
   },
   uploadProductImage: async (id: number, file: File) => {
     const body = new FormData();
     body.append('file', file);
     const updated = await request<any>(`/products/${id}/image`, { method: 'POST', body });
+    invalidateProductsCache();
     return updated;
   },
   deleteProduct: async (id: number) => {
     const res = await request<void>(`/products/${id}`, { method: 'DELETE' });
+    invalidateProductsCache();
     return res;
   },
 
@@ -222,7 +298,7 @@ export const api = {
     courier?: string;
     shippingAddress?: string;
   }) => {
-    const created = await request<any>('/orders', { method: 'POST', body: JSON.stringify(data) });
+    const created = await request<{ id: number; userId: number; total: number; status: string; courier?: string; shippingAddress?: string }>('/orders', { method: 'POST', body: JSON.stringify(data) });
     return created;
   },
   deleteOrder: async (id: number) => {

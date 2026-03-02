@@ -153,7 +153,6 @@ export default function AllProductsPage() {
 
   const handleClearCompare = async () => {
     if (!user) {
-      clearCompare();
       setCompareIds([]);
       return;
     }
@@ -265,7 +264,7 @@ export default function AllProductsPage() {
                   product={p}
                   showWishlist={true}
                   isWishlisted={wishlistIds.includes(p.id)}
-                  onToggleWishlist={(id) => handleToggleWishlist(id, p.name)}
+                  onToggleWishlist={handleToggleWishlist}
                   showCompare={true}
                   isCompared={compareIds.includes(p.id)}
                   onToggleCompare={handleToggleCompare}
