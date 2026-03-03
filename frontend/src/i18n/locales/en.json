@@ -65,7 +65,10 @@
     "category": "Category",
     "allCategories": "All categories",
     "searchResults": "Search Results for \"{query}\"",
-    "logInToCompare": "Please log in to compare products"
+    "logInToCompare": "Please log in to compare products",
+    "resetFilters": "Reset Filters",
+    "noProductsInCategory": "No products found in this category.",
+    "adjustFilters": "Try adjusting your filters"
   },
   "cart": {
     "title": "Shopping Cart",
