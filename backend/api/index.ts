@@ -7,6 +7,27 @@ import express, { Request, Response } from 'express';
 
 let cachedServer: express.Express;
 
+const API_ROUTE_PREFIX = /^\/(auth|products|orders|order-items|users|wishlist|recently-viewed|compare|addresses|reviews|translations)(\/|$)/;
+
+const normalizeRequestUrl = (rawUrl: string) => {
+  const [pathPart, queryPart] = rawUrl.split('?');
+  let normalizedPath = pathPart || '/';
+
+  normalizedPath = normalizedPath.replace(/^\/api\/index(?:\.ts)?(?=\/|$)/, '');
+  if (!normalizedPath) {
+    normalizedPath = '/';
+  }
+
+  if (normalizedPath !== '/api/docs' && normalizedPath.startsWith('/api/')) {
+    const withoutApiPrefix = normalizedPath.replace(/^\/api/, '');
+    if (API_ROUTE_PREFIX.test(withoutApiPrefix)) {
+      normalizedPath = withoutApiPrefix;
+    }
+  }
+
+  return queryPart ? `${normalizedPath}?${queryPart}` : normalizedPath;
+};
+
 async function bootstrapServer(): Promise<express.Express> {
   if (!cachedServer) {
     try {
@@ -79,6 +100,7 @@ export default async function handler(req: Request, res: Response) {
 
   try {
     const server = await bootstrapServer();
+    req.url = normalizeRequestUrl(req.url);
     server(req, res);
   } catch (error) {
     console.error('Handler error:', error);
