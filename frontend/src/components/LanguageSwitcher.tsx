@@ -15,6 +15,10 @@ export const LanguageSwitcher = () => {
     localStorage.setItem('language', langCode);
   };
 
+  const selectedLanguage = languages.some((lang) => lang.code === i18n.language)
+    ? i18n.language
+    : 'hu';
+
   return (
     <div className={styles.languageSwitcher}>
       <label htmlFor="language-select" className={styles.label}>
@@ -22,7 +26,7 @@ export const LanguageSwitcher = () => {
       </label>
       <select
         id="language-select"
-        value={i18n.language}
+        value={selectedLanguage}
         onChange={(e) => handleLanguageChange(e.target.value)}
         className={styles.select}
       >

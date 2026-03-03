@@ -1,8 +1,40 @@
+const normalizeBaseUrl = (value: string) => value.replace(/\/+$/, '');
+
 const rawBaseUrl = import.meta.env.VITE_API_URL;
-let BASE_URL = 'http://localhost:3000';
+let BASE_URL = normalizeBaseUrl('http://localhost:3000');
 if (typeof rawBaseUrl === 'string' && rawBaseUrl.length > 0) {
-  BASE_URL = rawBaseUrl;
+  BASE_URL = normalizeBaseUrl(rawBaseUrl);
 }
+
+const cloneRequestInit = (init: RequestInit): RequestInit => ({
+  ...init,
+  headers: init.headers ? new Headers(init.headers) : undefined,
+});
+
+const withLeadingSlash = (path: string) => (path.startsWith('/') ? path : `/${path}`);
+
+const getFallbackPath = (path: string) => {
+  if (path.startsWith('/api/')) {
+    return path.replace(/^\/api/, '');
+  }
+  return `/api${path}`;
+};
+
+const fetchWithPathFallback = async (path: string, init: RequestInit) => {
+  const normalizedPath = withLeadingSlash(path);
+  const firstResponse = await fetch(`${BASE_URL}${normalizedPath}`, cloneRequestInit(init));
+
+  if (firstResponse.status !== 404) {
+    return firstResponse;
+  }
+
+  const fallbackPath = getFallbackPath(normalizedPath);
+  if (fallbackPath === normalizedPath) {
+    return firstResponse;
+  }
+
+  return fetch(`${BASE_URL}${fallbackPath}`, cloneRequestInit(init));
+};
 
 let authToken = '';
 let refreshToken = '';
@@ -110,7 +142,7 @@ async function refreshAccessToken(): Promise<string> {
 
   isRefreshing = true;
   try {
-    const res = await fetch(`${BASE_URL}/auth/refresh`, {
+    const res = await fetchWithPathFallback('/auth/refresh', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
@@ -142,7 +174,6 @@ async function request<T>(path: string, init?: RequestInit, retry = true) {
     headers['Authorization'] = `Bearer ${authToken}`;
   }
 
-  const url = `${BASE_URL}${path}`;
   const requestInit: RequestInit = {
     headers,
   };
@@ -150,7 +181,7 @@ async function request<T>(path: string, init?: RequestInit, retry = true) {
     Object.assign(requestInit, init);
   }
 
-  const res = await fetch(url, requestInit);
+  const res = await fetchWithPathFallback(path, requestInit);
   
   // Handle token expiration - retry with fresh token if available
   if (res.status === 401 && retry && refreshToken) {

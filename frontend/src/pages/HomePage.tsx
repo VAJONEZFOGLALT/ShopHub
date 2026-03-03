@@ -5,6 +5,14 @@ import { api } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { useToast } from '../contexts/ToastContext';
 
+const getProductCategory = (product: any) => {
+  const rawCategory = product?.category ?? product?.categoryName ?? product?.category?.name;
+  if (typeof rawCategory !== 'string') {
+    return '';
+  }
+  return rawCategory.trim();
+};
+
 export default function HomePage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -31,7 +39,7 @@ export default function HomePage() {
         const unique: Record<string, boolean> = {};
         const collected: string[] = [];
         for (let i = 0; i < prods.length; i += 1) {
-          const cat = prods[i]?.category;
+          const cat = getProductCategory(prods[i]);
           if (cat && !unique[cat]) {
             unique[cat] = true;
             collected.push(cat);
@@ -93,7 +101,7 @@ export default function HomePage() {
         <h2>{t('home.featuredCategories')}</h2>
         <div className="categories-grid">
           {categories.map((cat) => (
-            <div key={cat} className="category-card" onClick={() => navigate(`/shop/category/${cat}`)}>
+            <div key={cat} className="category-card" onClick={() => navigate(`/shop/category/${encodeURIComponent(cat)}`)}>
               <div className="category-card-icon">📦</div>
               <h3>{cat}</h3>
             </div>

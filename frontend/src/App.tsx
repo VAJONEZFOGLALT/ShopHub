@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
-import React, { useState } from 'react'
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
 import './styles/App.css'
 
 import UsersView from './adminpages/UsersView'
@@ -26,8 +26,37 @@ import ProfilePage from './pages/ProfilePage'
 import OrdersPage from './pages/OrdersPage'
 import { Toast } from './components/Toast'
 import { ScrollToTop } from './components/ScrollToTop'
+import { useTranslation } from 'react-i18next';
 
 type Modals = 'none' | 'login' | 'register'
+
+const SUPPORTED_LANGUAGES = ['hu', 'en', 'es'];
+
+function LanguageUrlSync() {
+  const { i18n } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const urlLang = params.get('lang');
+    const isUrlLangSupported = !!urlLang && SUPPORTED_LANGUAGES.includes(urlLang);
+
+    if (isUrlLangSupported && urlLang !== i18n.language) {
+      void i18n.changeLanguage(urlLang);
+      localStorage.setItem('language', urlLang);
+      return;
+    }
+
+    const currentLang = SUPPORTED_LANGUAGES.includes(i18n.language) ? i18n.language : 'hu';
+    if (!isUrlLangSupported || urlLang !== currentLang) {
+      params.set('lang', currentLang);
+      navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+    }
+  }, [i18n, i18n.language, location.pathname, location.search, navigate]);
+
+  return null;
+}
 
 function AdminPanel() {
   const [tab, setTab] = useState('users')
@@ -75,6 +104,7 @@ function App() {
     <AuthProvider>
       <ToastProvider>
         <Router>
+          <LanguageUrlSync />
           <ScrollToTop />
           <CartProvider>
             <Routes>
