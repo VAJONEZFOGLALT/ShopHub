@@ -109,14 +109,18 @@ export default function HomePage() {
       {/* Categories Showcase */}
       <section className="categories-showcase">
         <h2>{t('home.featuredCategories')}</h2>
-        <div className="categories-grid">
-          {categories.map((cat) => (
-            <div key={cat.key} className="category-card" onClick={() => navigate(`/shop/category/${encodeURIComponent(cat.key)}`)}>
-              <div className="category-card-icon">📦</div>
-              <h3>{cat.label}</h3>
-            </div>
-          ))}
-        </div>
+        {loading ? (
+          <LoadingSpinner />
+        ) : (
+          <div className="categories-grid">
+            {categories.map((cat) => (
+              <div key={cat.key} className="category-card" onClick={() => navigate(`/shop/category/${encodeURIComponent(cat.key)}`)}>
+                <div className="category-card-icon">📦</div>
+                <h3>{cat.label}</h3>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Featured Products */}
