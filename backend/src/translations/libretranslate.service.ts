@@ -47,7 +47,42 @@ export class LibreTranslateService {
       throw new BadRequestException(`Unsupported target language: ${targetLang}`);
     }
 
-    // Try services in order of quality: OpenAI > DeepL > LibreTranslate > MyMemory
+    // Try services in order of speed/quality:
+    // For HU→EN: DeepL first (fast) > OpenAI (slower but better) > fallbacks
+    // For other pairs: OpenAI > DeepL > fallbacks
+    
+    const isHuToEn = (source === 'hu' || source === 'hu-HU') && (target === 'en' || target === 'en-US');
+    
+    if (isHuToEn) {
+      // Fast path for Hungarian→English: DeepL is super fast and good
+      try {
+        const translatedText = await this.translateWithDeepL(text, source, target);
+        console.log('✓ DeepL succeeded (fast HU→EN)');
+        return { translatedText };
+      } catch (deepLError) {
+        console.warn('⚠ DeepL unavailable, trying OpenAI...');
+        try {
+          const translatedText = await this.openaiService.translate(text, source, target);
+          return { translatedText };
+        } catch (openaiError) {
+          console.warn('⚠ OpenAI unavailable, trying LibreTranslate...');
+          try {
+            const translatedText = await this.translateWithLibreTranslate(text, source, target);
+            return { translatedText };
+          } catch (libError) {
+            try {
+              const translatedText = await this.translateWithMyMemory(text, source, target);
+              return { translatedText };
+            } catch (memoryError) {
+              console.error('All translation services failed:', { deepLError, openaiError, libError, memoryError });
+              throw new BadRequestException('All translation services unavailable');
+            }
+          }
+        }
+      }
+    }
+
+    // Other language pairs: try all services
     try {
       const translatedText = await this.openaiService.translate(text, source, target);
       return { translatedText };
@@ -157,13 +192,32 @@ export class LibreTranslateService {
     const source = this.languageMap[sourceLang] || sourceLang;
     const target = this.languageMap[targetLang] || targetLang;
 
-    // Try OpenAI first for better batch handling
+    // For HU→EN: skip slow OpenAI, use fast DeepL
+    const isHuToEn = (source === 'hu' || source === 'hu-HU') && (target === 'en' || target === 'en-US');
+    
+    if (isHuToEn) {
+      try {
+        console.log(`✓ Using DeepL for fast HU→EN batch (${texts.length} items)`);
+        const results = await Promise.all(
+          texts.map((text) => this.translateWithDeepL(text, source, target)),
+        );
+        return results;
+      } catch (deepLError) {
+        console.warn(`⚠ DeepL batch failed, falling back to individual translations`);
+        const results = await Promise.all(
+          texts.map((text) => this.translate(text, source, target)),
+        );
+        return results.map((r) => r.translatedText);
+      }
+    }
+
+    // Other language pairs: try OpenAI first
     try {
       const results = await this.openaiService.translateBatch(texts, source, target);
       console.log(`✓ OpenAI batch-translated ${texts.length} items`);
       return results;
     } catch (openaiError) {
-      console.warn(`⚠ OpenAI batch failed, falling back to individual translations (${texts.length} items)`);
+      console.warn(`⚠ OpenAI batch failed, falling back to DeepL or individual translations`);
       // Fallback to individual translations via regular translate (which has its own fallback chain)
       const results = await Promise.all(
         texts.map((text) => this.translate(text, source, target)),
