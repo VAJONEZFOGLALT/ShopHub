@@ -7,7 +7,7 @@ import { api } from '../../services/api';
 import { getThumbnailUrl } from '../../utils/imageOptimization';
 
 export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart?: () => void }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [categories, setCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -39,7 +39,7 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
       });
       setCategories(list.sort());
     });
-  }, []);
+  }, [i18n.language]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -66,6 +66,7 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
       setSearchResults(products.filter(p => 
         p.name.toLowerCase().includes(q) || 
         p.category.toLowerCase().includes(q) ||
+        (p.categoryLabel && p.categoryLabel.toLowerCase().includes(q)) ||
         (p.description && p.description.toLowerCase().includes(q))
       ).slice(0, 6));
       setShowSearch(true);
@@ -92,7 +93,7 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
                   {p.image && <img src={getThumbnailUrl(p.image)} alt={p.name} loading="lazy" />}
                   <div className="search-result-content">
                     <div>{p.name}</div>
-                    <div className="muted">{p.category} • ${p.price.toFixed(2)}</div>
+                    <div className="muted">{p.categoryLabel || p.category} • ${p.price.toFixed(2)}</div>
                   </div>
                 </div>
               ))}
@@ -143,7 +144,10 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
       <div className="categories-bar">
         <div className="categories-bar-container">
           <Link to="/shop/all" style={{ fontWeight: 600 }}>{t('common.all')}</Link>
-          {categories.map(cat => <Link key={cat} to={`/shop/category/${cat}`}>{cat}</Link>)}
+          {categories.map(cat => {
+            const categoryLabel = products.find((product) => product.category === cat)?.categoryLabel || cat;
+            return <Link key={cat} to={`/shop/category/${encodeURIComponent(cat)}`}>{categoryLabel}</Link>;
+          })}
         </div>
       </div>
     </nav>

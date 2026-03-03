@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useTranslateDynamic } from '../hooks/useTranslateDynamic';
 import { api } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { ProductCardSkeleton } from '../components/SkeletonLoader';
@@ -12,13 +11,11 @@ import { useToast } from '../contexts/ToastContext';
 
 export default function AllProductsPage() {
   const { t, i18n } = useTranslation();
-  const { translateBatch } = useTranslateDynamic();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [translatedProducts, setTranslatedProducts] = useState<any[]>([]);
   const { user, isAuthenticated } = useAuth();
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [sortBy, setSortBy] = useState('name');
@@ -49,33 +46,7 @@ export default function AllProductsPage() {
       setLoading(false);
     }
   }
-  useEffect(() => { load(); }, []);
-
-  // Translate product names when language changes or products load
-  useEffect(() => {
-    const translateProducts = async () => {
-      if (products.length === 0 || i18n.language === 'en') {
-        setTranslatedProducts(products);
-        return;
-      }
-
-      try {
-        const names = products.map(p => p.name);
-        const translated = await translateBatch(names, i18n.language);
-        
-        const updated = products.map((p, idx) => ({
-          ...p,
-          name: translated[idx] || p.name,
-        }));
-        setTranslatedProducts(updated);
-      } catch (err) {
-        console.error('Failed to translate products:', err);
-        setTranslatedProducts(products);
-      }
-    };
-
-    translateProducts();
-  }, [products, i18n.language, translateBatch]);
+  useEffect(() => { load(); }, [i18n.language]);
 
   useEffect(() => {
     const loadLists = async () => {
@@ -113,8 +84,7 @@ export default function AllProductsPage() {
   const filteredProducts = useMemo(() => {
     const loweredSearch = searchTerm.trim().toLowerCase();
     const result: any[] = [];
-    // Use translated products if available, otherwise original
-    const displayProducts = translatedProducts.length > 0 ? translatedProducts : products;
+    const displayProducts = products;
     
     for (let i = 0; i < displayProducts.length; i += 1) {
       const p = displayProducts[i];
@@ -130,7 +100,8 @@ export default function AllProductsPage() {
       if (loweredSearch) {
         const nameMatch = p.name.toLowerCase().includes(loweredSearch);
         const descriptionMatch = p.description && p.description.toLowerCase().includes(loweredSearch);
-        const categoryMatch = p.category.toLowerCase().includes(loweredSearch);
+        const categoryMatch = p.category.toLowerCase().includes(loweredSearch)
+          || (p.categoryLabel && p.categoryLabel.toLowerCase().includes(loweredSearch));
         if (!nameMatch && !descriptionMatch && !categoryMatch) {
           continue;
         }
@@ -147,12 +118,23 @@ export default function AllProductsPage() {
       result.sort((a, b) => a.name.localeCompare(b.name));
     }
     return result;
-  }, [translatedProducts, products, categoryFilter, priceRange, inStockOnly, searchTerm, sortBy]);
+  }, [products, categoryFilter, priceRange, inStockOnly, searchTerm, sortBy]);
 
   const categories = useMemo(() => {
-    const list = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
-    list.sort();
-    return list;
+    const labelsByCategory = new Map<string, string>();
+    for (let i = 0; i < products.length; i += 1) {
+      const product = products[i];
+      if (!product?.category) {
+        continue;
+      }
+      if (!labelsByCategory.has(product.category)) {
+        labelsByCategory.set(product.category, product.categoryLabel || product.category);
+      }
+    }
+
+    const entries = Array.from(labelsByCategory.entries()).map(([value, label]) => ({ value, label }));
+    entries.sort((a, b) => a.label.localeCompare(b.label));
+    return entries;
   }, [products]);
 
   const compareItemsFallback = useMemo(() => {
@@ -237,7 +219,7 @@ export default function AllProductsPage() {
             <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className="sort-select">
               <option value="all">{t('products.allCategories')}</option>
               {categories.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
+                <option key={cat.value} value={cat.value}>{cat.label}</option>
               ))}
             </select>
           </div>

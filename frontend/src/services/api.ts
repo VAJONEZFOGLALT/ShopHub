@@ -13,28 +13,20 @@ const cloneRequestInit = (init: RequestInit): RequestInit => ({
 
 const withLeadingSlash = (path: string) => (path.startsWith('/') ? path : `/${path}`);
 
-const getFallbackPath = (path: string) => {
-  if (path.startsWith('/api/')) {
-    return path.replace(/^\/api/, '');
-  }
-  return `/api${path}`;
-};
-
-const fetchWithPathFallback = async (path: string, init: RequestInit) => {
+const withApiPrefix = (path: string) => {
   const normalizedPath = withLeadingSlash(path);
-  const firstResponse = await fetch(`${BASE_URL}${normalizedPath}`, cloneRequestInit(init));
-
-  if (firstResponse.status !== 404) {
-    return firstResponse;
+  if (normalizedPath.startsWith('/api/')) {
+    return normalizedPath;
   }
-
-  const fallbackPath = getFallbackPath(normalizedPath);
-  if (fallbackPath === normalizedPath) {
-    return firstResponse;
-  }
-
-  return fetch(`${BASE_URL}${fallbackPath}`, cloneRequestInit(init));
+  return `/api${normalizedPath}`;
 };
+
+const requestUrl = (path: string) => {
+  const normalizedBase = BASE_URL.replace(/\/api\/?$/, '');
+  return `${normalizedBase}${withApiPrefix(path)}`;
+};
+
+const fetchApi = (path: string, init: RequestInit) => fetch(requestUrl(path), cloneRequestInit(init));
 
 let authToken = '';
 let refreshToken = '';
@@ -49,12 +41,35 @@ if (storedRefresh) {
 
 let isRefreshing = false;
 let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: Error) => void }> = [];
-let productsCache: any[] | null = null;
-let productsCacheExpiresAt = 0;
-let productsRequestInFlight: Promise<any[]> | null = null;
+type ProductsCacheEntry = {
+  data: any[];
+  expiresAt: number;
+};
 
-const PRODUCTS_CACHE_KEY = 'shophub_products_cache_v2';
+const productsCache = new Map<string, ProductsCacheEntry>();
+const productsRequestInFlight = new Map<string, Promise<any[]>>();
+
+const PRODUCTS_CACHE_KEY_PREFIX = 'shophub_products_cache_v4';
+const LEGACY_PRODUCTS_CACHE_KEYS = ['shophub_products_cache_v2', 'shophub_products_cache_v3'];
 const PRODUCTS_CACHE_TTL_MS = 60 * 1000;
+
+const normalizeLanguage = (value: string) => value.toLowerCase().split('-')[0];
+
+const getCurrentLanguage = () => {
+  const explicitLanguage = localStorage.getItem('language');
+  if (explicitLanguage) {
+    return normalizeLanguage(explicitLanguage);
+  }
+
+  const i18nLanguage = localStorage.getItem('i18nextLng');
+  if (i18nLanguage) {
+    return normalizeLanguage(i18nLanguage);
+  }
+
+  return 'hu';
+};
+
+const getProductsCacheKey = (language: string) => `${PRODUCTS_CACHE_KEY_PREFIX}_${normalizeLanguage(language)}`;
 
 const processQueue = (err: Error | null, token: string | null) => {
   failedQueue.forEach(p => {
@@ -83,40 +98,53 @@ const clearTokens = () => {
   localStorage.removeItem('refreshToken');
 };
 
-const loadProductsFromStorage = () => {
-  if (productsCache && Date.now() < productsCacheExpiresAt) {
-    return productsCache;
+const loadProductsFromStorage = (language: string) => {
+  const normalizedLanguage = normalizeLanguage(language);
+  const inMemory = productsCache.get(normalizedLanguage);
+  if (inMemory && Date.now() < inMemory.expiresAt) {
+    return inMemory.data;
   }
+
   try {
-    const raw = localStorage.getItem(PRODUCTS_CACHE_KEY);
+    for (let i = 0; i < LEGACY_PRODUCTS_CACHE_KEYS.length; i += 1) {
+      localStorage.removeItem(LEGACY_PRODUCTS_CACHE_KEYS[i]);
+    }
+
+    const raw = localStorage.getItem(getProductsCacheKey(normalizedLanguage));
     if (!raw) {
       return null;
     }
     const parsed = JSON.parse(raw) as { data?: any[]; expiresAt?: number };
     if (!parsed || !Array.isArray(parsed.data) || typeof parsed.expiresAt !== 'number') {
-      localStorage.removeItem(PRODUCTS_CACHE_KEY);
+      localStorage.removeItem(getProductsCacheKey(normalizedLanguage));
       return null;
     }
     if (Date.now() >= parsed.expiresAt) {
-      localStorage.removeItem(PRODUCTS_CACHE_KEY);
+      localStorage.removeItem(getProductsCacheKey(normalizedLanguage));
       return null;
     }
-    productsCache = parsed.data;
-    productsCacheExpiresAt = parsed.expiresAt;
-    return productsCache;
+
+    productsCache.set(normalizedLanguage, { data: parsed.data, expiresAt: parsed.expiresAt });
+    return parsed.data;
   } catch {
-    localStorage.removeItem(PRODUCTS_CACHE_KEY);
+    localStorage.removeItem(getProductsCacheKey(normalizedLanguage));
     return null;
   }
 };
 
-const saveProductsToStorage = (data: any[]) => {
-  productsCache = data;
-  productsCacheExpiresAt = Date.now() + PRODUCTS_CACHE_TTL_MS;
+const saveProductsToStorage = (language: string, data: any[]) => {
+  const normalizedLanguage = normalizeLanguage(language);
+  const expiresAt = Date.now() + PRODUCTS_CACHE_TTL_MS;
+
+  productsCache.set(normalizedLanguage, {
+    data,
+    expiresAt,
+  });
+
   try {
     localStorage.setItem(
-      PRODUCTS_CACHE_KEY,
-      JSON.stringify({ data, expiresAt: productsCacheExpiresAt }),
+      getProductsCacheKey(normalizedLanguage),
+      JSON.stringify({ data, expiresAt }),
     );
   } catch {
     // best effort cache
@@ -124,10 +152,19 @@ const saveProductsToStorage = (data: any[]) => {
 };
 
 const invalidateProductsCache = () => {
-  productsCache = null;
-  productsCacheExpiresAt = 0;
-  productsRequestInFlight = null;
-  localStorage.removeItem(PRODUCTS_CACHE_KEY);
+  productsCache.clear();
+  productsRequestInFlight.clear();
+
+  for (let i = localStorage.length - 1; i >= 0; i -= 1) {
+    const key = localStorage.key(i);
+    if (!key) {
+      continue;
+    }
+
+    if (key.startsWith(PRODUCTS_CACHE_KEY_PREFIX) || LEGACY_PRODUCTS_CACHE_KEYS.includes(key)) {
+      localStorage.removeItem(key);
+    }
+  }
 };
 
 async function refreshAccessToken(): Promise<string> {
@@ -142,7 +179,7 @@ async function refreshAccessToken(): Promise<string> {
 
   isRefreshing = true;
   try {
-    const res = await fetchWithPathFallback('/auth/refresh', {
+    const res = await fetchApi('/auth/refresh', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
@@ -181,7 +218,7 @@ async function request<T>(path: string, init?: RequestInit, retry = true) {
     Object.assign(requestInit, init);
   }
 
-  const res = await fetchWithPathFallback(path, requestInit);
+  const res = await fetchApi(path, requestInit);
   
   // Handle token expiration - retry with fresh token if available
   if (res.status === 401 && retry && refreshToken) {
@@ -213,6 +250,92 @@ async function request<T>(path: string, init?: RequestInit, retry = true) {
 
   return undefined as unknown as T;
 }
+
+const translateTexts = async (texts: string[], targetLanguage: string) => {
+  const normalizedLanguage = normalizeLanguage(targetLanguage);
+  if (normalizedLanguage === 'en' || texts.length === 0) {
+    return texts;
+  }
+
+  const uniqueValues: string[] = [];
+  const uniqueMap = new Map<string, number>();
+  for (let i = 0; i < texts.length; i += 1) {
+    const value = texts[i];
+    if (!value || uniqueMap.has(value)) {
+      continue;
+    }
+    uniqueMap.set(value, uniqueValues.length);
+    uniqueValues.push(value);
+  }
+
+  if (uniqueValues.length === 0) {
+    return texts;
+  }
+
+  try {
+    const translatedUnique = await request<string[]>('/translations/translate-batch', {
+      method: 'POST',
+      body: JSON.stringify({
+        texts: uniqueValues,
+        sourceLang: 'en',
+        targetLang: normalizedLanguage,
+      }),
+    });
+
+    const translated: string[] = [];
+    for (let i = 0; i < texts.length; i += 1) {
+      const value = texts[i];
+      if (!value) {
+        translated.push(value);
+        continue;
+      }
+
+      const index = uniqueMap.get(value);
+      if (typeof index !== 'number') {
+        translated.push(value);
+        continue;
+      }
+
+      translated.push(translatedUnique[index] || value);
+    }
+
+    return translated;
+  } catch {
+    return texts;
+  }
+};
+
+const translateProducts = async (products: any[], language: string) => {
+  const normalizedLanguage = normalizeLanguage(language);
+  if (products.length === 0) {
+    return products;
+  }
+
+  if (normalizedLanguage === 'en') {
+    return products.map((product) => ({
+      ...product,
+      categoryLabel: product.categoryLabel || product.category,
+    }));
+  }
+
+  const names = products.map((product) => (typeof product?.name === 'string' ? product.name : ''));
+  const descriptions = products.map((product) => (typeof product?.description === 'string' ? product.description : ''));
+  const categories = products.map((product) => (typeof product?.category === 'string' ? product.category : ''));
+
+  const [translatedNames, translatedDescriptions, translatedCategories] = await Promise.all([
+    translateTexts(names, normalizedLanguage),
+    translateTexts(descriptions, normalizedLanguage),
+    translateTexts(categories, normalizedLanguage),
+  ]);
+
+  return products.map((product, index) => ({
+    ...product,
+    name: translatedNames[index] || product.name,
+    description: translatedDescriptions[index] || product.description,
+    category: product.category,
+    categoryLabel: translatedCategories[index] || product.category,
+  }));
+};
 
 export const api = {
   // Auth
@@ -273,28 +396,33 @@ export const api = {
 
   // Products
   getProducts: async () => {
-    const inMemory = productsCache && Date.now() < productsCacheExpiresAt ? productsCache : null;
-    if (inMemory) {
-      return inMemory;
-    }
+    const language = getCurrentLanguage();
 
-    const fromStorage = loadProductsFromStorage();
+    const fromStorage = loadProductsFromStorage(language);
     if (fromStorage) {
       return fromStorage;
     }
 
-    if (!productsRequestInFlight) {
-      productsRequestInFlight = request<any[]>('/products')
-        .then((data) => {
-          saveProductsToStorage(data);
-          return data;
-        })
-        .finally(() => {
-          productsRequestInFlight = null;
-        });
+    const normalizedLanguage = normalizeLanguage(language);
+    const inFlight = productsRequestInFlight.get(normalizedLanguage);
+    if (inFlight) {
+      return inFlight;
     }
 
-    return productsRequestInFlight;
+    const requestPromise = request<any[]>('/products')
+      .then(async (data) => {
+        const list = Array.isArray(data) ? data : [];
+        const translated = await translateProducts(list, normalizedLanguage);
+        saveProductsToStorage(normalizedLanguage, translated);
+        return translated;
+      })
+      .finally(() => {
+        productsRequestInFlight.delete(normalizedLanguage);
+      });
+
+    productsRequestInFlight.set(normalizedLanguage, requestPromise);
+
+    return requestPromise;
   },
   createProduct: async (data: { name: string; description?: string; category: string; price: number; stock: number }) => {
     const created = await request<any>('/products', { method: 'POST', body: JSON.stringify(data) });
