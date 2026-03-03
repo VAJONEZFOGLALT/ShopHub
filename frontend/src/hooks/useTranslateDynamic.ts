@@ -78,7 +78,7 @@ export const useTranslateDynamic = (options: UseTranslateDynamicOptions = {}) =>
           '/api/translations/translate',
           {
             text,
-            sourceLang: 'en',
+            sourceLang: 'auto',
             targetLang: target,
           },
         );
@@ -124,7 +124,7 @@ export const useTranslateDynamic = (options: UseTranslateDynamicOptions = {}) =>
           '/api/translations/translate-batch',
           {
             texts,
-            sourceLang: 'en',
+            sourceLang: 'auto',
             targetLang: target,
           },
         );
