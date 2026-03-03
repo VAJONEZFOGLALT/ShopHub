@@ -9,6 +9,7 @@ import OrderItemsView from './adminpages/OrderItemsView'
 import CartProvider from './contexts/CartContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { ToastProvider } from './contexts/ToastContext'
+import { ModalProvider, useModal } from './contexts/ModalContext'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { ProtectedAdminRoute } from './components/auth/ProtectedAdminRoute'
 import { LoginModal } from './components/auth/LoginModal'
@@ -27,8 +28,6 @@ import OrdersPage from './pages/OrdersPage'
 import { Toast } from './components/Toast'
 import { ScrollToTop } from './components/ScrollToTop'
 import { useTranslation } from 'react-i18next';
-
-type Modals = 'none' | 'login' | 'register'
 
 const SUPPORTED_LANGUAGES = ['hu', 'en', 'es'];
 const normalizeLanguage = (value: string) => value.toLowerCase().split('-')[0];
@@ -98,47 +97,55 @@ function AdminPanel() {
   )
 }
 
-function App() {
-  const [modal, setModal] = useState<Modals>('none')
+function AppContent() {
   const [cartOpen, setCartOpen] = useState(false)
   const [orderConfirmed, setOrderConfirmed] = useState<number | undefined>(undefined)
+  const { modal, openLoginModal, closeModal, switchToRegister, switchToLogin } = useModal()
 
+  return (
+    <Router>
+      <LanguageUrlSync />
+      <ScrollToTop />
+      <CartProvider>
+        <Routes>
+          <Route path="/admin/*" element={<ProtectedAdminRoute><AdminPanel /></ProtectedAdminRoute>} />
+          <Route 
+            path="/shop/*" 
+            element={
+              <Layout onAuth={() => openLoginModal()} onCart={() => setCartOpen(true)}>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="all" element={<AllProductsPage />} />
+                  <Route path="product/:id" element={<ProductDetailPage />} />
+                  <Route path="category/:name" element={<CategoryPage />} />
+                  <Route path="checkout" element={<ProtectedRoute><CheckoutPage onSuccess={setOrderConfirmed} /></ProtectedRoute>} />
+                  <Route path="confirmation" element={<ProtectedRoute><OrderConfirmationPage orderId={orderConfirmed} /></ProtectedRoute>} />
+                  <Route path="profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+                  <Route path="orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </Layout>
+            } 
+          />
+          <Route path="/" element={<Navigate to="/shop" replace />} />
+        </Routes>
+
+        <LoginModal isOpen={modal === 'login'} onClose={() => closeModal()} onSwitchToRegister={() => switchToRegister()} />
+        <RegisterModal isOpen={modal === 'register'} onClose={() => closeModal()} onSwitchToLogin={() => switchToLogin()} />
+        <CartModal isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+        <Toast />
+      </CartProvider>
+    </Router>
+  )
+}
+
+function App() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <Router>
-          <LanguageUrlSync />
-          <ScrollToTop />
-          <CartProvider>
-            <Routes>
-              <Route path="/admin/*" element={<ProtectedAdminRoute><AdminPanel /></ProtectedAdminRoute>} />
-              <Route 
-                path="/shop/*" 
-                element={
-                  <Layout onAuth={() => setModal('login')} onCart={() => setCartOpen(true)}>
-                    <Routes>
-                      <Route path="/" element={<HomePage />} />
-                      <Route path="all" element={<AllProductsPage />} />
-                      <Route path="product/:id" element={<ProductDetailPage />} />
-                      <Route path="category/:name" element={<CategoryPage />} />
-                      <Route path="checkout" element={<ProtectedRoute><CheckoutPage onSuccess={setOrderConfirmed} /></ProtectedRoute>} />
-                      <Route path="confirmation" element={<ProtectedRoute><OrderConfirmationPage orderId={orderConfirmed} /></ProtectedRoute>} />
-                      <Route path="profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-                      <Route path="orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
-                      <Route path="*" element={<NotFoundPage />} />
-                    </Routes>
-                  </Layout>
-                } 
-              />
-              <Route path="/" element={<Navigate to="/shop" replace />} />
-            </Routes>
-
-            <LoginModal isOpen={modal === 'login'} onClose={() => setModal('none')} onSwitchToRegister={() => setModal('register')} />
-            <RegisterModal isOpen={modal === 'register'} onClose={() => setModal('none')} onSwitchToLogin={() => setModal('login')} />
-            <CartModal isOpen={cartOpen} onClose={() => setCartOpen(false)} />
-            <Toast />
-          </CartProvider>
-        </Router>
+        <ModalProvider>
+          <AppContent />
+        </ModalProvider>
       </ToastProvider>
     </AuthProvider>
   )
