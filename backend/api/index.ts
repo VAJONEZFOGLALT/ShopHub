@@ -3,8 +3,7 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from '../src/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import * as express from 'express';
-import { Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 
 let cachedServer: express.Express;
 
@@ -17,6 +16,7 @@ async function bootstrapServer(): Promise<express.Express> {
 
     const origins = [
       process.env.FRONTEND_URL,
+      'https://webshopfrontend.vercel.app',
       'http://localhost:5173',
       'http://localhost:5174',
     ].filter((origin): origin is string => Boolean(origin));
@@ -24,7 +24,7 @@ async function bootstrapServer(): Promise<express.Express> {
     app.enableCors({
       origin: origins,
       credentials: true,
-      methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
+      methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
       optionsSuccessStatus: 200,
     });
