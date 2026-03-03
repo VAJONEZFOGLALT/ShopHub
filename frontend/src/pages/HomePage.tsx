@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { useToast } from '../contexts/ToastContext';
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -80,15 +82,15 @@ export default function HomePage() {
       {/* Hero Banner */}
       <section className="hero-banner">
         <div className="hero-content">
-          <h1>Welcome to ShopHub</h1>
-          <p>Discover amazing products across all categories</p>
-          <button onClick={handleShopNow} className="btn-primary">Shop Now</button>
+          <h1>{t('home.welcome')}</h1>
+          <p>{t('home.subtitle')}</p>
+          <button onClick={handleShopNow} className="btn-primary">{t('home.shopNow')}</button>
         </div>
       </section>
 
       {/* Categories Showcase */}
       <section className="categories-showcase">
-        <h2>Featured Categories</h2>
+        <h2>{t('home.featuredCategories')}</h2>
         <div className="categories-grid">
           {categories.map((cat) => (
             <div key={cat} className="category-card" onClick={() => navigate(`/shop/category/${cat}`)}>
@@ -101,9 +103,9 @@ export default function HomePage() {
 
       {/* Featured Products */}
       <section className="featured-section">
-        <h2>Featured Products</h2>
+        <h2>{t('home.featuredProducts')}</h2>
         {loading ? (
-          <p>Loading…</p>
+          <p>{t('common.loading')}</p>
         ) : (
           <>
             <div className="carousel-container">
@@ -132,7 +134,7 @@ export default function HomePage() {
           </>
         )}
         <div className="featured-footer">
-          <button onClick={handleViewAll} className="btn-secondary">View All Products</button>
+          <button onClick={handleViewAll} className="btn-secondary">{t('home.viewAllProducts')}</button>
         </div>
       </section>
     </div>
