@@ -15,26 +15,8 @@ export declare class ProductsController {
         stock: number;
         image: string | null;
     }>;
-    findAll(lang?: string): Promise<{
-        categoryLabel: string;
-        name: string;
-        id: number;
-        description: string | null;
-        category: string;
-        price: number;
-        stock: number;
-        image: string | null;
-    }[]>;
-    findOne(id: string, lang?: string): Promise<{
-        categoryLabel: string;
-        name: string;
-        id: number;
-        description: string | null;
-        category: string;
-        price: number;
-        stock: number;
-        image: string | null;
-    } | null>;
+    findAll(lang?: string): Promise<any[]>;
+    findOne(id: string, lang?: string): Promise<any>;
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
         name: string;
         id: number;

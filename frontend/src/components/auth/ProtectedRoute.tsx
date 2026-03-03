@@ -1,23 +1,23 @@
 import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { LoadingSpinner } from '../LoadingSpinner';
-import { useModal } from '../../contexts/ModalContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  onAuthNeeded?: () => void;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, onAuthNeeded }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading } = useAuth();
-  const { openLoginModal } = useModal();
 
-  let content: React.ReactNode = children;
   if (isLoading) {
-    content = <LoadingSpinner fullScreen={true} />;
-  } else if (!isAuthenticated) {
-    openLoginModal();
-    content = null;
+    return <LoadingSpinner fullScreen={true} />;
   }
 
-  return <>{content}</>;
+  if (!isAuthenticated) {
+    onAuthNeeded?.();
+    return null;
+  }
+
+  return <>{children}</>;
 }

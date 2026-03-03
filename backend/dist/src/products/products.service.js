@@ -16,6 +16,9 @@ const libretranslate_service_1 = require("../translations/libretranslate.service
 let ProductsService = class ProductsService {
     prisma;
     translateService;
+    listCache = new Map();
+    itemCache = new Map();
+    cacheTtlMs = 60 * 1000;
     constructor(prisma, translateService) {
         this.prisma = prisma;
         this.translateService = translateService;
@@ -23,16 +26,44 @@ let ProductsService = class ProductsService {
     normalizeLanguage(lang) {
         return lang.toLowerCase().split('-')[0];
     }
+    getFromCache(cache, key) {
+        const entry = cache.get(key);
+        if (!entry) {
+            return null;
+        }
+        if (Date.now() > entry.expiresAt) {
+            cache.delete(key);
+            return null;
+        }
+        return entry.data;
+    }
+    setCache(cache, key, data) {
+        cache.set(key, {
+            expiresAt: Date.now() + this.cacheTtlMs,
+            data,
+        });
+    }
+    clearProductCaches() {
+        this.listCache.clear();
+        this.itemCache.clear();
+    }
     async findAll(language) {
         try {
+            const normalizedLang = this.normalizeLanguage(language || 'hu');
+            const listCacheKey = `list:${normalizedLang}`;
+            const cachedList = this.getFromCache(this.listCache, listCacheKey);
+            if (cachedList) {
+                return cachedList;
+            }
             const products = await this.prisma.products.findMany();
-            if (!language || this.normalizeLanguage(language) === 'hu') {
-                return products.map((product) => ({
+            if (normalizedLang === 'hu') {
+                const originalProducts = products.map((product) => ({
                     ...product,
                     categoryLabel: product.category,
                 }));
+                this.setCache(this.listCache, listCacheKey, originalProducts);
+                return originalProducts;
             }
-            const normalizedLang = this.normalizeLanguage(language);
             const names = products.map((p) => p.name || '');
             const descriptions = products.map((p) => p.description || '');
             const categories = products.map((p) => p.category || '');
@@ -41,13 +72,15 @@ let ProductsService = class ProductsService {
                 this.translateService.translateBatch(descriptions, 'hu', normalizedLang),
                 this.translateService.translateBatch(categories, 'hu', normalizedLang),
             ]);
-            return products.map((product, index) => ({
+            const translatedProducts = products.map((product, index) => ({
                 ...product,
                 name: translatedNames[index] || product.name,
                 description: translatedDescriptions[index] || product.description,
                 category: product.category,
                 categoryLabel: translatedCategories[index] || product.category,
             }));
+            this.setCache(this.listCache, listCacheKey, translatedProducts);
+            return translatedProducts;
         }
         catch (error) {
             console.error('Products findAll error:', error);
@@ -56,7 +89,9 @@ let ProductsService = class ProductsService {
     }
     async create(createProductDto) {
         try {
-            return await this.prisma.products.create({ data: createProductDto });
+            const created = await this.prisma.products.create({ data: createProductDto });
+            this.clearProductCaches();
+            return created;
         }
         catch (error) {
             console.error('Products create error:', error);
@@ -65,29 +100,38 @@ let ProductsService = class ProductsService {
     }
     async findOne(id, language) {
         try {
+            const normalizedLang = this.normalizeLanguage(language || 'hu');
+            const itemCacheKey = `item:${id}:${normalizedLang}`;
+            const cachedItem = this.getFromCache(this.itemCache, itemCacheKey);
+            if (cachedItem) {
+                return cachedItem;
+            }
             const product = await this.prisma.products.findUnique({ where: { id } });
             if (!product) {
                 return null;
             }
-            if (!language || this.normalizeLanguage(language) === 'hu') {
-                return {
+            if (normalizedLang === 'hu') {
+                const originalProduct = {
                     ...product,
                     categoryLabel: product.category,
                 };
+                this.setCache(this.itemCache, itemCacheKey, originalProduct);
+                return originalProduct;
             }
-            const normalizedLang = this.normalizeLanguage(language);
             const [translatedName, translatedDescription, translatedCategory] = await Promise.all([
                 this.translateService.translate(product.name || '', 'hu', normalizedLang),
                 this.translateService.translate(product.description || '', 'hu', normalizedLang),
                 this.translateService.translate(product.category || '', 'hu', normalizedLang),
             ]);
-            return {
+            const translatedProduct = {
                 ...product,
                 name: translatedName.translatedText || product.name,
                 description: translatedDescription.translatedText || product.description,
                 category: product.category,
                 categoryLabel: translatedCategory.translatedText || product.category,
             };
+            this.setCache(this.itemCache, itemCacheKey, translatedProduct);
+            return translatedProduct;
         }
         catch (error) {
             console.error('Products findOne error:', error);
@@ -96,7 +140,9 @@ let ProductsService = class ProductsService {
     }
     async update(id, updateProductDto) {
         try {
-            return await this.prisma.products.update({ where: { id }, data: updateProductDto });
+            const updated = await this.prisma.products.update({ where: { id }, data: updateProductDto });
+            this.clearProductCaches();
+            return updated;
         }
         catch (error) {
             console.error('Products update error:', error);
@@ -105,7 +151,9 @@ let ProductsService = class ProductsService {
     }
     async remove(id) {
         try {
-            return await this.prisma.products.delete({ where: { id } });
+            const deleted = await this.prisma.products.delete({ where: { id } });
+            this.clearProductCaches();
+            return deleted;
         }
         catch (error) {
             console.error('Products remove error:', error);
