@@ -37,7 +37,7 @@ export default function AllProductsPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await api.getProducts();
+      const data = await api.getProducts(i18n.language);
       setProducts(Array.isArray(data) ? data : []);
     } catch (e: any) {
       setError(e.message);

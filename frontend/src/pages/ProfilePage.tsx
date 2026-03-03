@@ -9,7 +9,7 @@ import { getAvatarUrl, getProductImageUrl } from '../utils/imageOptimization';
 import { useToast } from '../contexts/ToastContext';
 
 export default function ProfilePage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, updateProfile, setUserData } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -37,14 +37,14 @@ export default function ProfilePage() {
     const load = async () => {
       setLoadingProducts(true);
       try {
-        const data = await api.getProducts();
+        const data = await api.getProducts(i18n.language);
         setProducts(data);
       } finally {
         setLoadingProducts(false);
       }
     };
     load();
-  }, []);
+  }, [i18n.language]);
 
   useEffect(() => {
     const loadOrders = async () => {

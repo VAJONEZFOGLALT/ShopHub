@@ -1,10 +1,14 @@
 import { PrismaService } from '../prisma.service';
+import { LibreTranslateService } from '../translations/libretranslate.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 export declare class ProductsService {
     private readonly prisma;
-    constructor(prisma: PrismaService);
-    findAll(): Promise<{
+    private readonly translateService;
+    constructor(prisma: PrismaService, translateService: LibreTranslateService);
+    private normalizeLanguage;
+    findAll(language?: string): Promise<{
+        categoryLabel: string;
         name: string;
         id: number;
         description: string | null;
@@ -22,7 +26,8 @@ export declare class ProductsService {
         stock: number;
         image: string | null;
     }>;
-    findOne(id: number): Promise<{
+    findOne(id: number, language?: string): Promise<{
+        categoryLabel: string;
         name: string;
         id: number;
         description: string | null;

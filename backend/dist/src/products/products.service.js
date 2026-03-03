@@ -12,14 +12,42 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma.service");
+const libretranslate_service_1 = require("../translations/libretranslate.service");
 let ProductsService = class ProductsService {
     prisma;
-    constructor(prisma) {
+    translateService;
+    constructor(prisma, translateService) {
         this.prisma = prisma;
+        this.translateService = translateService;
     }
-    async findAll() {
+    normalizeLanguage(lang) {
+        return lang.toLowerCase().split('-')[0];
+    }
+    async findAll(language) {
         try {
-            return await this.prisma.products.findMany();
+            const products = await this.prisma.products.findMany();
+            if (!language || this.normalizeLanguage(language) === 'en') {
+                return products.map((product) => ({
+                    ...product,
+                    categoryLabel: product.category,
+                }));
+            }
+            const normalizedLang = this.normalizeLanguage(language);
+            const names = products.map((p) => p.name || '');
+            const descriptions = products.map((p) => p.description || '');
+            const categories = products.map((p) => p.category || '');
+            const [translatedNames, translatedDescriptions, translatedCategories] = await Promise.all([
+                this.translateService.translateBatch(names, 'en', normalizedLang),
+                this.translateService.translateBatch(descriptions, 'en', normalizedLang),
+                this.translateService.translateBatch(categories, 'en', normalizedLang),
+            ]);
+            return products.map((product, index) => ({
+                ...product,
+                name: translatedNames[index] || product.name,
+                description: translatedDescriptions[index] || product.description,
+                category: product.category,
+                categoryLabel: translatedCategories[index] || product.category,
+            }));
         }
         catch (error) {
             console.error('Products findAll error:', error);
@@ -35,9 +63,31 @@ let ProductsService = class ProductsService {
             throw new common_1.BadRequestException(`Failed to create product: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
-    async findOne(id) {
+    async findOne(id, language) {
         try {
-            return await this.prisma.products.findUnique({ where: { id } });
+            const product = await this.prisma.products.findUnique({ where: { id } });
+            if (!product) {
+                return null;
+            }
+            if (!language || this.normalizeLanguage(language) === 'en') {
+                return {
+                    ...product,
+                    categoryLabel: product.category,
+                };
+            }
+            const normalizedLang = this.normalizeLanguage(language);
+            const [translatedName, translatedDescription, translatedCategory] = await Promise.all([
+                this.translateService.translate(product.name || '', 'en', normalizedLang),
+                this.translateService.translate(product.description || '', 'en', normalizedLang),
+                this.translateService.translate(product.category || '', 'en', normalizedLang),
+            ]);
+            return {
+                ...product,
+                name: translatedName.translatedText || product.name,
+                description: translatedDescription.translatedText || product.description,
+                category: product.category,
+                categoryLabel: translatedCategory.translatedText || product.category,
+            };
         }
         catch (error) {
             console.error('Products findOne error:', error);
@@ -66,6 +116,7 @@ let ProductsService = class ProductsService {
 exports.ProductsService = ProductsService;
 exports.ProductsService = ProductsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        libretranslate_service_1.LibreTranslateService])
 ], ProductsService);
 //# sourceMappingURL=products.service.js.map

@@ -29,11 +29,11 @@ let ProductsController = class ProductsController {
     create(createProductDto) {
         return this.productsService.create(createProductDto);
     }
-    findAll() {
-        return this.productsService.findAll();
+    findAll(lang) {
+        return this.productsService.findAll(lang);
     }
-    findOne(id) {
-        return this.productsService.findOne(+id);
+    findOne(id, lang) {
+        return this.productsService.findOne(+id, lang);
     }
     update(id, updateProductDto) {
         return this.productsService.update(+id, updateProductDto);
@@ -56,15 +56,17 @@ __decorate([
 ], ProductsController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)('lang')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Query)('lang')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "findOne", null);
 __decorate([

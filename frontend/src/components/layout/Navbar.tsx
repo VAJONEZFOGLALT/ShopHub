@@ -27,7 +27,7 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
   }, [theme]);
 
   useEffect(() => {
-    api.getProducts().then(p => {
+    api.getProducts(i18n.language).then(p => {
       setProducts(p);
       const cats: Record<string, boolean> = {};
       const list: string[] = [];

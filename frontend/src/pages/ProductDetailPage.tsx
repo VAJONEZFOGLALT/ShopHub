@@ -32,7 +32,7 @@ export default function ProductDetailPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const products = await api.getProducts();
+        const products = await api.getProducts(i18n.language);
         let found: any = null;
         const targetId = Number(id);
         for (let i = 0; i < products.length; i += 1) {

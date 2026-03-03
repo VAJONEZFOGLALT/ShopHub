@@ -33,7 +33,7 @@ export default function HomePage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const prods = await api.getProducts();
+        const prods = await api.getProducts(i18n.language);
 
         // Safety check: ensure prods is an array
         if (!Array.isArray(prods)) {

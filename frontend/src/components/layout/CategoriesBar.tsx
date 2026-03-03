@@ -11,7 +11,7 @@ export default function CategoriesBar() {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const products = await api.getProducts();
+        const products = await api.getProducts(i18n.language);
         const seen: Record<string, boolean> = {};
         const list: Array<{ key: string; label: string }> = [];
         for (let i = 0; i < products.length; i += 1) {
