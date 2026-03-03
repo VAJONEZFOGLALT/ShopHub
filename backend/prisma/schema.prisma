@@ -169,3 +169,25 @@ model Address {
 
   @@index([userId])
 }
+enum SupportedLanguage {
+  HU
+  EN
+  DE
+  FR
+  ES
+  PL
+  CZ
+  IT
+}
+
+model Translation {
+  id        Int               @id @default(autoincrement())
+  key       String            // e.g., "products.1.name"
+  language  SupportedLanguage
+  value     String            // translated text
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@unique([key, language])
+  @@index([language])
+}

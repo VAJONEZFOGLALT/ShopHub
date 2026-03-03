@@ -398,7 +398,8 @@ export const ModelName = {
   CompareItems: 'CompareItems',
   Orders: 'Orders',
   OrderItems: 'OrderItems',
-  Address: 'Address'
+  Address: 'Address',
+  Translation: 'Translation'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -414,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "users" | "products" | "reviews" | "wishlist" | "recentlyViewed" | "compareItems" | "orders" | "orderItems" | "address"
+    modelProps: "users" | "products" | "reviews" | "wishlist" | "recentlyViewed" | "compareItems" | "orders" | "orderItems" | "address" | "translation"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1012,6 +1013,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Translation: {
+      payload: Prisma.$TranslationPayload<ExtArgs>
+      fields: Prisma.TranslationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TranslationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TranslationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload>
+        }
+        findFirst: {
+          args: Prisma.TranslationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TranslationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload>
+        }
+        findMany: {
+          args: Prisma.TranslationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload>[]
+        }
+        create: {
+          args: Prisma.TranslationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload>
+        }
+        createMany: {
+          args: Prisma.TranslationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.TranslationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload>
+        }
+        update: {
+          args: Prisma.TranslationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload>
+        }
+        deleteMany: {
+          args: Prisma.TranslationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TranslationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.TranslationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload>
+        }
+        aggregate: {
+          args: Prisma.TranslationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTranslation>
+        }
+        groupBy: {
+          args: Prisma.TranslationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TranslationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TranslationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TranslationCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1162,6 +1229,18 @@ export const AddressScalarFieldEnum = {
 export type AddressScalarFieldEnum = (typeof AddressScalarFieldEnum)[keyof typeof AddressScalarFieldEnum]
 
 
+export const TranslationScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  language: 'language',
+  value: 'value',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TranslationScalarFieldEnum = (typeof TranslationScalarFieldEnum)[keyof typeof TranslationScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1229,6 +1308,14 @@ export const AddressOrderByRelevanceFieldEnum = {
 export type AddressOrderByRelevanceFieldEnum = (typeof AddressOrderByRelevanceFieldEnum)[keyof typeof AddressOrderByRelevanceFieldEnum]
 
 
+export const TranslationOrderByRelevanceFieldEnum = {
+  key: 'key',
+  value: 'value'
+} as const
+
+export type TranslationOrderByRelevanceFieldEnum = (typeof TranslationOrderByRelevanceFieldEnum)[keyof typeof TranslationOrderByRelevanceFieldEnum]
+
+
 
 /**
  * Field references
@@ -1281,6 +1368,13 @@ export type EnumCourierServiceFieldRefInput<$PrismaModel> = FieldRefInputType<$P
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'SupportedLanguage'
+ */
+export type EnumSupportedLanguageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportedLanguage'>
     
 
 /**
@@ -1379,6 +1473,7 @@ export type GlobalOmitConfig = {
   orders?: Prisma.OrdersOmit
   orderItems?: Prisma.OrderItemsOmit
   address?: Prisma.AddressOmit
+  translation?: Prisma.TranslationOmit
 }
 
 /* Types for Logging */
