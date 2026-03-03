@@ -52,7 +52,7 @@ export default function ProductDetailPage() {
       }
     };
     load();
-  }, [id, i18n.language]);
+  }, [id, i18n.language, showToast]);
 
   useEffect(() => {
     const loadLists = async () => {

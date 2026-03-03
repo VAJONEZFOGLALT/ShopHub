@@ -26,7 +26,7 @@ let ProductsService = class ProductsService {
     async findAll(language) {
         try {
             const products = await this.prisma.products.findMany();
-            if (!language || this.normalizeLanguage(language) === 'en') {
+            if (!language || this.normalizeLanguage(language) === 'hu') {
                 return products.map((product) => ({
                     ...product,
                     categoryLabel: product.category,
@@ -37,9 +37,9 @@ let ProductsService = class ProductsService {
             const descriptions = products.map((p) => p.description || '');
             const categories = products.map((p) => p.category || '');
             const [translatedNames, translatedDescriptions, translatedCategories] = await Promise.all([
-                this.translateService.translateBatch(names, 'en', normalizedLang),
-                this.translateService.translateBatch(descriptions, 'en', normalizedLang),
-                this.translateService.translateBatch(categories, 'en', normalizedLang),
+                this.translateService.translateBatch(names, 'hu', normalizedLang),
+                this.translateService.translateBatch(descriptions, 'hu', normalizedLang),
+                this.translateService.translateBatch(categories, 'hu', normalizedLang),
             ]);
             return products.map((product, index) => ({
                 ...product,
@@ -69,7 +69,7 @@ let ProductsService = class ProductsService {
             if (!product) {
                 return null;
             }
-            if (!language || this.normalizeLanguage(language) === 'en') {
+            if (!language || this.normalizeLanguage(language) === 'hu') {
                 return {
                     ...product,
                     categoryLabel: product.category,
@@ -77,9 +77,9 @@ let ProductsService = class ProductsService {
             }
             const normalizedLang = this.normalizeLanguage(language);
             const [translatedName, translatedDescription, translatedCategory] = await Promise.all([
-                this.translateService.translate(product.name || '', 'en', normalizedLang),
-                this.translateService.translate(product.description || '', 'en', normalizedLang),
-                this.translateService.translate(product.category || '', 'en', normalizedLang),
+                this.translateService.translate(product.name || '', 'hu', normalizedLang),
+                this.translateService.translate(product.description || '', 'hu', normalizedLang),
+                this.translateService.translate(product.category || '', 'hu', normalizedLang),
             ]);
             return {
                 ...product,

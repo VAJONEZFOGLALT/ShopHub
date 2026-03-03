@@ -38,6 +38,8 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
         }
       });
       setCategories(list.sort());
+    }).catch(() => {
+      // Silent fail for navbar categories
     });
   }, [i18n.language]);
 
