@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import styles from './LanguageSwitcher.module.css';
 
+const normalizeLanguage = (value: string) => value.toLowerCase().split('-')[0];
+
 export const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
 
@@ -11,12 +13,19 @@ export const LanguageSwitcher = () => {
   ];
 
   const handleLanguageChange = (langCode: string) => {
-    i18n.changeLanguage(langCode);
+    const params = new URLSearchParams(window.location.search);
+    params.set('lang', langCode);
+    const query = params.toString();
+    const nextUrl = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`;
+    window.history.replaceState(null, '', nextUrl);
+
+    void i18n.changeLanguage(langCode);
     localStorage.setItem('language', langCode);
   };
 
-  const selectedLanguage = languages.some((lang) => lang.code === i18n.language)
-    ? i18n.language
+  const currentLanguage = normalizeLanguage(i18n.resolvedLanguage || i18n.language || 'hu');
+  const selectedLanguage = languages.some((lang) => lang.code === currentLanguage)
+    ? currentLanguage
     : 'hu';
 
   return (

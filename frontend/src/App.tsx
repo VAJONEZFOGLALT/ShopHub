@@ -31,6 +31,7 @@ import { useTranslation } from 'react-i18next';
 type Modals = 'none' | 'login' | 'register'
 
 const SUPPORTED_LANGUAGES = ['hu', 'en', 'es'];
+const normalizeLanguage = (value: string) => value.toLowerCase().split('-')[0];
 
 function LanguageUrlSync() {
   const { i18n } = useTranslation();
@@ -39,16 +40,18 @@ function LanguageUrlSync() {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const urlLang = params.get('lang');
+    const rawUrlLang = params.get('lang');
+    const urlLang = rawUrlLang ? normalizeLanguage(rawUrlLang) : null;
+    const currentI18nLanguage = normalizeLanguage(i18n.language || 'hu');
     const isUrlLangSupported = !!urlLang && SUPPORTED_LANGUAGES.includes(urlLang);
 
-    if (isUrlLangSupported && urlLang !== i18n.language) {
+    if (isUrlLangSupported && urlLang !== currentI18nLanguage) {
       void i18n.changeLanguage(urlLang);
       localStorage.setItem('language', urlLang);
       return;
     }
 
-    const currentLang = SUPPORTED_LANGUAGES.includes(i18n.language) ? i18n.language : 'hu';
+    const currentLang = SUPPORTED_LANGUAGES.includes(currentI18nLanguage) ? currentI18nLanguage : 'hu';
     if (!isUrlLangSupported || urlLang !== currentLang) {
       params.set('lang', currentLang);
       navigate(`${location.pathname}?${params.toString()}`, { replace: true });

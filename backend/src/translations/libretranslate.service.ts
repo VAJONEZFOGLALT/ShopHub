@@ -15,6 +15,7 @@ export interface TranslateResponse {
 export class LibreTranslateService {
   private readonly apiUrl = process.env.LIBRETRANSLATE_API_URL || 'https://api.libretranslate.de';
   private readonly apiKey = process.env.LIBRETRANSLATE_API_KEY;
+  private readonly myMemoryApiUrl = 'https://api.mymemory.translated.net/get';
 
   private readonly languageMap: Record<string, string> = {
     hu: 'hu',
@@ -57,13 +58,42 @@ export class LibreTranslateService {
         translatedText: response.data.translatedText,
       };
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new BadRequestException(
-          `Translation failed: ${error.response?.data?.message || error.message}`,
-        );
+      try {
+        const fallback = await this.translateWithMyMemory(text, source, target);
+        return {
+          translatedText: fallback,
+        };
+      } catch (fallbackError) {
+        if (axios.isAxiosError(error)) {
+          throw new BadRequestException(
+            `Translation failed: ${error.response?.data?.message || error.message}`,
+          );
+        }
+        if (axios.isAxiosError(fallbackError)) {
+          throw new BadRequestException(
+            `Translation failed: ${fallbackError.response?.data?.message || fallbackError.message}`,
+          );
+        }
+        throw new BadRequestException('Translation service error');
       }
-      throw new BadRequestException('Translation service error');
     }
+  }
+
+  private async translateWithMyMemory(text: string, source: string, target: string): Promise<string> {
+    const response = await axios.get(this.myMemoryApiUrl, {
+      params: {
+        q: text,
+        langpair: `${source}|${target}`,
+      },
+      timeout: 10000,
+    });
+
+    const translated = response?.data?.responseData?.translatedText;
+    if (typeof translated !== 'string' || translated.trim().length === 0) {
+      throw new Error('MyMemory returned empty translation');
+    }
+
+    return translated;
   }
 
   async translateBatch(
