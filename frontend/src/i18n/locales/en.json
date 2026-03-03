@@ -4,12 +4,17 @@
     "products": "Products",
     "cart": "Cart",
     "account": "My Account",
+    "myProfile": "My Profile",
+    "myOrders": "My Orders",
+    "admin": "Admin",
+    "all": "All",
     "logout": "Logout",
     "login": "Login",
     "register": "Register",
     "search": "Search",
     "language": "Language",
-    "currency": "Currency"
+    "currency": "Currency",
+    "footerRights": "Professional Shop. All rights reserved."
   },
   "products": {
     "title": "Products",

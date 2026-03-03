@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { api } from '../../services/api';
 import { getThumbnailUrl } from '../../utils/imageOptimization';
 
 export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart?: () => void }) {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -80,7 +82,7 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
 
         <div className="navbar-search-wrapper" ref={searchRef}>
           <form className="navbar-search" onSubmit={handleSearch}>
-            <input type="text" placeholder="Search..." value={searchQuery} onChange={e => handleSearchInput(e.target.value)} className="search-input" />
+            <input type="text" placeholder={`${t('common.search')}...`} value={searchQuery} onChange={e => handleSearchInput(e.target.value)} className="search-input" />
             <button type="submit" className="search-btn">🔍</button>
           </form>
           {showSearch && searchResults.length > 0 && (
@@ -109,7 +111,7 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
 
           <div className="navbar-user" ref={userRef}>
             <button className="navbar-user-btn" onClick={() => setShowUser(!showUser)}>
-              👤 {user?.username || 'Account'} ▼
+              👤 {user?.username || t('common.account')} ▼
             </button>
             {showUser && (
               <div className="dropdown-menu user-menu">
@@ -120,16 +122,16 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
                       <small>{user.email}</small>
                     </div>
                     <div className="dropdown-divider"></div>
-                    <Link to="/shop/profile" className="dropdown-item" onClick={() => setShowUser(false)}>My Profile</Link>
-                    <Link to="/shop/orders" className="dropdown-item" onClick={() => setShowUser(false)}>My Orders</Link>
-                    {user.role === 'ADMIN' && <Link to="/admin" className="dropdown-item" onClick={() => setShowUser(false)}>⚡ Admin</Link>}
+                    <Link to="/shop/profile" className="dropdown-item" onClick={() => setShowUser(false)}>{t('common.myProfile')}</Link>
+                    <Link to="/shop/orders" className="dropdown-item" onClick={() => setShowUser(false)}>{t('common.myOrders')}</Link>
+                    {user.role === 'ADMIN' && <Link to="/admin" className="dropdown-item" onClick={() => setShowUser(false)}>⚡ {t('common.admin')}</Link>}
                     <div className="dropdown-divider"></div>
-                    <button className="dropdown-item logout-btn" onClick={() => { logout(); setShowUser(false); navigate('/shop'); }}>Logout</button>
+                    <button className="dropdown-item logout-btn" onClick={() => { logout(); setShowUser(false); navigate('/shop'); }}>{t('common.logout')}</button>
                   </>
                 ) : (
                   <>
-                    <button className="dropdown-item" onClick={() => { onAuth?.(); setShowUser(false); }}>Login</button>
-                    <button className="dropdown-item" onClick={() => { onAuth?.(); setShowUser(false); }}>Register</button>
+                    <button className="dropdown-item" onClick={() => { onAuth?.(); setShowUser(false); }}>{t('common.login')}</button>
+                    <button className="dropdown-item" onClick={() => { onAuth?.(); setShowUser(false); }}>{t('common.register')}</button>
                   </>
                 )}
               </div>
@@ -140,7 +142,7 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
 
       <div className="categories-bar">
         <div className="categories-bar-container">
-          <Link to="/shop/all" style={{ fontWeight: 600 }}>All</Link>
+          <Link to="/shop/all" style={{ fontWeight: 600 }}>{t('common.all')}</Link>
           {categories.map(cat => <Link key={cat} to={`/shop/category/${cat}`}>{cat}</Link>)}
         </div>
       </div>
