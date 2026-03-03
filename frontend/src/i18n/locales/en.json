@@ -1,0 +1,28 @@
+{
+  "common": {
+    "home": "Home",
+    "products": "Products",
+    "cart": "Cart",
+    "account": "My Account",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register",
+    "search": "Search",
+    "language": "Language",
+    "currency": "Currency"
+  },
+  "products": {
+    "title": "Products",
+    "price": "Price",
+    "stock": "Stock",
+    "addToCart": "Add to Cart",
+    "viewDetails": "View Details",
+    "noProducts": "No products found"
+  },
+  "footer": {
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  }
+}
