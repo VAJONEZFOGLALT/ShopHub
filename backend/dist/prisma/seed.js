@@ -66,6 +66,15 @@ const statuses = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
 const couriers = ['UPS', 'PACKETA', 'DPD', 'INPOST'];
 async function main() {
     console.log('🌱 Starting database seed...\n');
+    console.log('🧹 Clearing old data...');
+    await prisma.reviews.deleteMany({});
+    await prisma.orderItems.deleteMany({});
+    await prisma.orders.deleteMany({});
+    await prisma.wishlist.deleteMany({});
+    await prisma.compareItems.deleteMany({});
+    await prisma.recentlyViewed.deleteMany({});
+    await prisma.products.deleteMany({});
+    console.log('✓ Old data cleared\n');
     const createdUsers = [];
     for (const userData of users) {
         const hashedPassword = await bcrypt.hash(userData.password, 10);
@@ -113,35 +122,17 @@ async function main() {
         'Nagy asztalterítő egér és billentyűzet alá',
     ];
     for (let i = 0; i < productNames.length; i++) {
-        const existing = await prisma.products.findFirst({
-            where: { name: productNames[i] },
+        const created = await prisma.products.create({
+            data: {
+                name: productNames[i],
+                description: productDescriptions[i],
+                category: randomElement(categories),
+                price: random(15, 500),
+                stock: random(10, 200),
+                image: null,
+            },
         });
-        if (existing) {
-            const updated = await prisma.products.update({
-                where: { id: existing.id },
-                data: {
-                    description: productDescriptions[i],
-                    category: randomElement(categories),
-                    price: random(15, 500),
-                    stock: random(10, 200),
-                    image: null,
-                },
-            });
-            createdProducts.push(updated);
-        }
-        else {
-            const created = await prisma.products.create({
-                data: {
-                    name: productNames[i],
-                    description: productDescriptions[i],
-                    category: randomElement(categories),
-                    price: random(15, 500),
-                    stock: random(10, 200),
-                    image: null,
-                },
-            });
-            createdProducts.push(created);
-        }
+        createdProducts.push(created);
     }
     console.log(`✓ Created ${createdProducts.length} products\n`);
     const addressExamples = [

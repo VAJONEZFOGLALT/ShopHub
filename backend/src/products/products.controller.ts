@@ -9,6 +9,7 @@ import {
   UploadedFile,
   UseInterceptors,
   Query,
+  Header,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductsService } from './products.service';
@@ -29,11 +30,17 @@ export class ProductsController {
   }
 
   @Get()
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  @Header('Pragma', 'no-cache')
+  @Header('Expires', '0')
   findAll(@Query('lang') lang?: string) {
     return this.productsService.findAll(lang);
   }
 
   @Get(':id')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  @Header('Pragma', 'no-cache')
+  @Header('Expires', '0')
   findOne(@Param('id') id: string, @Query('lang') lang?: string) {
     return this.productsService.findOne(+id, lang);
   }

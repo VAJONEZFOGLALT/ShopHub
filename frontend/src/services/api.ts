@@ -131,6 +131,7 @@ async function request<T>(path: string, init?: RequestInit, retry = true) {
 
   const requestInit: RequestInit = {
     headers,
+    cache: 'no-store', // Prevent browser caching for language-dependent responses
   };
   if (init) {
     Object.assign(requestInit, init);

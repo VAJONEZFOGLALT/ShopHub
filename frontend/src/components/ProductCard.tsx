@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { getProductImageUrl } from '../utils/imageOptimization';
@@ -26,6 +27,7 @@ function ProductCard({
   onToggleCompare,
   showStockBadge,
 }: ProductCardProps) {
+  const { t } = useTranslation();
   const { add } = useCart();
   const navigate = useNavigate();
 
@@ -62,7 +64,7 @@ function ProductCard({
         )}
         {showStockBadge && (
           <span className={`stock-badge ${isOutOfStock ? 'out' : isLowStock ? 'low' : 'in'}`}>
-            {isOutOfStock ? 'Out of stock' : isLowStock ? `Only ${product.stock} left` : 'In stock'}
+            {isOutOfStock ? t('products.outOfStock') : isLowStock ? t('products.lowStock') : t('products.inStock')}
           </span>
         )}
         {showWishlist && (
@@ -70,7 +72,7 @@ function ProductCard({
             type="button"
             className={`wishlist-btn ${isWishlisted ? 'active' : ''}`}
             onClick={(e) => { e.stopPropagation(); onToggleWishlist?.(product.id, product.name); }}
-            title={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+            title={isWishlisted ? t('products.removeFromWishlist') : t('products.addToWishlist')}
           >
             ♥
           </button>
@@ -85,20 +87,20 @@ function ProductCard({
               checked={!!isCompared}
               onChange={() => onToggleCompare?.(product.id)}
             />
-            Compare
+            {t('products.compare')}
           </label>
         )}
       </div>
       <div className="product-header">
         <h3>{product.name}</h3>
-        <span className="product-category">{product.category}</span>
+        <span className="product-category">{product.categoryLabel || product.category}</span>
       </div>
       <div className="product-body">
         <div className="price">{Number(product.price).toFixed(2)}</div>
-        {typeof product.stock === 'number' && <div className="stock">{isOutOfStock ? 'Out of stock' : `Stock: ${product.stock}`}</div>}
+        {typeof product.stock === 'number' && <div className="stock">{isOutOfStock ? t('products.outOfStock') : `${t('products.stock')}: ${product.stock}`}</div>}
       </div>
       <div className="product-actions">
-        <button onClick={handleAddToCart} disabled={isOutOfStock}>Add to Cart</button>
+        <button onClick={handleAddToCart} disabled={isOutOfStock}>{t('products.addToCart')}</button>
       </div>
     </div>
   );
