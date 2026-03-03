@@ -185,6 +185,7 @@ export declare const ModelName: {
     readonly Orders: "Orders";
     readonly OrderItems: "OrderItems";
     readonly Address: "Address";
+    readonly Translation: "Translation";
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 export interface TypeMapCb<GlobalOmitOptions = {}> extends runtime.Types.Utils.Fn<{
@@ -197,7 +198,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "users" | "products" | "reviews" | "wishlist" | "recentlyViewed" | "compareItems" | "orders" | "orderItems" | "address";
+        modelProps: "users" | "products" | "reviews" | "wishlist" | "recentlyViewed" | "compareItems" | "orders" | "orderItems" | "address" | "translation";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
@@ -795,6 +796,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 };
             };
         };
+        Translation: {
+            payload: Prisma.$TranslationPayload<ExtArgs>;
+            fields: Prisma.TranslationFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.TranslationFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.TranslationFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload>;
+                };
+                findFirst: {
+                    args: Prisma.TranslationFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.TranslationFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload>;
+                };
+                findMany: {
+                    args: Prisma.TranslationFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload>[];
+                };
+                create: {
+                    args: Prisma.TranslationCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload>;
+                };
+                createMany: {
+                    args: Prisma.TranslationCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                delete: {
+                    args: Prisma.TranslationDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload>;
+                };
+                update: {
+                    args: Prisma.TranslationUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.TranslationDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.TranslationUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                upsert: {
+                    args: Prisma.TranslationUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$TranslationPayload>;
+                };
+                aggregate: {
+                    args: Prisma.TranslationAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateTranslation>;
+                };
+                groupBy: {
+                    args: Prisma.TranslationGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.TranslationGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.TranslationCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.TranslationCountAggregateOutputType> | number;
+                };
+            };
+        };
     };
 } & {
     other: {
@@ -910,6 +977,15 @@ export declare const AddressScalarFieldEnum: {
     readonly createdAt: "createdAt";
 };
 export type AddressScalarFieldEnum = (typeof AddressScalarFieldEnum)[keyof typeof AddressScalarFieldEnum];
+export declare const TranslationScalarFieldEnum: {
+    readonly id: "id";
+    readonly key: "key";
+    readonly language: "language";
+    readonly value: "value";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type TranslationScalarFieldEnum = (typeof TranslationScalarFieldEnum)[keyof typeof TranslationScalarFieldEnum];
 export declare const SortOrder: {
     readonly asc: "asc";
     readonly desc: "desc";
@@ -956,6 +1032,11 @@ export declare const AddressOrderByRelevanceFieldEnum: {
     readonly country: "country";
 };
 export type AddressOrderByRelevanceFieldEnum = (typeof AddressOrderByRelevanceFieldEnum)[keyof typeof AddressOrderByRelevanceFieldEnum];
+export declare const TranslationOrderByRelevanceFieldEnum: {
+    readonly key: "key";
+    readonly value: "value";
+};
+export type TranslationOrderByRelevanceFieldEnum = (typeof TranslationOrderByRelevanceFieldEnum)[keyof typeof TranslationOrderByRelevanceFieldEnum];
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>;
 export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>;
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>;
@@ -963,6 +1044,7 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
 export type EnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus'>;
 export type EnumCourierServiceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CourierService'>;
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>;
+export type EnumSupportedLanguageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportedLanguage'>;
 export type BatchPayload = {
     count: number;
 };
@@ -998,6 +1080,7 @@ export type GlobalOmitConfig = {
     orders?: Prisma.OrdersOmit;
     orderItems?: Prisma.OrderItemsOmit;
     address?: Prisma.AddressOmit;
+    translation?: Prisma.TranslationOmit;
 };
 export type LogLevel = 'info' | 'query' | 'warn' | 'error';
 export type LogDefinition = {

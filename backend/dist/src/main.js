@@ -8,13 +8,14 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const origins = [
         process.env.FRONTEND_URL,
+        'https://webshopfrontend.vercel.app',
         'http://localhost:5173',
         'http://localhost:5174',
     ].filter((origin) => Boolean(origin));
     app.enableCors({
         origin: origins,
         credentials: true,
-        methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
+        methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         optionsSuccessStatus: 200,
     });

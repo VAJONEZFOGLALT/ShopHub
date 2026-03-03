@@ -7,4 +7,5 @@ export type * from './models/CompareItems.js';
 export type * from './models/Orders.js';
 export type * from './models/OrderItems.js';
 export type * from './models/Address.js';
+export type * from './models/Translation.js';
 export type * from './commonInputTypes.js';

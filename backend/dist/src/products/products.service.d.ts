@@ -4,57 +4,49 @@ import { UpdateProductDto } from './dto/update-product.dto';
 export declare class ProductsService {
     private readonly prisma;
     constructor(prisma: PrismaService);
-    create(createProductDto: CreateProductDto): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        id: number;
+    findAll(): Promise<{
         name: string;
-        description: string | null;
-        category: string;
-        price: number;
-        stock: number;
-        image: string | null;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
-    }>;
-    findAll(): import("../../generated/prisma/internal/prismaNamespace").PrismaPromise<{
         id: number;
-        name: string;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
     }[]>;
-    findOne(id: number): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        id: number;
+    create(createProductDto: CreateProductDto): Promise<{
         name: string;
+        id: number;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
-    } | null, null, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
-    update(id: number, updateProductDto: UpdateProductDto): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        id: number;
+    findOne(id: number): Promise<{
         name: string;
+        id: number;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
+    } | null>;
+    update(id: number, updateProductDto: UpdateProductDto): Promise<{
+        name: string;
+        id: number;
+        description: string | null;
+        category: string;
+        price: number;
+        stock: number;
+        image: string | null;
     }>;
-    remove(id: number): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        id: number;
+    remove(id: number): Promise<{
         name: string;
+        id: number;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
 }

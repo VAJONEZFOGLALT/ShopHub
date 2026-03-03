@@ -24,6 +24,7 @@ const wishlist_module_1 = require("./wishlist/wishlist.module");
 const recently_viewed_module_1 = require("./recently-viewed/recently-viewed.module");
 const compare_module_1 = require("./compare/compare.module");
 const addresses_module_1 = require("./addresses/addresses.module");
+const translations_module_1 = require("./translations/translations.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -49,6 +50,7 @@ exports.AppModule = AppModule = __decorate([
             recently_viewed_module_1.RecentlyViewedModule,
             compare_module_1.CompareModule,
             addresses_module_1.AddressesModule,
+            translations_module_1.TranslationsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

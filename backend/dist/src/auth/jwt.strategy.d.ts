@@ -4,13 +4,13 @@ export declare class JwtStrategy extends JwtStrategy_base {
     private authService;
     constructor(authService: AuthService);
     validate(payload: any): Promise<{
-        id: number;
         username: string;
         email: string;
-        password_hash: string;
         name: string;
-        avatar: string | null;
         role: string;
+        avatar: string | null;
+        password_hash: string;
+        id: number;
     } | null>;
 }
 export {};

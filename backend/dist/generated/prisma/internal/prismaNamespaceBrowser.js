@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AddressOrderByRelevanceFieldEnum = exports.OrdersOrderByRelevanceFieldEnum = exports.ReviewsOrderByRelevanceFieldEnum = exports.ProductsOrderByRelevanceFieldEnum = exports.UsersOrderByRelevanceFieldEnum = exports.NullsOrder = exports.SortOrder = exports.AddressScalarFieldEnum = exports.OrderItemsScalarFieldEnum = exports.OrdersScalarFieldEnum = exports.CompareItemsScalarFieldEnum = exports.RecentlyViewedScalarFieldEnum = exports.WishlistScalarFieldEnum = exports.ReviewsScalarFieldEnum = exports.ProductsScalarFieldEnum = exports.UsersScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
+exports.TranslationOrderByRelevanceFieldEnum = exports.AddressOrderByRelevanceFieldEnum = exports.OrdersOrderByRelevanceFieldEnum = exports.ReviewsOrderByRelevanceFieldEnum = exports.ProductsOrderByRelevanceFieldEnum = exports.UsersOrderByRelevanceFieldEnum = exports.NullsOrder = exports.SortOrder = exports.TranslationScalarFieldEnum = exports.AddressScalarFieldEnum = exports.OrderItemsScalarFieldEnum = exports.OrdersScalarFieldEnum = exports.CompareItemsScalarFieldEnum = exports.RecentlyViewedScalarFieldEnum = exports.WishlistScalarFieldEnum = exports.ReviewsScalarFieldEnum = exports.ProductsScalarFieldEnum = exports.UsersScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/index-browser"));
 exports.Decimal = runtime.Decimal;
 exports.NullTypes = {
@@ -53,7 +53,8 @@ exports.ModelName = {
     CompareItems: 'CompareItems',
     Orders: 'Orders',
     OrderItems: 'OrderItems',
-    Address: 'Address'
+    Address: 'Address',
+    Translation: 'Translation'
 };
 exports.TransactionIsolationLevel = runtime.makeStrictEnum({
     ReadUncommitted: 'ReadUncommitted',
@@ -136,6 +137,14 @@ exports.AddressScalarFieldEnum = {
     isDefault: 'isDefault',
     createdAt: 'createdAt'
 };
+exports.TranslationScalarFieldEnum = {
+    id: 'id',
+    key: 'key',
+    language: 'language',
+    value: 'value',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
 exports.SortOrder = {
     asc: 'asc',
     desc: 'desc'
@@ -174,5 +183,9 @@ exports.AddressOrderByRelevanceFieldEnum = {
     state: 'state',
     zipCode: 'zipCode',
     country: 'country'
+};
+exports.TranslationOrderByRelevanceFieldEnum = {
+    key: 'key',
+    value: 'value'
 };
 //# sourceMappingURL=prismaNamespaceBrowser.js.map

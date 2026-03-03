@@ -180,6 +180,21 @@ export type BoolWithAggregatesFilter<$PrismaModel = never> = {
     _min?: Prisma.NestedBoolFilter<$PrismaModel>;
     _max?: Prisma.NestedBoolFilter<$PrismaModel>;
 };
+export type EnumSupportedLanguageFilter<$PrismaModel = never> = {
+    equals?: $Enums.SupportedLanguage | Prisma.EnumSupportedLanguageFieldRefInput<$PrismaModel>;
+    in?: $Enums.SupportedLanguage[];
+    notIn?: $Enums.SupportedLanguage[];
+    not?: Prisma.NestedEnumSupportedLanguageFilter<$PrismaModel> | $Enums.SupportedLanguage;
+};
+export type EnumSupportedLanguageWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SupportedLanguage | Prisma.EnumSupportedLanguageFieldRefInput<$PrismaModel>;
+    in?: $Enums.SupportedLanguage[];
+    notIn?: $Enums.SupportedLanguage[];
+    not?: Prisma.NestedEnumSupportedLanguageWithAggregatesFilter<$PrismaModel> | $Enums.SupportedLanguage;
+    _count?: Prisma.NestedIntFilter<$PrismaModel>;
+    _min?: Prisma.NestedEnumSupportedLanguageFilter<$PrismaModel>;
+    _max?: Prisma.NestedEnumSupportedLanguageFilter<$PrismaModel>;
+};
 export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | Prisma.IntFieldRefInput<$PrismaModel>;
     in?: number[];
@@ -365,4 +380,19 @@ export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
     _count?: Prisma.NestedIntFilter<$PrismaModel>;
     _min?: Prisma.NestedBoolFilter<$PrismaModel>;
     _max?: Prisma.NestedBoolFilter<$PrismaModel>;
+};
+export type NestedEnumSupportedLanguageFilter<$PrismaModel = never> = {
+    equals?: $Enums.SupportedLanguage | Prisma.EnumSupportedLanguageFieldRefInput<$PrismaModel>;
+    in?: $Enums.SupportedLanguage[];
+    notIn?: $Enums.SupportedLanguage[];
+    not?: Prisma.NestedEnumSupportedLanguageFilter<$PrismaModel> | $Enums.SupportedLanguage;
+};
+export type NestedEnumSupportedLanguageWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SupportedLanguage | Prisma.EnumSupportedLanguageFieldRefInput<$PrismaModel>;
+    in?: $Enums.SupportedLanguage[];
+    notIn?: $Enums.SupportedLanguage[];
+    not?: Prisma.NestedEnumSupportedLanguageWithAggregatesFilter<$PrismaModel> | $Enums.SupportedLanguage;
+    _count?: Prisma.NestedIntFilter<$PrismaModel>;
+    _min?: Prisma.NestedEnumSupportedLanguageFilter<$PrismaModel>;
+    _max?: Prisma.NestedEnumSupportedLanguageFilter<$PrismaModel>;
 };

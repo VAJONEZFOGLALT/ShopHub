@@ -35,12 +35,12 @@ export declare class AuthService {
         refreshToken: string;
     }>;
     validateUser(userId: number): Promise<{
-        id: number;
         username: string;
         email: string;
-        password_hash: string;
         name: string;
-        avatar: string | null;
         role: string;
+        avatar: string | null;
+        password_hash: string;
+        id: number;
     } | null>;
 }

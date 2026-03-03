@@ -2,10 +2,10 @@ import { WishlistService } from './wishlist.service';
 export declare class WishlistController {
     private readonly wishlistService;
     constructor(wishlistService: WishlistService);
-    findByUser(userId: string): import("../../generated/prisma/internal/prismaNamespace").PrismaPromise<({
+    findByUser(userId: string): import("@prisma/client").Prisma.PrismaPromise<({
         product: {
-            id: number;
             name: string;
+            id: number;
             description: string | null;
             category: string;
             price: number;
@@ -14,32 +14,30 @@ export declare class WishlistController {
         };
     } & {
         id: number;
-        createdAt: Date;
         userId: number;
         productId: number;
+        createdAt: Date;
     })[]>;
     add(body: {
         userId: number;
         productId: number;
     }): Promise<{
         id: number;
-        createdAt: Date;
         userId: number;
         productId: number;
+        createdAt: Date;
     }>;
-    remove(id: string): import("../../generated/prisma/models").Prisma__WishlistClient<{
+    remove(id: string): import("@prisma/client").Prisma.Prisma__WishlistClient<{
         id: number;
-        createdAt: Date;
         userId: number;
         productId: number;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
-    }>;
+        createdAt: Date;
+    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
     removeByUserProduct(userId: string, productId: string): Promise<{
         id: number;
-        createdAt: Date;
         userId: number;
         productId: number;
+        createdAt: Date;
     } | null>;
     isInWishlist(userId: string, productId: string): Promise<boolean>;
 }
