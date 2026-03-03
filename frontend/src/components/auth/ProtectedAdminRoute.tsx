@@ -17,7 +17,7 @@ export function ProtectedAdminRoute({ children, onAuthNeeded }: ProtectedAdminRo
 
   if (!isAuthenticated) {
     onAuthNeeded?.();
-    return null;
+    return <Navigate to="/shop" replace />;
   }
 
   if (user?.role !== 'ADMIN') {

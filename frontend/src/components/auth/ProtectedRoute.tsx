@@ -1,4 +1,5 @@
 import React from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { LoadingSpinner } from '../LoadingSpinner';
 
@@ -16,7 +17,7 @@ export function ProtectedRoute({ children, onAuthNeeded }: ProtectedRouteProps) 
 
   if (!isAuthenticated) {
     onAuthNeeded?.();
-    return null;
+    return <Navigate to="/shop" replace />;
   }
 
   return <>{children}</>;
