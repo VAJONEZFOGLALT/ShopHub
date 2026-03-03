@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { useToast } from '../contexts/ToastContext';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 const getProductCategory = (product: any) => {
   const rawCategory = product?.category ?? product?.categoryName ?? product?.category?.name;
@@ -122,7 +123,7 @@ export default function HomePage() {
       <section className="featured-section">
         <h2>{t('home.featuredProducts')}</h2>
         {loading ? (
-          <p>{t('common.loading')}</p>
+          <LoadingSpinner />
         ) : (
           <>
             <div className="carousel-container">
