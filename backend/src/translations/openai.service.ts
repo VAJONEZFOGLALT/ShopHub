@@ -42,19 +42,13 @@ export class OpenaiService {
 CRITICAL RULES:
 - Return ONLY the translations, one per line, in exact same order as input
 - No numbering, quotes, formatting, or explanations
-- Be concise and natural - use terms a native ${targetLang} speaker would use
+- Be concise and natural - use terms a native ${targetLang} speaker would use in e-commerce
 - Preserve the meaning exactly
 
-For product categories, use these standard translations:
-HUNGARIAN → ENGLISH:
-- Elektronika → Electronics
-- Kiegészítők → Accessories
-- Iroda → Office
-- Otthon → Home
-- Divat → Fashion
-- Sport → Sports
-
-For product descriptions, be technical but accessible.`,
+Guidelines:
+- For product names/descriptions: be technical but accessible
+- For categories: use common e-commerce terminology (typically short, 1-2 words)
+- Never be overly literal - prioritize what makes sense in context`,
             },
             {
               role: 'user',
