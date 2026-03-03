@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useCart } from '../../contexts/CartContext';
 
 interface CartModalProps {
@@ -7,6 +8,7 @@ interface CartModalProps {
 }
 
 export function CartModal({ isOpen, onClose }: CartModalProps) {
+  const { t } = useTranslation();
   const { items, update, remove, total, clear } = useCart();
   const navigate = useNavigate();
 
@@ -30,7 +32,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
   };
 
   const handleClear = () => {
-    const ok = confirm('Clear all items from cart?');
+    const ok = confirm(t('cart.clearConfirm'));
     if (ok) {
       clear();
     }
@@ -44,7 +46,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content cart-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>🛒 Your Cart</h2>
+          <h2>{t('cart.yourCart')}</h2>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
 
@@ -52,7 +54,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
           {items.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--muted)' }}>
               <p style={{ fontSize: '3em', margin: '0 0 16px 0' }}>🛒</p>
-              <p style={{ fontSize: '1.1em' }}>Your cart is empty</p>
+              <p style={{ fontSize: '1.1em' }}>{t('cart.empty')}</p>
             </div>
           ) : (
             <div className="cart-items">
@@ -95,7 +97,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
           {items.length > 0 && (
             <>
               <div className="cart-total">
-                <span>Total:</span>
+                <span>{t('cart.total')}</span>
                 <span className="cart-total-amount">${total.toFixed(2)}</span>
               </div>
 
@@ -104,13 +106,13 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
                   className="btn-primary cart-checkout-btn" 
                   onClick={handleCheckout}
                 >
-                  Proceed to Checkout
+                  {t('cart.proceedToCheckout')}
                 </button>
                 <button 
                   className="cart-clear-btn" 
                   onClick={handleClear}
                 >
-                  Clear Cart
+                  {t('cart.clear')}
                 </button>
               </div>
             </>
