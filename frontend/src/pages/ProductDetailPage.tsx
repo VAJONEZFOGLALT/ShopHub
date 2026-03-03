@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,6 +11,7 @@ import { ProductDetailSkeleton } from '../components/SkeletonLoader';
 import { getDetailImageUrl } from '../utils/imageOptimization';
 
 export default function ProductDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<any>(null);
@@ -98,14 +100,14 @@ export default function ProductDetailPage() {
     </div>
   );
   if (error) return <div className="view"><div className="error">{error}</div></div>;
-  if (!product) return <div className="view"><p>Product not found.</p></div>;
+  if (!product) return <div className="view"><p>{t('products.notFound')}</p></div>;
   const isOutOfStock = product.stock <= 0;
   const isLowStock = product.stock > 0 && product.stock <= 5;
 
 
   const handleToggleCompare = async () => {
     if (!isAuthenticated) {
-      showToast('Please log in to compare products', 'warning');
+      showToast(t('products.logInToCompare'), 'warning');
       return;
     }
 
@@ -132,7 +134,7 @@ export default function ProductDetailPage() {
 
   const openReviewsModal = (mode: 'list' | 'write') => {
     if (mode === 'write' && !isAuthenticated) {
-      showToast('Please log in to write a review', 'warning');
+      showToast(t('products.logInToReview'), 'warning');
       return;
     }
     setReviewsModalView(mode);
@@ -150,7 +152,7 @@ export default function ProductDetailPage() {
 
   return (
     <div className="view product-detail">
-      <button onClick={handleBack}>← Back</button>
+      <button onClick={handleBack}>{t('common.backToShop')}</button>
       <div className="detail-content">
         <div className="detail-left">
           <div className="detail-image-frame">
@@ -169,7 +171,7 @@ export default function ProductDetailPage() {
                 type="button" 
                 className={`wishlist-btn ${wishlistIds.includes(product.id) ? 'active' : ''}`} 
                 onClick={() => handleToggleWishlist(product.id, product.name)}
-                title={!isAuthenticated ? 'Log in to add to wishlist' : wishlistIds.includes(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
+                title={!isAuthenticated ? t('products.logInToWishlist') : wishlistIds.includes(product.id) ? t('products.removeFromWishlist') : t('products.addToWishlist')}
               >
                 ♥
               </button>
@@ -177,9 +179,9 @@ export default function ProductDetailPage() {
                 type="button" 
                 className={`compare-action ${compareIds.includes(product.id) ? 'active' : ''}`} 
                 onClick={handleToggleCompare}
-                title={!isAuthenticated ? 'Log in to compare products' : compareIds.includes(product.id) ? 'Remove from compare' : 'Add to compare'}
+                title={!isAuthenticated ? t('products.logInToCompare') : compareIds.includes(product.id) ? 'Remove from compare' : 'Add to compare'}
               >
-                {compareIds.includes(product.id) ? 'Compared' : 'Compare'}
+                {compareIds.includes(product.id) ? t('products.compared') : t('products.compare')}
               </button>
             </div>
           </div>
@@ -187,35 +189,35 @@ export default function ProductDetailPage() {
         <div className="detail-right">
           <h1>{product.name}</h1>
           <div className="detail-meta">
-            <span className="category">Category: {product.category}</span>
+            <span className="category">{t('products.category')}: {product.category}</span>
             <span className={`stock ${product.stock > 0 ? 'in-stock' : 'out-stock'}`}>
-              {product.stock > 0 ? `In stock: ${product.stock}` : 'Out of stock'}
+              {product.stock > 0 ? `${t('products.inStock')}: ${product.stock}` : t('products.outOfStock')}
             </span>
-            {isLowStock && <span className="stock low-stock">Low stock</span>}
+            {isLowStock && <span className="stock low-stock">{t('products.lowStock')}</span>}
           </div>
           <div className="review-summary">
             <span className="review-score">★ {reviewSummary.average.toFixed(1)}</span>
-            <span className="review-count">{reviewSummary.count} reviews</span>
+            <span className="review-count">{reviewSummary.count} {t('products.reviews')}</span>
           </div>
-          <p className="description">{product.description || 'No description available.'}</p>
+          <p className="description">{product.description || t('products.noDescription')}</p>
           <div className="detail-highlights">
             <div className="highlight-item">
-              <span className="highlight-label">Shipping</span>
+              <span className="highlight-label">{t('products.shipping')}</span>
               <span className="highlight-value">2-4 business days</span>
             </div>
             <div className="highlight-item">
-              <span className="highlight-label">Returns</span>
+              <span className="highlight-label">{t('products.returns')}</span>
               <span className="highlight-value">30-day returns</span>
             </div>
             <div className="highlight-item">
-              <span className="highlight-label">Warranty</span>
+              <span className="highlight-label">{t('products.warranty')}</span>
               <span className="highlight-value">12 months</span>
             </div>
           </div>
           <div className="detail-footer">
             <div className="price-large">${Number(product.price).toFixed(2)}</div>
             <div className="qty-selector">
-              <label>Quantity:</label>
+              <label>{t('cart.quantity')}:</label>
               <input
                 type="number"
                 min={1}
@@ -234,7 +236,7 @@ export default function ProductDetailPage() {
                 backgroundColor: addedToCart ? 'var(--success)' : '',
               }}
             >
-              {addedToCart ? '✓ Added to Cart' : 'Add to Cart'}
+              {addedToCart ? `✓ ${t('products.addedToCart')}` : t('products.addToCart')}
             </button>
           </div>
         </div>
@@ -243,32 +245,32 @@ export default function ProductDetailPage() {
       <div className="detail-reviews">
         <div className="reviews-header">
           <div>
-            <h2>Customer Reviews</h2>
+            <h2>{t('products.customerReviews')}</h2>
             <div className="review-summary-inline">
               <span className="review-score">★ {reviewSummary.average.toFixed(1)}</span>
-              <span className="review-count">{reviewSummary.count} reviews</span>
+              <span className="review-count">{reviewSummary.count} {t('products.reviews')}</span>
             </div>
           </div>
           <div className="reviews-header-actions">
             <button 
               className="btn-secondary" 
               onClick={() => openReviewsModal('write')}
-              title={!isAuthenticated ? 'Log in to write a review' : 'Write a review'}
+              title={!isAuthenticated ? t('products.logInToReview') : t('products.writeReview')}
             >
-              ✍️ Write a Review
+              ✍️ {t('products.writeReview')}
             </button>
           </div>
         </div>
         <div className="reviews-preview">
           {reviews.length === 0 ? (
             <div className="empty-reviews-preview">
-              <p className="muted">No reviews yet. Be the first to review!</p>
+              <p className="muted">{t('products.noReviewsYet')}</p>
               <button 
                 className="btn-primary" 
                 onClick={() => openReviewsModal('write')}
-                title={!isAuthenticated ? 'Log in to write a review' : 'Write a review'}
+                title={!isAuthenticated ? t('products.logInToReview') : t('products.writeReview')}
               >
-                Write the First Review
+                {t('products.writeFirstReview')}
               </button>
             </div>
           ) : (
@@ -290,7 +292,7 @@ export default function ProductDetailPage() {
                   className="btn-secondary view-more-reviews-btn" 
                   onClick={() => openReviewsModal('list')}
                 >
-                  View All {reviewSummary.count} Reviews
+                  {t('products.viewAllReviews', { count: reviewSummary.count })}
                 </button>
               )}
             </>
