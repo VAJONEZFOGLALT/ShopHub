@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { LoadingSpinner } from '../LoadingSpinner';
 
 interface ProtectedAdminRouteProps {
   children: React.ReactNode;
@@ -11,7 +12,7 @@ export function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
 
   let content: React.ReactNode = children;
   if (isLoading) {
-    content = <div className="loading">Loading...</div>;
+    content = <LoadingSpinner fullScreen={true} />;
   } else if (!isAuthenticated) {
     content = <Navigate to="/login" replace />;
   } else if (user?.role !== 'ADMIN') {
