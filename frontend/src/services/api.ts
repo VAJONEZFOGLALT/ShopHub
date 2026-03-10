@@ -276,6 +276,15 @@ export const api = {
     return res;
   },
 
+  fulfillOrder: async (id: number, teljesitve: boolean = true) => {
+    const res = await request<any>(`/orders/${id}/fulfill`, {
+      method: 'PATCH',
+      body: JSON.stringify({ teljesitve }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    return res;
+  },
+
   // Order Items
   getOrderItems: async () => {
     const data = await request<any[]>('/order-items');

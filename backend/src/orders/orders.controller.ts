@@ -32,6 +32,11 @@ export class OrdersController {
     return this.ordersService.update(+id, { status: body.status as any });
   }
 
+  @Patch(':id/fulfill')
+  fulfillOrder(@Param('id') id: string, @Body() body: { teljesitve?: boolean }) {
+    return this.ordersService.update(+id, { teljesitve: typeof body.teljesitve === 'boolean' ? body.teljesitve : true });
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.ordersService.remove(+id);

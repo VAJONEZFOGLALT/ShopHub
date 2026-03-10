@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateOrderDto } from './create-order.dto';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 
 export enum OrderStatus {
   PENDING = 'PENDING',
@@ -18,4 +18,8 @@ export class UpdateOrderDto extends PartialType(CreateOrderDto) {
   @IsOptional()
   @IsString()
   trackingNumber?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  teljesitve?: boolean;
 }
