@@ -11,8 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
-.env
-.env.example
+
+# Don't ignore .env - we want it in git for easy clone-to-run
+# Only ignore secret overrides
+.env.local
+.env.*.local
 
 # Editor directories and files
 .vscode/*
