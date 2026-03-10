@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { CreateRecentlyViewedDto } from './dto/create-recently-viewed.dto';
 
@@ -15,12 +16,20 @@ export class RecentlyViewedService {
     });
   }
 
-  upsert(data: CreateRecentlyViewedDto) {
-    return this.prisma.recentlyViewed.upsert({
-      where: { userId_productId: { userId: data.userId, productId: data.productId } },
-      update: { viewedAt: new Date() },
-      create: { userId: data.userId, productId: data.productId },
-    });
+  async upsert(data: CreateRecentlyViewedDto) {
+    try {
+      return await this.prisma.recentlyViewed.create({
+        data: { userId: data.userId, productId: data.productId },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        return this.prisma.recentlyViewed.update({
+          where: { userId_productId: { userId: data.userId, productId: data.productId } },
+          data: { viewedAt: new Date() },
+        });
+      }
+      throw error;
+    }
   }
 
   clear(userId: number) {
