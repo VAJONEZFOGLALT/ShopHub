@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { LibreTranslateService } from '../translations/libretranslate.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -52,7 +52,9 @@ export class ProductsService {
         return cachedList;
       }
 
-      const products = await this.prisma.products.findMany();
+      const products = await this.prisma.products.findMany({
+        where: { deletedAt: null },
+      });
 
       if (normalizedLang === 'hu') {
         const originalProducts = products.map((product) => ({
@@ -112,7 +114,12 @@ export class ProductsService {
         return cachedItem;
       }
 
-      const product = await this.prisma.products.findUnique({ where: { id } });
+      const product = await this.prisma.products.findFirst({
+        where: {
+          id,
+          deletedAt: null,
+        },
+      });
       
       if (!product) {
         return null;
@@ -165,10 +172,22 @@ export class ProductsService {
 
   async remove(id: number) {
     try {
-      const deleted = await this.prisma.products.delete({ where: { id } });
+      const product = await this.prisma.products.findUnique({ where: { id } });
+      if (!product) {
+        throw new NotFoundException(`Product with id ${id} not found`);
+      }
+
+      const deleted = await this.prisma.products.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
+
       this.clearProductCaches();
       return deleted;
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       console.error('Products remove error:', error);
       throw new BadRequestException(
         `Failed to delete product: ${error instanceof Error ? error.message : 'Unknown error'}`

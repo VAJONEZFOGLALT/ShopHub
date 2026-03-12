@@ -19,7 +19,12 @@ let WishlistService = class WishlistService {
     }
     findByUser(userId) {
         return this.prisma.wishlist.findMany({
-            where: { userId },
+            where: {
+                userId,
+                product: {
+                    deletedAt: null,
+                },
+            },
             include: { product: true },
             orderBy: { createdAt: 'desc' },
         });
@@ -30,7 +35,12 @@ let WishlistService = class WishlistService {
             if (!user) {
                 throw new common_1.BadRequestException('User not found');
             }
-            const product = await this.prisma.products.findUnique({ where: { id: productId } });
+            const product = await this.prisma.products.findFirst({
+                where: {
+                    id: productId,
+                    deletedAt: null,
+                },
+            });
             if (!product) {
                 throw new common_1.BadRequestException('Product not found');
             }

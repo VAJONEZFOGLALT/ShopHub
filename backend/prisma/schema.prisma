@@ -43,6 +43,7 @@ model Products {
   price       Float
   stock       Int          @default(0)
   image       String?
+  deletedAt   DateTime?
   orderItems  OrderItems[]
   reviews     Reviews[]
   wishlist    Wishlist[]
@@ -50,6 +51,7 @@ model Products {
   compareItems CompareItems[]
 
   @@index([category])
+  @@index([deletedAt])
 }
 
 model Reviews {

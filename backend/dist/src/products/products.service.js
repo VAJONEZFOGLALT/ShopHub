@@ -55,7 +55,9 @@ let ProductsService = class ProductsService {
             if (cachedList) {
                 return cachedList;
             }
-            const products = await this.prisma.products.findMany();
+            const products = await this.prisma.products.findMany({
+                where: { deletedAt: null },
+            });
             if (normalizedLang === 'hu') {
                 const originalProducts = products.map((product) => ({
                     ...product,
@@ -106,7 +108,12 @@ let ProductsService = class ProductsService {
             if (cachedItem) {
                 return cachedItem;
             }
-            const product = await this.prisma.products.findUnique({ where: { id } });
+            const product = await this.prisma.products.findFirst({
+                where: {
+                    id,
+                    deletedAt: null,
+                },
+            });
             if (!product) {
                 return null;
             }
@@ -151,11 +158,21 @@ let ProductsService = class ProductsService {
     }
     async remove(id) {
         try {
-            const deleted = await this.prisma.products.delete({ where: { id } });
+            const product = await this.prisma.products.findUnique({ where: { id } });
+            if (!product) {
+                throw new common_1.NotFoundException(`Product with id ${id} not found`);
+            }
+            const deleted = await this.prisma.products.update({
+                where: { id },
+                data: { deletedAt: new Date() },
+            });
             this.clearProductCaches();
             return deleted;
         }
         catch (error) {
+            if (error instanceof common_1.NotFoundException) {
+                throw error;
+            }
             console.error('Products remove error:', error);
             throw new common_1.BadRequestException(`Failed to delete product: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }

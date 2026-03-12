@@ -7,7 +7,12 @@ export class WishlistService {
 
 	findByUser(userId: number) {
 		return this.prisma.wishlist.findMany({
-			where: { userId },
+			where: {
+				userId,
+				product: {
+					deletedAt: null,
+				},
+			},
 			include: { product: true },
 			orderBy: { createdAt: 'desc' },
 		});
@@ -22,7 +27,12 @@ export class WishlistService {
 			}
 
 			// Verify product exists
-			const product = await this.prisma.products.findUnique({ where: { id: productId } });
+			const product = await this.prisma.products.findFirst({
+				where: {
+					id: productId,
+					deletedAt: null,
+				},
+			});
 			if (!product) {
 				throw new BadRequestException('Product not found');
 			}

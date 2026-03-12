@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -13,9 +13,19 @@ export class OrdersService {
     // fetch product prices for items
     const productIds = Array.from(new Set(items.map((i) => i.productId)));
     const products = await this.prisma.products.findMany({
-      where: { id: { in: productIds } },
+      where: {
+        id: { in: productIds },
+        deletedAt: null,
+      },
       select: { id: true, price: true },
     });
+
+    const foundIds = new Set(products.map((p) => p.id));
+    const unavailableIds = productIds.filter((id) => !foundIds.has(id));
+    if (unavailableIds.length > 0) {
+      throw new BadRequestException(`Products unavailable: ${unavailableIds.join(', ')}`);
+    }
+
     const priceMap = new Map(products.map((p) => [p.id, p.price]));
 
     const orderItemsData = items.map((item) => {
@@ -58,7 +68,15 @@ export class OrdersService {
     return this.prisma.orders.update({ where: { id }, data: rest, include: { orderItems: true } });
   }
 
-  remove(id: number) {
-    return this.prisma.orders.delete({ where: { id } });
+  async remove(id: number) {
+    const existing = await this.prisma.orders.findUnique({ where: { id }, select: { id: true } });
+    if (!existing) {
+      throw new NotFoundException(`Order with id ${id} not found`);
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.orderItems.deleteMany({ where: { orderId: id } });
+      return tx.orders.delete({ where: { id } });
+    });
   }
 }

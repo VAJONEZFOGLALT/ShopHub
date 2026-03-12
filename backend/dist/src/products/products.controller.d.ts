@@ -7,41 +7,45 @@ export declare class ProductsController {
     private readonly cloudinaryService;
     constructor(productsService: ProductsService, cloudinaryService: CloudinaryService);
     create(createProductDto: CreateProductDto): Promise<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
+        deletedAt: Date | null;
     }>;
     findAll(lang?: string): Promise<any[]>;
     findOne(id: string, lang?: string): Promise<any>;
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
+        deletedAt: Date | null;
     }>;
     uploadImage(id: string, file: Express.Multer.File): Promise<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
+        deletedAt: Date | null;
     }>;
     remove(id: string): Promise<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
+        deletedAt: Date | null;
     }>;
 }

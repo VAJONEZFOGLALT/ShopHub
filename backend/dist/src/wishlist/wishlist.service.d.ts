@@ -4,13 +4,14 @@ export declare class WishlistService {
     constructor(prisma: PrismaService);
     findByUser(userId: number): import("@prisma/client").Prisma.PrismaPromise<({
         product: {
-            name: string;
             id: number;
+            name: string;
             description: string | null;
             category: string;
             price: number;
             stock: number;
             image: string | null;
+            deletedAt: Date | null;
         };
     } & {
         id: number;

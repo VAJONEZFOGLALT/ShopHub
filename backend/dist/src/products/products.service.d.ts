@@ -15,31 +15,34 @@ export declare class ProductsService {
     private clearProductCaches;
     findAll(language?: string): Promise<any[]>;
     create(createProductDto: CreateProductDto): Promise<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
+        deletedAt: Date | null;
     }>;
     findOne(id: number, language?: string): Promise<any>;
     update(id: number, updateProductDto: UpdateProductDto): Promise<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
+        deletedAt: Date | null;
     }>;
     remove(id: number): Promise<{
-        name: string;
         id: number;
+        name: string;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
+        deletedAt: Date | null;
     }>;
 }

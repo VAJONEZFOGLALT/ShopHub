@@ -8,82 +8,87 @@ export declare class OrdersService {
         orderItems: {
             id: number;
             price: number;
-            productId: number;
             quantity: number;
+            productId: number;
             orderId: number;
         }[];
     } & {
-        id: number;
-        userId: number;
-        courier: import("@prisma/client").$Enums.CourierService;
-        shippingAddress: string | null;
-        status: import("@prisma/client").$Enums.OrderStatus;
-        trackingNumber: string | null;
         totalPrice: number;
         createdAt: Date;
+        status: import("@prisma/client").$Enums.OrderStatus;
+        courier: import("@prisma/client").$Enums.CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
+        teljesitve: boolean;
+        id: number;
+        userId: number;
     }>;
     findAll(): import("@prisma/client").Prisma.PrismaPromise<({
         orderItems: {
             id: number;
             price: number;
-            productId: number;
             quantity: number;
+            productId: number;
             orderId: number;
         }[];
     } & {
-        id: number;
-        userId: number;
-        courier: import("@prisma/client").$Enums.CourierService;
-        shippingAddress: string | null;
-        status: import("@prisma/client").$Enums.OrderStatus;
-        trackingNumber: string | null;
         totalPrice: number;
         createdAt: Date;
+        status: import("@prisma/client").$Enums.OrderStatus;
+        courier: import("@prisma/client").$Enums.CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
+        teljesitve: boolean;
+        id: number;
+        userId: number;
     })[]>;
     findOne(id: number): import("@prisma/client").Prisma.Prisma__OrdersClient<({
         orderItems: {
             id: number;
             price: number;
-            productId: number;
             quantity: number;
+            productId: number;
             orderId: number;
         }[];
     } & {
-        id: number;
-        userId: number;
-        courier: import("@prisma/client").$Enums.CourierService;
-        shippingAddress: string | null;
-        status: import("@prisma/client").$Enums.OrderStatus;
-        trackingNumber: string | null;
         totalPrice: number;
         createdAt: Date;
+        status: import("@prisma/client").$Enums.OrderStatus;
+        courier: import("@prisma/client").$Enums.CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
+        teljesitve: boolean;
+        id: number;
+        userId: number;
     }) | null, null, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
     update(id: number, updateOrderDto: UpdateOrderDto): import("@prisma/client").Prisma.Prisma__OrdersClient<{
         orderItems: {
             id: number;
             price: number;
-            productId: number;
             quantity: number;
+            productId: number;
             orderId: number;
         }[];
     } & {
-        id: number;
-        userId: number;
-        courier: import("@prisma/client").$Enums.CourierService;
-        shippingAddress: string | null;
-        status: import("@prisma/client").$Enums.OrderStatus;
-        trackingNumber: string | null;
         totalPrice: number;
         createdAt: Date;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
-    remove(id: number): import("@prisma/client").Prisma.Prisma__OrdersClient<{
-        id: number;
-        userId: number;
+        status: import("@prisma/client").$Enums.OrderStatus;
         courier: import("@prisma/client").$Enums.CourierService;
         shippingAddress: string | null;
-        status: import("@prisma/client").$Enums.OrderStatus;
         trackingNumber: string | null;
+        teljesitve: boolean;
+        id: number;
+        userId: number;
+    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
+    remove(id: number): Promise<{
         totalPrice: number;
         createdAt: Date;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
+        status: import("@prisma/client").$Enums.OrderStatus;
+        courier: import("@prisma/client").$Enums.CourierService;
+        shippingAddress: string | null;
+        trackingNumber: string | null;
+        teljesitve: boolean;
+        id: number;
+        userId: number;
+    }>;
 }
