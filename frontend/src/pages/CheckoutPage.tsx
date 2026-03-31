@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
+import { CourierSelectionModal } from '../components/checkout/CourierSelectionModal';
 
 const couriers = [
   { id: 'MAGYAR_POSTA', name: '🇭🇺 Magyar Posta', price: 2.99, days: '2-3 days', type: 'address' },
@@ -19,6 +20,8 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
   const { user } = useAuth();
   const navigate = useNavigate();
   const [courier, setCourier] = useState('UPS');
+  const [courierLocation, setCourierLocation] = useState('');
+  const [showCourierModal, setShowCourierModal] = useState(false);
   const [addresses, setAddresses] = useState<any[]>([]);
   const [selectedAddr, setSelectedAddr] = useState<number | null>(null);
   const [newUser, setNewUser] = useState({ username: '', email: '', password: '' });
@@ -85,54 +88,60 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
             </div>
           ) : (
             <>
-          <div className="checkout-section">
-            <h3>{t('checkout.items')} ({items.length})</h3>
-              {items.map(it => (
-                <div key={it.productId} className="checkout-item">
-                  <div className="checkout-item-info">
-                    <strong>{it.name}</strong> x {it.quantity}
-                    <span>${(it.price * it.quantity).toFixed(2)}</span>
+              <div className="checkout-section">
+                <h3>{t('checkout.items')} ({items.length})</h3>
+                {items.map(it => (
+                  <div key={it.productId} className="checkout-item">
+                    <div className="checkout-item-info">
+                      <strong>{it.name}</strong> x {it.quantity}
+                      <span>${(it.price * it.quantity).toFixed(2)}</span>
+                    </div>
+                    <button className="btn-text" onClick={() => remove(it.productId)}>{t('checkout.remove')}</button>
                   </div>
-                  <button className="btn-text" onClick={() => remove(it.productId)}>{t('checkout.remove')}</button>
-                </div>
-              ))}
-          </div>
+                ))}
+              </div>
 
-          <div className="checkout-section">
-            <h3>{t('checkout.delivery')}</h3>
-            {couriers.map(c => (
-              <label key={c.id} style={{ display: 'flex', gap: '10px', margin: '10px 0', padding: '10px', border: '1px solid var(--border)', borderRadius: '6px' }}>
-                <input type="radio" value={c.id} checked={courier === c.id} onChange={e => setCourier(e.target.value)} />
-                <div style={{ flex: 1 }}>
-                  <div><strong>{c.name}</strong> - ${c.price.toFixed(2)}</div>
-                  <div className="muted" style={{ fontSize: '0.9em' }}>{c.days}</div>
-                </div>
-              </label>
-            ))}
-          </div>
-
-          {user && addresses.length > 0 && (
-            <div className="checkout-section">
-              <h3>{t('checkout.address')}</h3>
-              {addresses.map(a => (
-                <label key={a.id} style={{ display: 'flex', gap: '10px', margin: '10px 0', padding: '10px', border: '1px solid var(--border)', borderRadius: '6px' }}>
-                  <input type="radio" checked={selectedAddr === a.id} onChange={() => setSelectedAddr(a.id)} />
-                  <div>
-                    <strong>{a.label}</strong><br />
-                    {a.fullName}, {a.street}, {a.city}, {a.state} {a.zipCode}
+              <div className="checkout-section">
+                <h3>{t('checkout.delivery')}</h3>
+                <div className="courier-selected-info">
+                  <div className="courier-display">
+                    <strong>{couriers.find(c => c.id === courier)?.name}</strong>
+                    <p className="muted">${couriers.find(c => c.id === courier)?.price.toFixed(2)}</p>
+                    {courierLocation && <p className="muted" style={{ fontSize: '0.85em' }}>📍 {courierLocation}</p>}
                   </div>
-                </label>
-              ))}
-            </div>
-          )}
+                  <button 
+                    className="btn-secondary" 
+                    onClick={() => setShowCourierModal(true)}
+                  >
+                    {t('common.change')}
+                  </button>
+                </div>
+              </div>
 
-          {!user && (
-            <div className="checkout-section">
-              <h3>{t('checkout.accountInfo')}</h3>
-              <input placeholder={t('common.username')} value={newUser.username} onChange={e => setNewUser({...newUser, username: e.target.value})} style={{ width: '100%', marginBottom: '8px', padding: '8px' }} required />
-              <input placeholder={t('auth.email')} type="email" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} style={{ width: '100%', marginBottom: '8px', padding: '8px' }} required />
-              <input placeholder={t('auth.password')} type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} style={{ width: '100%', padding: '8px' }} required />
-            </div>
+              {user && addresses.length > 0 && (
+                <div className="checkout-section">
+                  <h3>{t('checkout.address')}</h3>
+                  {addresses.map(a => (
+                    <label key={a.id} style={{ display: 'flex', gap: '10px', margin: '10px 0', padding: '10px', border: '1px solid var(--border)', borderRadius: '6px' }}>
+                      <input type="radio" checked={selectedAddr === a.id} onChange={() => setSelectedAddr(a.id)} />
+                      <div>
+                        <strong>{a.label}</strong><br />
+                        {a.fullName}, {a.street}, {a.city}, {a.state} {a.zipCode}
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              {!user && (
+                <div className="checkout-section">
+                  <h3>{t('checkout.accountInfo')}</h3>
+                  <input placeholder={t('common.username')} value={newUser.username} onChange={e => setNewUser({...newUser, username: e.target.value})} style={{ width: '100%', marginBottom: '8px', padding: '8px' }} required />
+                  <input placeholder={t('auth.email')} type="email" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} style={{ width: '100%', marginBottom: '8px', padding: '8px' }} required />
+                  <input placeholder={t('auth.password')} type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} style={{ width: '100%', padding: '8px' }} required />
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -156,9 +165,19 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
             {loading ? t('checkout.processing') : t('checkout.placeOrder')}
           </button>
         </div>
-            </>
-          )}
       </div>
+
+      {/* Courier Selection Modal */}
+      <CourierSelectionModal
+        isOpen={showCourierModal}
+        onClose={() => setShowCourierModal(false)}
+        couriers={couriers}
+        selectedCourier={courier}
+        onSelect={(courierId, location) => {
+          setCourier(courierId);
+          setCourierLocation(location || '');
+        }}
+      />
     </div>
   );
 }

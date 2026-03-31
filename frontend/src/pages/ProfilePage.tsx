@@ -7,6 +7,7 @@ import { useWishlist } from '../hooks/useWishlist';
 import { getRecentlyViewed } from '../services/storage';
 import { getAvatarUrl, getProductImageUrl } from '../utils/imageOptimization';
 import { useToast } from '../contexts/ToastContext';
+import { ProfileEditModal } from '../components/profile/ProfileEditModal';
 
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
@@ -17,11 +18,7 @@ export default function ProfilePage() {
   const { wishlistIds, handleRemoveWishlist } = useWishlist();
   const [recentlyViewed, setRecentlyViewed] = useState<any[]>(() => getRecentlyViewed());
   const [loadingProducts, setLoadingProducts] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [nameInput, setNameInput] = useState('');
-  const [emailInput, setEmailInput] = useState('');
-  const [passwordInput, setPasswordInput] = useState('');
-  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [orderCount, setOrderCount] = useState(0);
   const [totalSpent, setTotalSpent] = useState(0);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
@@ -89,43 +86,32 @@ export default function ProfilePage() {
   }, [user]);
 
   useEffect(() => {
-    if (user) {
-      setNameInput(user.name || '');
-      setEmailInput(user.email || '');
-    }
+    const load = async () => {
+      if (!user) {
+        setRecentlyViewed(getRecentlyViewed());
+        return;
+      }
+      const items = await api.getRecentlyViewed(user.id);
+      setRecentlyViewed(items.map((entry: any) => entry.product));
+    };
+    load();
   }, [user]);
 
   const wishlistItems = useMemo(() => {
     return products.filter(p => wishlistIds.includes(p.id));
   }, [products, wishlistIds]);
 
-
-
   const handleStartEdit = () => {
-    setIsEditing(true);
-    setSaveMessage(null);
+    setEditModalOpen(true);
   };
 
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    setPasswordInput('');
-    if (user) {
-      setNameInput(user.name || '');
-      setEmailInput(user.email || '');
-    }
-  };
-
-  const handleSaveProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaveMessage(null);
+  const handleSaveProfile = async (data: { name: string; email: string; username: string; password?: string }) => {
     await updateProfile({
-      name: nameInput.trim(),
-      email: emailInput.trim(),
-      password: passwordInput.trim() || undefined,
+      name: data.name,
+      email: data.email,
+      password: data.password || undefined,
     });
-    setPasswordInput('');
-    setIsEditing(false);
-    setSaveMessage('Profile updated successfully.');
+    showToast('Profile updated successfully', 'success');
   };
 
   const handleAvatarUpload = async () => {
@@ -257,54 +243,28 @@ export default function ProfilePage() {
             <div className="profile-card-header">
               <h2>{t('profile.accountInfo')}</h2>
               <div style={{display: 'flex', gap: '8px'}}>
-                {!isEditing && (
-                  <button className="btn-secondary" onClick={handleStartEdit}>{t('common.edit')}</button>
-                )}
+                <button className="btn-secondary" onClick={handleStartEdit}>{t('common.edit')}</button>
                 <button className="btn-secondary" onClick={() => setShowAddressModal(!showAddressModal)}>
                   📍 {t('profile.savedAddresses')}
                 </button>
               </div>
             </div>
-            {saveMessage && <div className="success">{t('profile.profileUpdatedSuccessfully')}</div>}
-            {isEditing ? (
-              <form className="profile-edit-form" onSubmit={handleSaveProfile}>
-                <label>
-                  {t('profile.email')}
-                  <input type="email" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} />
-                </label>
-                <label>
-                  {t('profile.fullName')}
-                  <input value={nameInput} onChange={(e) => setNameInput(e.target.value)} />
-                </label>
-                <label>
-                  {t('profile.newPassword')}
-                  <input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} placeholder={t('profile.leaveBlank')} />
-                </label>
-                <div className="profile-edit-actions">
-                  <button type="button" className="btn-secondary" onClick={handleCancelEdit}>{t('common.cancel')}</button>
-                  <button type="submit" className="btn-primary">{t('common.save')}</button>
-                </div>
-              </form>
-            ) : (
-              <>
-                <div className="profile-field">
-                  <label>{t('profile.username')}</label>
-                  <div className="profile-value">{user.username}</div>
-                </div>
-                <div className="profile-field">
-                  <label>{t('profile.email')}</label>
-                  <div className="profile-value">{user.email}</div>
-                </div>
-                <div className="profile-field">
-                  <label>{t('profile.fullName')}</label>
-                  <div className="profile-value">{user.name || '—'}</div>
-                </div>
-                <div className="profile-field">
-                  <label>{t('profile.accountType')}</label>
-                  <div className="profile-value">{accountTypeLabel}</div>
-                </div>
-              </>
-            )}
+            <div className="profile-field">
+              <label>{t('profile.username')}</label>
+              <div className="profile-value">{user.username}</div>
+            </div>
+            <div className="profile-field">
+              <label>{t('profile.email')}</label>
+              <div className="profile-value">{user.email}</div>
+            </div>
+            <div className="profile-field">
+              <label>{t('profile.fullName')}</label>
+              <div className="profile-value">{user.name || '—'}</div>
+            </div>
+            <div className="profile-field">
+              <label>{t('profile.accountType')}</label>
+              <div className="profile-value">{accountTypeLabel}</div>
+            </div>
 
             {/* Address Modal - Collapsible */}
             {showAddressModal && (
@@ -440,6 +400,18 @@ export default function ProfilePage() {
           <Link to="/shop/all" className="btn-secondary">{t('profile.continueShopping')}</Link>
         </div>
       </div>
+
+      {/* Profile Edit Modal */}
+      <ProfileEditModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSave={handleSaveProfile}
+        currentData={{
+          name: user?.name || '',
+          email: user?.email || '',
+          username: user?.username || '',
+        }}
+      />
     </div>
   );
 }

@@ -52,9 +52,20 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
 
         <div className="modal-body">
           {items.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--muted)' }}>
-              <p style={{ fontSize: '3em', margin: '0 0 16px 0' }}>🛒</p>
-              <p style={{ fontSize: '1.1em' }}>{t('cart.empty')}</p>
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--muted)' }}>
+              <p style={{ fontSize: '4em', margin: '0 0 16px 0', lineHeight: '1' }}>🛒</p>
+              <p style={{ fontSize: '1.2em', fontWeight: '600', marginBottom: '8px' }}>{t('cart.empty')}</p>
+              <p style={{ fontSize: '0.9em', marginBottom: '24px' }}>Add items to get started!</p>
+              <button 
+                className="btn-primary"
+                onClick={() => {
+                  onClose();
+                  // Navigate to shop - you might need to use navigate hook
+                  window.location.href = '/shop/all';
+                }}
+              >
+                Continue Shopping
+              </button>
             </div>
           ) : (
             <div className="cart-items">
