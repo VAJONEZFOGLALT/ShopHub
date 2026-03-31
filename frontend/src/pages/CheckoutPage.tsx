@@ -6,10 +6,11 @@ import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 
 const couriers = [
-  { id: 'UPS', name: 'UPS Express', price: 15.99, days: '2-3 days' },
-  { id: 'PACKETA', name: 'Packeta', price: 4.99, days: '3-5 days' },
-  { id: 'DPD', name: 'DPD Express', price: 12.99, days: '1-2 days' },
-  { id: 'INPOST', name: 'InPost Locker', price: 3.99, days: '2-4 days' },
+  { id: 'MAGYAR_POSTA', name: '🇭🇺 Magyar Posta', price: 2.99, days: '2-3 days', type: 'address' },
+  { id: 'UPS', name: 'UPS Express', price: 15.99, days: '1-2 days', type: 'address' },
+  { id: 'DPD', name: 'DPD Express', price: 12.99, days: '1-2 days', type: 'address' },
+  { id: 'PACKETA', name: 'Packeta (Z-box)', price: 4.99, days: '2-3 days', type: 'pickup' },
+  { id: 'GLS', name: 'GLS (Box/Pickup)', price: 5.99, days: '2-4 days', type: 'both' },
 ];
 
 export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) => void }) {
@@ -67,12 +68,26 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
           <h2>{t('checkout.title')}</h2>
           {error && <div className="error">{error}</div>}
 
+          {items.length === 0 ? (
+            <div className="empty-checkout">
+              <div className="empty-state">
+                <p style={{ fontSize: '4em', margin: '0 0 16px 0' }}>🛒</p>
+                <h3>{t('cart.empty')}</h3>
+                <p className="muted">{t('checkout.addItemsFirst')}</p>
+                <button 
+                  className="btn-primary" 
+                  onClick={() => navigate('/shop/all')}
+                  style={{ marginTop: '20px' }}
+                >
+                  Continue Shopping
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
           <div className="checkout-section">
             <h3>{t('checkout.items')} ({items.length})</h3>
-            {items.length === 0 ? (
-              <p className="muted">{t('cart.empty')}</p>
-            ) : (
-              items.map(it => (
+              {items.map(it => (
                 <div key={it.productId} className="checkout-item">
                   <div className="checkout-item-info">
                     <strong>{it.name}</strong> x {it.quantity}
@@ -80,8 +95,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                   </div>
                   <button className="btn-text" onClick={() => remove(it.productId)}>{t('checkout.remove')}</button>
                 </div>
-              ))
-            )}
+              ))}
           </div>
 
           <div className="checkout-section">
@@ -142,6 +156,8 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
             {loading ? t('checkout.processing') : t('checkout.placeOrder')}
           </button>
         </div>
+            </>
+          )}
       </div>
     </div>
   );
