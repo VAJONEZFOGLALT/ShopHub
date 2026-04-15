@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -7,7 +7,6 @@ import { useWishlist } from '../hooks/useWishlist';
 import { getRecentlyViewed } from '../services/storage';
 import { getAvatarUrl, getProductImageUrl } from '../utils/imageOptimization';
 import { useToast } from '../contexts/ToastContext';
-import { ProfileEditModal } from '../components/profile/ProfileEditModal';
 
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
@@ -18,7 +17,12 @@ export default function ProfilePage() {
   const { wishlistIds, handleRemoveWishlist } = useWishlist();
   const [recentlyViewed, setRecentlyViewed] = useState<any[]>(() => getRecentlyViewed());
   const [loadingProducts, setLoadingProducts] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [nameInput, setNameInput] = useState('');
+  const [emailInput, setEmailInput] = useState('');
+  const [usernameInput, setUsernameInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [orderCount, setOrderCount] = useState(0);
   const [totalSpent, setTotalSpent] = useState(0);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
@@ -29,6 +33,11 @@ export default function ProfilePage() {
   const roleLabel = user?.role === 'ADMIN' ? t('profile.adminAccount') : `👤 ${t('profile.customer')}`;
   const accountTypeLabel = user?.role === 'ADMIN' ? t('profile.administrator') : t('profile.customer');
   const displayName = user?.name || user?.username || '';
+  const addressButtonText = addresses.length === 0 ? 'Cim megadasa' : 'Cim modositasa';
+  const preferredAddress = useMemo(() => {
+    if (addresses.length === 0) return null;
+    return addresses.find((addr) => addr.isDefault) || addresses[0];
+  }, [addresses]);
 
   useEffect(() => {
     const load = async () => {
@@ -86,15 +95,10 @@ export default function ProfilePage() {
   }, [user]);
 
   useEffect(() => {
-    const load = async () => {
-      if (!user) {
-        setRecentlyViewed(getRecentlyViewed());
-        return;
-      }
-      const items = await api.getRecentlyViewed(user.id);
-      setRecentlyViewed(items.map((entry: any) => entry.product));
-    };
-    load();
+    if (!user) return;
+    setNameInput(user.name || '');
+    setEmailInput(user.email || '');
+    setUsernameInput(user.username || '');
   }, [user]);
 
   const wishlistItems = useMemo(() => {
@@ -102,16 +106,32 @@ export default function ProfilePage() {
   }, [products, wishlistIds]);
 
   const handleStartEdit = () => {
-    setEditModalOpen(true);
+    setIsEditing(true);
+    setSaveMessage(null);
   };
 
-  const handleSaveProfile = async (data: { name: string; email: string; username: string; password?: string }) => {
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setPasswordInput('');
+    if (user) {
+      setNameInput(user.name || '');
+      setEmailInput(user.email || '');
+      setUsernameInput(user.username || '');
+    }
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaveMessage(null);
     await updateProfile({
-      name: data.name,
-      email: data.email,
-      password: data.password || undefined,
+      name: nameInput.trim(),
+      email: emailInput.trim(),
+      username: usernameInput.trim(),
+      password: passwordInput.trim() || undefined,
     });
-    showToast('Profile updated successfully', 'success');
+    setPasswordInput('');
+    setIsEditing(false);
+    setSaveMessage('Profil frissitve.');
   };
 
   const handleAvatarUpload = async () => {
@@ -244,127 +264,52 @@ export default function ProfilePage() {
               <h2>{t('profile.accountInfo')}</h2>
               <div style={{display: 'flex', gap: '8px'}}>
                 <button className="btn-secondary" onClick={handleStartEdit}>{t('common.edit')}</button>
-                <button className="btn-secondary" onClick={() => setShowAddressModal(!showAddressModal)}>
-                  📍 {t('profile.savedAddresses')}
+                <button className="btn-secondary" onClick={() => {
+                  setShowAddressModal(true);
+                  setEditingAddress(null);
+                }}>
+                  📍 {addressButtonText}
                 </button>
               </div>
             </div>
-            <div className="profile-field">
-              <label>{t('profile.username')}</label>
-              <div className="profile-value">{user.username}</div>
-            </div>
-            <div className="profile-field">
-              <label>{t('profile.email')}</label>
-              <div className="profile-value">{user.email}</div>
-            </div>
-            <div className="profile-field">
-              <label>{t('profile.fullName')}</label>
-              <div className="profile-value">{user.name || '—'}</div>
-            </div>
-            <div className="profile-field">
-              <label>{t('profile.accountType')}</label>
-              <div className="profile-value">{accountTypeLabel}</div>
-            </div>
-
-            {/* Address Modal - Collapsible */}
-            {showAddressModal && (
-              <div className="address-modal">
-                <div className="address-modal-header">
-                  <h3>{t('profile.savedAddresses')}</h3>
-                  <button className="close-btn" onClick={() => {
-                    setShowAddressModal(false);
-                    setEditingAddress(null);
-                  }}>✕</button>
-                </div>
-                
-                {!editingAddress && (
-                  <button className="btn-primary" style={{marginBottom: '16px', width: '100%'}} onClick={() => setEditingAddress({})} >
-                    + {t('profile.addAddress')}
-                  </button>
-                )}
-
-                {editingAddress !== null && (
-                  <form className="address-form" onSubmit={async (e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.currentTarget);
-                    const data = {
-                      userId: user!.id,
-                      label: formData.get('label') as string,
-                      fullName: formData.get('fullName') as string,
-                      street: formData.get('street') as string,
-                      city: formData.get('city') as string,
-                      state: formData.get('state') as string,
-                      zipCode: formData.get('zipCode') as string,
-                      country: formData.get('country') as string || 'USA',
-                      isDefault: formData.get('isDefault') === 'on',
-                    };
-                    try {
-                      if (editingAddress.id) {
-                        await api.updateAddress(editingAddress.id, data);
-                      } else {
-                        await api.createAddress(data);
-                      }
-                      const updated = await api.getAddresses(user!.id);
-                      setAddresses(updated);
-                      setEditingAddress(null);
-                    } catch (err) {
-                      showToast(t('profile.failedToSaveAddress'), 'error');
-                    }
-                  }}>
-                    <input name="label" placeholder={t('profile.labelPlaceholder')} defaultValue={editingAddress?.label} required />
-                    <input name="fullName" placeholder={t('profile.fullName')} defaultValue={editingAddress?.fullName} required />
-                    <input name="street" placeholder={t('profile.streetAddress')} defaultValue={editingAddress?.street} required />
-                    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px'}}>
-                      <input name="city" placeholder={t('profile.city')} defaultValue={editingAddress?.city} required />
-                      <input name="state" placeholder={t('profile.state')} defaultValue={editingAddress?.state} required />
-                    </div>
-                    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px'}}>
-                      <input name="zipCode" placeholder={t('profile.zipCode')} defaultValue={editingAddress?.zipCode} required />
-                      <input name="country" placeholder={t('profile.country')} defaultValue={editingAddress?.country || 'USA'} />
-                    </div>
-                    <label style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                      <input type="checkbox" name="isDefault" defaultChecked={editingAddress?.isDefault} />
-                      {t('profile.setAsDefault')}
-                    </label>
-                    <div style={{display: 'flex', gap: '8px'}}>
-                      <button type="submit" className="btn-primary" style={{flex: 1}}>{editingAddress.id ? t('profile.updateAddress') : t('profile.saveAddress')}</button>
-                      <button type="button" className="btn-secondary" style={{flex: 1}} onClick={() => setEditingAddress(null)}>{t('common.cancel')}</button>
-                    </div>
-                  </form>
-                )}
-
-                {addresses.length === 0 ? (
-                  <p className="muted" style={{textAlign: 'center', padding: '20px'}}>{t('profile.noAddresses')}</p>
-                ) : (
-                  <div className="addresses-modal-list">
-                    {addresses.map((addr) => (
-                      <div key={addr.id} className={`address-modal-item ${addr.isDefault ? 'default' : ''}`}>
-                        <div className="address-modal-content">
-                          <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px'}}>
-                            <strong>{addr.label}</strong>
-                            {addr.isDefault && <span className="default-badge">{t('profile.defaultAddress')}</span>}
-                          </div>
-                          <div style={{fontSize: '0.9em', color: 'var(--text-secondary)', lineHeight: '1.4'}}>
-                            <div>{addr.fullName}</div>
-                            <div>{addr.street}</div>
-                            <div>{addr.city}, {addr.state} {addr.zipCode}</div>
-                            <div>{addr.country}</div>
-                          </div>
-                        </div>
-                        <div style={{display: 'flex', gap: '6px'}}>
-                          <button className="btn-sm" onClick={() => setEditingAddress(addr)}>{t('common.edit')}</button>
-                          <button className="btn-sm danger" onClick={async () => {
-                            await api.deleteAddress(addr.id);
-                            const updated = await api.getAddresses(user!.id);
-                            setAddresses(updated);
-                          }}>{t('common.delete')}</button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+            {saveMessage && <div className="success">{saveMessage}</div>}
+            <>
+              <div className="profile-field">
+                <label>{t('profile.username')}</label>
+                <div className="profile-value">{user.username}</div>
               </div>
-            )}
+              <div className="profile-field">
+                <label>{t('profile.email')}</label>
+                <div className="profile-value">{user.email}</div>
+              </div>
+              <div className="profile-field">
+                <label>{t('profile.fullName')}</label>
+                <div className="profile-value">{user.name || '—'}</div>
+              </div>
+              <div className="profile-field">
+                <label>{t('profile.accountType')}</label>
+                <div className="profile-value">{accountTypeLabel}</div>
+              </div>
+              <div className="profile-field profile-field-address">
+                <label>{t('profile.savedAddresses')}</label>
+                <div className="profile-value">
+                  {preferredAddress ? (
+                    <div className="profile-address-preview">
+                      <div className="profile-address-preview-title">
+                        <strong>{preferredAddress.label}</strong>
+                        {preferredAddress.isDefault && <span className="default-badge">{t('profile.defaultAddress')}</span>}
+                      </div>
+                      <div>{preferredAddress.fullName}</div>
+                      <div>{preferredAddress.street}</div>
+                      <div>{preferredAddress.city}, {preferredAddress.state} {preferredAddress.zipCode}</div>
+                      <div>{preferredAddress.country}</div>
+                    </div>
+                  ) : (
+                    <span className="muted">{t('profile.noAddresses')}</span>
+                  )}
+                </div>
+              </div>
+            </>
           </div>
 
           {/* RIGHT: Recently Viewed */}
@@ -401,17 +346,142 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Profile Edit Modal */}
-      <ProfileEditModal
-        isOpen={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
-        onSave={handleSaveProfile}
-        currentData={{
-          name: user?.name || '',
-          email: user?.email || '',
-          username: user?.username || '',
-        }}
-      />
+      {showAddressModal && (
+        <div className="modal-overlay" onClick={() => {
+          setShowAddressModal(false);
+          setEditingAddress(null);
+        }}>
+          <div className="modal-content address-modal-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="address-modal-header">
+              <h3>{t('profile.savedAddresses')}</h3>
+              <button className="close-btn" onClick={() => {
+                setShowAddressModal(false);
+                setEditingAddress(null);
+              }}>✕</button>
+            </div>
+
+            {!editingAddress && (
+              <button className="btn-primary" style={{marginBottom: '16px', width: '100%'}} onClick={() => setEditingAddress({})}>
+                + {t('profile.addAddress')}
+              </button>
+            )}
+
+            {editingAddress !== null && (
+              <form className="address-form" onSubmit={async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const data = {
+                  userId: user!.id,
+                  label: formData.get('label') as string,
+                  fullName: formData.get('fullName') as string,
+                  street: formData.get('street') as string,
+                  city: formData.get('city') as string,
+                  state: formData.get('state') as string,
+                  zipCode: formData.get('zipCode') as string,
+                  country: formData.get('country') as string || 'USA',
+                  isDefault: formData.get('isDefault') === 'on',
+                };
+                try {
+                  if (editingAddress.id) {
+                    await api.updateAddress(editingAddress.id, data);
+                  } else {
+                    await api.createAddress(data);
+                  }
+                  const updated = await api.getAddresses(user!.id);
+                  setAddresses(updated);
+                  setEditingAddress(null);
+                } catch (err) {
+                  showToast(t('profile.failedToSaveAddress'), 'error');
+                }
+              }}>
+                <input name="label" placeholder={t('profile.labelPlaceholder')} defaultValue={editingAddress?.label} required />
+                <input name="fullName" placeholder={t('profile.fullName')} defaultValue={editingAddress?.fullName} required />
+                <input name="street" placeholder={t('profile.streetAddress')} defaultValue={editingAddress?.street} required />
+                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px'}}>
+                  <input name="city" placeholder={t('profile.city')} defaultValue={editingAddress?.city} required />
+                  <input name="state" placeholder={t('profile.state')} defaultValue={editingAddress?.state} required />
+                </div>
+                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px'}}>
+                  <input name="zipCode" placeholder={t('profile.zipCode')} defaultValue={editingAddress?.zipCode} required />
+                  <input name="country" placeholder={t('profile.country')} defaultValue={editingAddress?.country || 'USA'} />
+                </div>
+                <label style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                  <input type="checkbox" name="isDefault" defaultChecked={editingAddress?.isDefault} />
+                  {t('profile.setAsDefault')}
+                </label>
+                <div style={{display: 'flex', gap: '8px'}}>
+                  <button type="submit" className="btn-primary" style={{flex: 1}}>{editingAddress.id ? t('profile.updateAddress') : t('profile.saveAddress')}</button>
+                  <button type="button" className="btn-secondary" style={{flex: 1}} onClick={() => setEditingAddress(null)}>{t('common.cancel')}</button>
+                </div>
+              </form>
+            )}
+
+            {addresses.length === 0 ? (
+              <p className="muted" style={{textAlign: 'center', padding: '20px'}}>{t('profile.noAddresses')}</p>
+            ) : (
+              <div className="addresses-modal-list">
+                {addresses.map((addr) => (
+                  <div key={addr.id} className={`address-modal-item ${addr.isDefault ? 'default' : ''}`}>
+                    <div className="address-modal-content">
+                      <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px'}}>
+                        <strong>{addr.label}</strong>
+                        {addr.isDefault && <span className="default-badge">{t('profile.defaultAddress')}</span>}
+                      </div>
+                      <div style={{fontSize: '0.9em', color: 'var(--text-secondary)', lineHeight: '1.4'}}>
+                        <div>{addr.fullName}</div>
+                        <div>{addr.street}</div>
+                        <div>{addr.city}, {addr.state} {addr.zipCode}</div>
+                        <div>{addr.country}</div>
+                      </div>
+                    </div>
+                    <div style={{display: 'flex', gap: '6px'}}>
+                      <button className="btn-sm" onClick={() => setEditingAddress(addr)}>{t('common.edit')}</button>
+                      <button className="btn-sm danger" onClick={async () => {
+                        await api.deleteAddress(addr.id);
+                        const updated = await api.getAddresses(user!.id);
+                        setAddresses(updated);
+                      }}>{t('common.delete')}</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {isEditing && (
+        <div className="modal-overlay" onClick={handleCancelEdit}>
+          <div className="modal-content profile-edit-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{t('profile.editAccount')}</h2>
+              <button className="modal-close" onClick={handleCancelEdit}>✕</button>
+            </div>
+            <form className="profile-edit-form modal-body" onSubmit={handleSaveProfile}>
+              <label>
+                {t('profile.username')}
+                <input value={usernameInput} onChange={(e) => setUsernameInput(e.target.value)} required />
+              </label>
+              <label>
+                {t('profile.email')}
+                <input type="email" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required />
+              </label>
+              <label>
+                {t('profile.fullName')}
+                <input value={nameInput} onChange={(e) => setNameInput(e.target.value)} />
+              </label>
+              <label>
+                {t('profile.newPassword')}
+                <input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} placeholder={t('profile.leaveBlank')} />
+              </label>
+              <div className="profile-edit-actions">
+                <button type="button" className="btn-secondary" onClick={handleCancelEdit}>{t('common.cancel')}</button>
+                <button type="submit" className="btn-primary">{t('common.save')}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

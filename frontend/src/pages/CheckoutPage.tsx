@@ -4,14 +4,28 @@ import { useTranslation } from 'react-i18next';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
-import { CourierSelectionModal } from '../components/checkout/CourierSelectionModal';
+import type { CourierOption } from '../components/checkout/CourierSelectionModal';
 
-const couriers = [
-  { id: 'MAGYAR_POSTA', name: '🇭🇺 Magyar Posta', price: 2.99, days: '2-3 days', type: 'address' },
-  { id: 'UPS', name: 'UPS Express', price: 15.99, days: '1-2 days', type: 'address' },
-  { id: 'DPD', name: 'DPD Express', price: 12.99, days: '1-2 days', type: 'address' },
-  { id: 'PACKETA', name: 'Packeta (Z-box)', price: 4.99, days: '2-3 days', type: 'pickup' },
-  { id: 'GLS', name: 'GLS (Box/Pickup)', price: 5.99, days: '2-4 days', type: 'both' },
+declare global {
+  interface Window {
+    Packeta?: {
+      Widget?: {
+        pick: (
+          apiKey: string,
+          callback: (point: any) => void,
+          options?: Record<string, unknown>
+        ) => void;
+      };
+    };
+  }
+}
+
+const couriers: CourierOption[] = [
+  { id: 'MAGYAR_POSTA', name: '🇭🇺 Magyar Posta', price: 2.99, days: '2-3 days', type: 'address' as const },
+  { id: 'UPS', name: 'UPS Express', price: 15.99, days: '1-2 days', type: 'address' as const },
+  { id: 'DPD', name: 'DPD Express', price: 12.99, days: '1-2 days', type: 'address' as const },
+  { id: 'PACKETA', name: 'Packeta (Z-box)', price: 4.99, days: '2-3 days', type: 'pickup' as const },
+  { id: 'GLS', name: 'GLS (Box/Pickup)', price: 5.99, days: '2-4 days', type: 'both' as const },
 ];
 
 export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) => void }) {
@@ -21,7 +35,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
   const navigate = useNavigate();
   const [courier, setCourier] = useState('UPS');
   const [courierLocation, setCourierLocation] = useState('');
-  const [showCourierModal, setShowCourierModal] = useState(false);
+  const [packetaReady, setPacketaReady] = useState(false);
   const [addresses, setAddresses] = useState<any[]>([]);
   const [selectedAddr, setSelectedAddr] = useState<number | null>(null);
   const [newUser, setNewUser] = useState({ username: '', email: '', password: '' });
@@ -34,6 +48,53 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
     }
   }, [user]);
 
+  useEffect(() => {
+    const existing = document.querySelector('script[data-packeta-widget="1"]') as HTMLScriptElement | null;
+    if (existing) {
+      setPacketaReady(true);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://widget.packeta.com/v6/www/js/library.js';
+    script.async = true;
+    script.setAttribute('data-packeta-widget', '1');
+    script.onload = () => setPacketaReady(true);
+    script.onerror = () => setPacketaReady(false);
+    document.body.appendChild(script);
+  }, []);
+
+  const handlePickPacketaPoint = () => {
+    const apiKey = import.meta.env.VITE_PACKETA_API_KEY || '';
+
+    if (!apiKey) {
+      setError('Hianyzik a VITE_PACKETA_API_KEY, add meg .env-ben.');
+      return;
+    }
+
+    if (!window.Packeta?.Widget?.pick) {
+      setError('A Packeta widget nem toltheto be most.');
+      return;
+    }
+
+    window.Packeta.Widget.pick(
+      apiKey,
+      (point: any) => {
+        if (!point) return;
+        const label = [point.name, point.city, point.street].filter(Boolean).join(', ');
+        setCourierLocation(label);
+      },
+      {
+        language: 'hu',
+        country: 'hu',
+      }
+    );
+  };
+
+  const handleOpenGlsFinder = () => {
+    window.open('https://gls-group.com/HU/hu/depo-csomagpont-kereses/', '_blank', 'noopener,noreferrer');
+  };
+
   const ship = couriers.find(c => c.id === courier)?.price || 0;
   const finalTotal = total + ship;
 
@@ -41,6 +102,14 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
     setLoading(true);
     setError('');
     try {
+      const selectedCourier = couriers.find((c) => c.id === courier);
+      const needsPickupPoint = selectedCourier?.type !== 'address';
+
+      if (needsPickupPoint && !courierLocation.trim()) {
+        setError('Valassz atvevo pontot/boxot a kivalasztott futarhoz.');
+        return;
+      }
+
       let userId: number;
       if (user?.id) {
         userId = user.id;
@@ -51,7 +120,9 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
 
       const orderItems = items.map(i => ({ productId: i.productId, quantity: i.quantity }));
       const addr = addresses.find(a => a.id === selectedAddr);
-      const shipping = addr ? `${addr.fullName}, ${addr.street}, ${addr.city}, ${addr.state} ${addr.zipCode}` : undefined;
+      const addressText = addr ? `${addr.fullName}, ${addr.street}, ${addr.city}, ${addr.state} ${addr.zipCode}` : '';
+      const pickupText = courierLocation ? `Atvevo pont: ${courierLocation}` : '';
+      const shipping = [addressText, pickupText].filter(Boolean).join(' | ') || undefined;
 
       const order = await api.createOrder({ userId, items: orderItems, courier, shippingAddress: shipping });
       clear();
@@ -103,19 +174,50 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
 
               <div className="checkout-section">
                 <h3>{t('checkout.delivery')}</h3>
-                <div className="courier-selected-info">
-                  <div className="courier-display">
-                    <strong>{couriers.find(c => c.id === courier)?.name}</strong>
-                    <p className="muted">${couriers.find(c => c.id === courier)?.price.toFixed(2)}</p>
-                    {courierLocation && <p className="muted" style={{ fontSize: '0.85em' }}>📍 {courierLocation}</p>}
+                {couriers.map(c => (
+                  <label key={c.id} style={{ display: 'flex', gap: '10px', margin: '10px 0', padding: '10px', border: '1px solid var(--border)', borderRadius: '6px' }}>
+                    <input
+                      type="radio"
+                      value={c.id}
+                      checked={courier === c.id}
+                      onChange={e => {
+                        setCourier(e.target.value);
+                        setCourierLocation('');
+                      }}
+                    />
+                    <div style={{ flex: 1 }}>
+                      <div><strong>{c.name}</strong> - ${c.price.toFixed(2)}</div>
+                      <div className="muted" style={{ fontSize: '0.9em' }}>{c.days}</div>
+                    </div>
+                  </label>
+                ))}
+
+                {courier === 'PACKETA' && (
+                  <div className="courier-picker-box">
+                    <button className="btn-secondary" onClick={handlePickPacketaPoint} disabled={!packetaReady}>
+                      {packetaReady ? 'Packeta Z-BOX kivalasztasa' : 'Packeta betoltese...'}
+                    </button>
+                    {courierLocation && <p className="muted" style={{ marginTop: '8px' }}>📍 {courierLocation}</p>}
                   </div>
-                  <button 
-                    className="btn-secondary" 
-                    onClick={() => setShowCourierModal(true)}
-                  >
-                    {t('common.change')}
-                  </button>
-                </div>
+                )}
+
+                {courier === 'GLS' && (
+                  <div className="courier-picker-box">
+                    <button className="btn-secondary" onClick={handleOpenGlsFinder}>
+                      GLS csomagpont kereso megnyitasa
+                    </button>
+                    <input
+                      style={{ width: '100%', marginTop: '10px', padding: '10px' }}
+                      placeholder="Kivalasztott GLS pont neve vagy kodja"
+                      value={courierLocation}
+                      onChange={(e) => setCourierLocation(e.target.value)}
+                    />
+                  </div>
+                )}
+
+                {courierLocation && courier !== 'PACKETA' && courier !== 'GLS' && (
+                  <p className="muted" style={{ fontSize: '0.85em' }}>📍 {courierLocation}</p>
+                )}
               </div>
 
               {user && addresses.length > 0 && (
@@ -166,18 +268,6 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
           </button>
         </div>
       </div>
-
-      {/* Courier Selection Modal */}
-      <CourierSelectionModal
-        isOpen={showCourierModal}
-        onClose={() => setShowCourierModal(false)}
-        couriers={couriers}
-        selectedCourier={courier}
-        onSelect={(courierId, location) => {
-          setCourier(courierId);
-          setCourierLocation(location || '');
-        }}
-      />
     </div>
   );
 }
