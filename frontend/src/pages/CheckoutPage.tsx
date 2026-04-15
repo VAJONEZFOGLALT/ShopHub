@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
-import type { CourierOption } from '../components/checkout/CourierSelectionModal';
+import { COUNTRY_ADDRESS_CONFIGS, DEFAULT_COUNTRY_CODE, formatAddressSingleLine, getCountryAddressConfig } from '../utils/addressing';
 
 declare global {
   interface Window {
@@ -21,32 +21,81 @@ declare global {
 }
 
 const couriers: CourierOption[] = [
-  { id: 'MAGYAR_POSTA', name: '🇭🇺 Magyar Posta', price: 2.99, days: '2-3 days', type: 'address' as const },
-  { id: 'UPS', name: 'UPS Express', price: 15.99, days: '1-2 days', type: 'address' as const },
-  { id: 'DPD', name: 'DPD Express', price: 12.99, days: '1-2 days', type: 'address' as const },
-  { id: 'PACKETA', name: 'Packeta (Z-box)', price: 4.99, days: '2-3 days', type: 'pickup' as const },
-  { id: 'GLS', name: 'GLS (Box/Pickup)', price: 5.99, days: '2-4 days', type: 'both' as const },
+  { id: 'UPS', name: 'UPS Express', price: 15.99, days: '1-2 days', type: 'address' },
+  { id: 'DPD', name: 'DPD', price: 7.99, days: '1-2 days', type: 'both' },
+  { id: 'PACKETA', name: 'Packeta (Z-Box / pickup point)', price: 4.99, days: '2-3 days', type: 'pickup' },
+  { id: 'INPOST', name: 'InPost Locker', price: 5.49, days: '2-3 days', type: 'pickup' },
 ];
+
+type CourierOption = {
+  id: 'UPS' | 'DPD' | 'PACKETA' | 'INPOST';
+  name: string;
+  price: number;
+  days: string;
+  type: 'address' | 'pickup' | 'both';
+};
+
+type DeliveryMode = 'address' | 'pickup';
+
+type GuestAddressDraft = {
+  fullName: string;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+};
+
+const getDefaultMode = (courier?: CourierOption): DeliveryMode => {
+  if (!courier) return 'address';
+  if (courier.type === 'pickup') return 'pickup';
+  return 'address';
+};
 
 export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) => void }) {
   const { t } = useTranslation();
   const { items, remove, clear, total } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [courier, setCourier] = useState('UPS');
-  const [courierLocation, setCourierLocation] = useState('');
+  const [courier, setCourier] = useState<CourierOption['id']>('UPS');
+  const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>('address');
   const [packetaReady, setPacketaReady] = useState(false);
   const [addresses, setAddresses] = useState<any[]>([]);
   const [selectedAddr, setSelectedAddr] = useState<number | null>(null);
+  const [pickupPointLabel, setPickupPointLabel] = useState('');
+  const [pickupPointCode, setPickupPointCode] = useState('');
+  const [guestAddress, setGuestAddress] = useState<GuestAddressDraft>({
+    fullName: '',
+    street: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: DEFAULT_COUNTRY_CODE,
+  });
   const [newUser, setNewUser] = useState({ username: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const selectedCourier = couriers.find((c) => c.id === courier) || couriers[0];
+  const needsPickup = selectedCourier.type === 'pickup' || (selectedCourier.type === 'both' && deliveryMode === 'pickup');
+  const needsAddress = selectedCourier.type === 'address' || (selectedCourier.type === 'both' && deliveryMode === 'address');
+  const guestCountryConfig = getCountryAddressConfig(guestAddress.country);
+
   useEffect(() => {
     if (user) {
-      api.getAddresses(user.id).then(setAddresses).catch(() => {});
+      api.getAddresses(user.id).then((data) => {
+        setAddresses(data);
+        const preferred = data.find((a: any) => a.isDefault) || data[0];
+        setSelectedAddr(preferred?.id ?? null);
+      }).catch(() => {});
     }
   }, [user]);
+
+  useEffect(() => {
+    setDeliveryMode(getDefaultMode(selectedCourier));
+    setPickupPointLabel('');
+    setPickupPointCode('');
+  }, [courier]);
 
   useEffect(() => {
     const existing = document.querySelector('script[data-packeta-widget="1"]') as HTMLScriptElement | null;
@@ -82,7 +131,8 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
       (point: any) => {
         if (!point) return;
         const label = [point.name, point.city, point.street].filter(Boolean).join(', ');
-        setCourierLocation(label);
+        setPickupPointLabel(label);
+        setPickupPointCode(String(point.id || point.code || 'PACKETA-POINT'));
       },
       {
         language: 'hu',
@@ -91,22 +141,40 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
     );
   };
 
-  const handleOpenGlsFinder = () => {
-    window.open('https://gls-group.com/HU/hu/depo-csomagpont-kereses/', '_blank', 'noopener,noreferrer');
+  const handleOpenDpdFinder = () => {
+    window.open('https://www.dpd.com/hu/hu/atvevohely-kereso/', '_blank', 'noopener,noreferrer');
   };
 
-  const ship = couriers.find(c => c.id === courier)?.price || 0;
+  const handleOpenInpostFinder = () => {
+    window.open('https://inpost.hu/automata-kereso', '_blank', 'noopener,noreferrer');
+  };
+
+  const validateGuestAddress = () => {
+    if (user) return true;
+    const requiredFields: Array<keyof GuestAddressDraft> = ['fullName', 'street', 'city', 'state', 'zipCode', 'country'];
+    const missing = requiredFields.some((field) => !guestAddress[field]?.trim());
+    return !missing;
+  };
+
+  const ship = selectedCourier.price;
   const finalTotal = total + ship;
 
   const handleOrder = async () => {
     setLoading(true);
     setError('');
     try {
-      const selectedCourier = couriers.find((c) => c.id === courier);
-      const needsPickupPoint = selectedCourier?.type !== 'address';
-
-      if (needsPickupPoint && !courierLocation.trim()) {
+      if (needsPickup && !pickupPointLabel.trim()) {
         setError('Valassz atvevo pontot/boxot a kivalasztott futarhoz.');
+        return;
+      }
+
+      if (needsAddress && user && !selectedAddr) {
+        setError('Valassz szallitasi cimet.');
+        return;
+      }
+
+      if (needsAddress && !validateGuestAddress()) {
+        setError('Toltsd ki a szallitasi cim kotelezo mezoit.');
         return;
       }
 
@@ -119,10 +187,10 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
       }
 
       const orderItems = items.map(i => ({ productId: i.productId, quantity: i.quantity }));
-      const addr = addresses.find(a => a.id === selectedAddr);
-      const addressText = addr ? `${addr.fullName}, ${addr.street}, ${addr.city}, ${addr.state} ${addr.zipCode}` : '';
-      const pickupText = courierLocation ? `Atvevo pont: ${courierLocation}` : '';
-      const shipping = [addressText, pickupText].filter(Boolean).join(' | ') || undefined;
+      const selectedAddress = addresses.find(a => a.id === selectedAddr);
+      const shipping = needsPickup
+        ? `PICKUP | ${courier} | ${pickupPointCode || 'N/A'} | ${pickupPointLabel}`
+        : `ADDRESS | ${courier} | ${formatAddressSingleLine(user ? selectedAddress || {} : guestAddress)}`;
 
       const order = await api.createOrder({ userId, items: orderItems, courier, shippingAddress: shipping });
       clear();
@@ -181,8 +249,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                       value={c.id}
                       checked={courier === c.id}
                       onChange={e => {
-                        setCourier(e.target.value);
-                        setCourierLocation('');
+                        setCourier(e.target.value as CourierOption['id']);
                       }}
                     />
                     <div style={{ flex: 1 }}>
@@ -192,35 +259,78 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                   </label>
                 ))}
 
-                {courier === 'PACKETA' && (
+                {selectedCourier.type === 'both' && (
+                  <div className="courier-picker-box">
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        className={`btn-secondary ${deliveryMode === 'address' ? 'active' : ''}`}
+                        onClick={() => setDeliveryMode('address')}
+                      >
+                        Hazhozszallitas
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn-secondary ${deliveryMode === 'pickup' ? 'active' : ''}`}
+                        onClick={() => setDeliveryMode('pickup')}
+                      >
+                        Atvevo pont / locker
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {needsPickup && courier === 'PACKETA' && (
                   <div className="courier-picker-box">
                     <button className="btn-secondary" onClick={handlePickPacketaPoint} disabled={!packetaReady}>
                       {packetaReady ? 'Packeta Z-BOX kivalasztasa' : 'Packeta betoltese...'}
                     </button>
-                    {courierLocation && <p className="muted" style={{ marginTop: '8px' }}>📍 {courierLocation}</p>}
+                    {pickupPointLabel && <p className="muted" style={{ marginTop: '8px' }}>📍 {pickupPointLabel}</p>}
                   </div>
                 )}
 
-                {courier === 'GLS' && (
+                {needsPickup && courier === 'DPD' && (
                   <div className="courier-picker-box">
-                    <button className="btn-secondary" onClick={handleOpenGlsFinder}>
-                      GLS csomagpont kereso megnyitasa
+                    <button className="btn-secondary" onClick={handleOpenDpdFinder}>
+                      DPD pont kereso megnyitasa
                     </button>
                     <input
                       style={{ width: '100%', marginTop: '10px', padding: '10px' }}
-                      placeholder="Kivalasztott GLS pont neve vagy kodja"
-                      value={courierLocation}
-                      onChange={(e) => setCourierLocation(e.target.value)}
+                      placeholder="DPD pont neve / cim"
+                      value={pickupPointLabel}
+                      onChange={(e) => setPickupPointLabel(e.target.value)}
+                    />
+                    <input
+                      style={{ width: '100%', marginTop: '10px', padding: '10px' }}
+                      placeholder="DPD pont azonosito"
+                      value={pickupPointCode}
+                      onChange={(e) => setPickupPointCode(e.target.value)}
                     />
                   </div>
                 )}
 
-                {courierLocation && courier !== 'PACKETA' && courier !== 'GLS' && (
-                  <p className="muted" style={{ fontSize: '0.85em' }}>📍 {courierLocation}</p>
+                {needsPickup && courier === 'INPOST' && (
+                  <div className="courier-picker-box">
+                    <button className="btn-secondary" onClick={handleOpenInpostFinder}>
+                      InPost locker kereso megnyitasa
+                    </button>
+                    <input
+                      style={{ width: '100%', marginTop: '10px', padding: '10px' }}
+                      placeholder="InPost locker kod"
+                      value={pickupPointCode}
+                      onChange={(e) => setPickupPointCode(e.target.value)}
+                    />
+                    <input
+                      style={{ width: '100%', marginTop: '10px', padding: '10px' }}
+                      placeholder="Locker cim / varos"
+                      value={pickupPointLabel}
+                      onChange={(e) => setPickupPointLabel(e.target.value)}
+                    />
+                  </div>
                 )}
               </div>
 
-              {user && addresses.length > 0 && (
+              {needsAddress && user && addresses.length > 0 && (
                 <div className="checkout-section">
                   <h3>{t('checkout.address')}</h3>
                   {addresses.map(a => (
@@ -228,10 +338,86 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                       <input type="radio" checked={selectedAddr === a.id} onChange={() => setSelectedAddr(a.id)} />
                       <div>
                         <strong>{a.label}</strong><br />
-                        {a.fullName}, {a.street}, {a.city}, {a.state} {a.zipCode}
+                        {formatAddressSingleLine(a)}
                       </div>
                     </label>
                   ))}
+                </div>
+              )}
+
+              {needsAddress && user && addresses.length === 0 && (
+                <div className="checkout-section">
+                  <h3>{t('checkout.address')}</h3>
+                  <p className="muted">Nincs mentett szallitasi cimed. Adj hozza egyet a profil oldalon.</p>
+                  <button className="btn-secondary" onClick={() => navigate('/shop/profile')}>Profil megnyitasa</button>
+                </div>
+              )}
+
+              {needsAddress && !user && (
+                <div className="checkout-section">
+                  <h3>Szallitasi cim</h3>
+                  <input
+                    placeholder={t('profile.fullName')}
+                    value={guestAddress.fullName}
+                    onChange={(e) => setGuestAddress((prev) => ({ ...prev, fullName: e.target.value }))}
+                    style={{ width: '100%', marginBottom: '8px', padding: '8px' }}
+                    required
+                  />
+                  <input
+                    placeholder={t('profile.streetAddress')}
+                    value={guestAddress.street}
+                    onChange={(e) => setGuestAddress((prev) => ({ ...prev, street: e.target.value }))}
+                    style={{ width: '100%', marginBottom: '8px', padding: '8px' }}
+                    required
+                  />
+                  <select
+                    value={guestAddress.country}
+                    onChange={(e) => setGuestAddress((prev) => ({ ...prev, country: e.target.value, state: '' }))}
+                    style={{ width: '100%', marginBottom: '8px', padding: '8px' }}
+                  >
+                    {COUNTRY_ADDRESS_CONFIGS.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <input
+                      placeholder={t('profile.city')}
+                      value={guestAddress.city}
+                      onChange={(e) => setGuestAddress((prev) => ({ ...prev, city: e.target.value }))}
+                      style={{ width: '100%', marginBottom: '8px', padding: '8px' }}
+                      required
+                    />
+                    {guestCountryConfig.regions ? (
+                      <select
+                        value={guestAddress.state}
+                        onChange={(e) => setGuestAddress((prev) => ({ ...prev, state: e.target.value }))}
+                        style={{ width: '100%', marginBottom: '8px', padding: '8px' }}
+                        required
+                      >
+                        <option value="" disabled>{guestCountryConfig.regionLabel}</option>
+                        {guestCountryConfig.regions.map((region) => (
+                          <option key={region} value={region}>{region}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        placeholder={guestCountryConfig.regionLabel}
+                        value={guestAddress.state}
+                        onChange={(e) => setGuestAddress((prev) => ({ ...prev, state: e.target.value }))}
+                        style={{ width: '100%', marginBottom: '8px', padding: '8px' }}
+                        required
+                      />
+                    )}
+                  </div>
+                  <input
+                    placeholder={guestCountryConfig.postalLabel}
+                    value={guestAddress.zipCode}
+                    onChange={(e) => setGuestAddress((prev) => ({ ...prev, zipCode: e.target.value }))}
+                    style={{ width: '100%', marginBottom: '8px', padding: '8px' }}
+                    required
+                  />
                 </div>
               )}
 

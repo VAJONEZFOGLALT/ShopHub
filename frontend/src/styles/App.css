@@ -2646,7 +2646,8 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   gap: 8px; 
   padding: 18px 0; 
   border-bottom: 1px solid var(--border); 
-  align-items: flex-start; 
+  align-items: flex-start;
+  min-width: 0;
 }
 
 @media (min-width: 900px) {
@@ -2673,6 +2674,9 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   color: var(--text); 
   font-size: 1.05em;
   font-weight: 600;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  min-width: 0;
 }
 
 .profile-address-preview-card {
@@ -2693,6 +2697,8 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 
 .profile-address-preview-title strong {
   color: var(--text);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .profile-address-line {
