@@ -196,60 +196,34 @@ export default function ProfilePage() {
             <p className="profile-role">{roleLabel}</p>
           </div>
           
-          <div className="profile-header-side">
-            <div className="profile-header-stats">
-              <div className="header-stat">
-                <span className="header-stat-icon">📦</span>
-                <div>
-                  <div className="header-stat-value">{orderCount}</div>
-                  <div className="header-stat-label">{t('profile.totalOrders')}</div>
-                </div>
-              </div>
-              <div className="header-stat">
-                <span className="header-stat-icon">💰</span>
-                <div>
-                  <div className="header-stat-value">${totalSpent.toFixed(2)}</div>
-                  <div className="header-stat-label">{t('profile.totalSpent')}</div>
-                </div>
-              </div>
-              <div className="header-stat">
-                <span className="header-stat-icon">❤️</span>
-                <div>
-                  <div className="header-stat-value">{wishlistItems.length}</div>
-                  <div className="header-stat-label">{t('profile.wishlistItems')}</div>
-                </div>
-              </div>
-              <div className="header-stat">
-                <span className="header-stat-icon">👁️</span>
-                <div>
-                  <div className="header-stat-value">{recentlyViewed.length}</div>
-                  <div className="header-stat-label">{t('profile.recentlyViewedCount')}</div>
-                </div>
+          <div className="profile-header-stats">
+            <div className="header-stat">
+              <span className="header-stat-icon">📦</span>
+              <div>
+                <div className="header-stat-value">{orderCount}</div>
+                <div className="header-stat-label">{t('profile.totalOrders')}</div>
               </div>
             </div>
-            <div className="profile-header-address">
-              <div className="profile-header-address-title-row">
-                <span className="profile-header-address-title">📍 {t('profile.savedAddresses')}</span>
-                <button className="profile-header-address-edit" onClick={() => {
-                  setShowAddressModal(true);
-                  setEditingAddress(null);
-                }}>
-                  {t('common.edit')}
-                </button>
+            <div className="header-stat">
+              <span className="header-stat-icon">💰</span>
+              <div>
+                <div className="header-stat-value">${totalSpent.toFixed(2)}</div>
+                <div className="header-stat-label">{t('profile.totalSpent')}</div>
               </div>
-              {preferredAddress ? (
-                <div className="profile-header-address-content">
-                  <div className="profile-header-address-line profile-header-address-main">
-                    <strong>{preferredAddress.label}</strong>
-                    {preferredAddress.isDefault && <span className="default-badge">{t('profile.defaultAddress')}</span>}
-                  </div>
-                  <div className="profile-header-address-line">{preferredAddress.fullName}</div>
-                  <div className="profile-header-address-line">{preferredAddress.street}</div>
-                  <div className="profile-header-address-line">{preferredAddress.city}, {preferredAddress.state} {preferredAddress.zipCode}</div>
-                </div>
-              ) : (
-                <div className="profile-header-address-empty">{t('profile.noAddresses')}</div>
-              )}
+            </div>
+            <div className="header-stat">
+              <span className="header-stat-icon">❤️</span>
+              <div>
+                <div className="header-stat-value">{wishlistItems.length}</div>
+                <div className="header-stat-label">{t('profile.wishlistItems')}</div>
+              </div>
+            </div>
+            <div className="header-stat">
+              <span className="header-stat-icon">👁️</span>
+              <div>
+                <div className="header-stat-value">{recentlyViewed.length}</div>
+                <div className="header-stat-label">{t('profile.recentlyViewedCount')}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -288,15 +262,7 @@ export default function ProfilePage() {
           <div className="profile-card profile-center">
             <div className="profile-card-header">
               <h2>{t('profile.accountInfo')}</h2>
-              <div style={{display: 'flex', gap: '8px'}}>
-                <button className="btn-secondary" onClick={handleStartEdit}>{t('common.edit')}</button>
-                <button className="btn-secondary" onClick={() => {
-                  setShowAddressModal(true);
-                  setEditingAddress(null);
-                }}>
-                  📍 {addressButtonText}
-                </button>
-              </div>
+              <button className="btn-secondary" onClick={handleStartEdit}>{t('common.edit')}</button>
             </div>
             {saveMessage && <div className="success">{saveMessage}</div>}
             <>
@@ -342,6 +308,35 @@ export default function ProfilePage() {
                   </div>
                 ))}
               </div>
+            )}
+          </div>
+
+          <div className="profile-card profile-address-column">
+            <div className="profile-card-header">
+              <h2>{t('profile.savedAddresses')}</h2>
+              <button className="btn-secondary" onClick={() => {
+                setShowAddressModal(true);
+                setEditingAddress(null);
+              }}>
+                📍 {addressButtonText}
+              </button>
+            </div>
+            {preferredAddress ? (
+              <div className="profile-address-preview-card">
+                <div className="profile-address-preview-title">
+                  <strong>{preferredAddress.label}</strong>
+                  {preferredAddress.isDefault && <span className="default-badge">{t('profile.defaultAddress')}</span>}
+                </div>
+                <div className="profile-address-line">{preferredAddress.fullName}</div>
+                <div className="profile-address-line">{preferredAddress.street}</div>
+                <div className="profile-address-line">{preferredAddress.city}, {preferredAddress.state} {preferredAddress.zipCode}</div>
+                <div className="profile-address-line">{preferredAddress.country}</div>
+                <div className="profile-address-count muted">
+                  {addresses.length} {t('profile.savedAddresses').toLowerCase()}
+                </div>
+              </div>
+            ) : (
+              <p className="muted">{t('profile.noAddresses')}</p>
             )}
           </div>
         </div>
