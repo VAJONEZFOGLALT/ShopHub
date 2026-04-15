@@ -104,8 +104,6 @@ export default function ProfilePage() {
   const wishlistItems = useMemo(() => {
     return products.filter(p => wishlistIds.includes(p.id));
   }, [products, wishlistIds]);
-  const visibleWishlistItems = useMemo(() => wishlistItems.slice(0, 4), [wishlistItems]);
-  const visibleRecentlyViewed = useMemo(() => recentlyViewed.slice(0, 4), [recentlyViewed]);
 
   const handleStartEdit = () => {
     setIsEditing(true);
@@ -240,7 +238,7 @@ export default function ProfilePage() {
               <p className="muted">{t('profile.emptyWishlist')}</p>
             ) : (
               <div className="profile-product-list">
-                {visibleWishlistItems.map((item) => (
+                {wishlistItems.map((item) => (
                   <div key={item.id} className="profile-product-mini">
                     <div className="profile-product-mini-img" onClick={() => navigate(`/shop/product/${item.id}`)}>
                       {item.image ? (
@@ -287,32 +285,6 @@ export default function ProfilePage() {
             </>
           </div>
 
-          {/* RIGHT: Recently Viewed */}
-          <div className="profile-card profile-right">
-            <h2>{t('profile.recentlyViewed')}</h2>
-            {recentlyViewed.length === 0 ? (
-              <p className="muted">{t('profile.noRecentlyViewed')}</p>
-            ) : (
-              <div className="profile-product-list">
-                {visibleRecentlyViewed.map((item: any) => (
-                  <div key={item.id} className="profile-product-mini">
-                    <div className="profile-product-mini-img" onClick={() => navigate(`/shop/product/${item.id}`)}>
-                      {item.image ? (
-                        <img src={getProductImageUrl(item.image)} alt={item.name} loading="lazy" />
-                      ) : (
-                        <div className="profile-product-placeholder-mini">{item.name}</div>
-                      )}
-                    </div>
-                    <div className="profile-product-mini-info">
-                      <strong onClick={() => navigate(`/shop/product/${item.id}`)} style={{cursor: 'pointer'}}>{item.name}</strong>
-                      <div className="muted">${Number(item.price).toFixed(2)}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
           <div className="profile-card profile-address-column">
             <div className="profile-card-header">
               <h2>{t('profile.savedAddresses')}</h2>
@@ -339,6 +311,32 @@ export default function ProfilePage() {
               </div>
             ) : (
               <p className="muted">{t('profile.noAddresses')}</p>
+            )}
+          </div>
+
+          {/* RIGHT: Recently Viewed */}
+          <div className="profile-card profile-right">
+            <h2>{t('profile.recentlyViewed')}</h2>
+            {recentlyViewed.length === 0 ? (
+              <p className="muted">{t('profile.noRecentlyViewed')}</p>
+            ) : (
+              <div className="profile-product-list">
+                {recentlyViewed.map((item: any) => (
+                  <div key={item.id} className="profile-product-mini">
+                    <div className="profile-product-mini-img" onClick={() => navigate(`/shop/product/${item.id}`)}>
+                      {item.image ? (
+                        <img src={getProductImageUrl(item.image)} alt={item.name} loading="lazy" />
+                      ) : (
+                        <div className="profile-product-placeholder-mini">{item.name}</div>
+                      )}
+                    </div>
+                    <div className="profile-product-mini-info">
+                      <strong onClick={() => navigate(`/shop/product/${item.id}`)} style={{cursor: 'pointer'}}>{item.name}</strong>
+                      <div className="muted">${Number(item.price).toFixed(2)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>
