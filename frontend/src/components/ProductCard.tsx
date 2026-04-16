@@ -141,8 +141,10 @@ export default memo(ProductCard, (prev, next) => {
     prev.disableNav === next.disableNav &&
     prev.showWishlist === next.showWishlist &&
     prev.isWishlisted === next.isWishlisted &&
+    prev.isWishlistPending === next.isWishlistPending &&
     prev.showCompare === next.showCompare &&
     prev.isCompared === next.isCompared &&
+    prev.isComparePending === next.isComparePending &&
     prev.showStockBadge === next.showStockBadge
   );
 });

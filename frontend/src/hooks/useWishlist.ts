@@ -48,6 +48,7 @@ export function useWishlist() {
   const { showToast } = useToast();
   const [wishlistIds, setWishlistIds] = useState<number[]>([]);
   const [pendingIds, setPendingIds] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const wishlistIdsRef = useRef<number[]>([]);
   const pendingIdsRef = useRef<number[]>([]);
   const mutationVersionRef = useRef(0);
@@ -62,9 +63,11 @@ export function useWishlist() {
         pendingIdsRef.current = [];
         setWishlistIds([]);
         setPendingIds([]);
+        setIsLoading(false);
         return;
       }
 
+      setIsLoading(true);
       const cached = readCachedWishlist(user.id);
       if (!cancelled) {
         setWishlistIds(cached);
@@ -85,6 +88,10 @@ export function useWishlist() {
         if (!cancelled && cached.length === 0 && loadVersion === mutationVersionRef.current) {
           wishlistIdsRef.current = [];
           setWishlistIds([]);
+        }
+      } finally {
+        if (!cancelled && loadVersion === mutationVersionRef.current) {
+          setIsLoading(false);
         }
       }
     }
@@ -165,6 +172,7 @@ export function useWishlist() {
     handleRemoveWishlist,
     isWishlisted: (productId: number) => wishlistIds.includes(productId),
     isWishlistPending: (productId: number) => pendingIds.includes(productId),
+    isWishlistLoading: isLoading,
     requiresAuth: !isAuthenticated,
   };
 }

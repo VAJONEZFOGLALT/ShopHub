@@ -153,6 +153,8 @@
     "accountInfo": "Fiókadatok",
     "email": "E-mail",
     "fullName": "Teljes név",
+    "oldPassword": "Jelenlegi jelszó",
+    "oldPasswordPlaceholder": "Add meg a jelenlegi jelszavad",
     "newPassword": "Új jelszó",
     "leaveBlank": "Hagyja üresnek az aktuális megtartásához",
     "username": "Felhasználónév",
