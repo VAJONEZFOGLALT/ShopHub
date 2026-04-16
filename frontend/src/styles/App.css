@@ -2407,7 +2407,7 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 
 .profile-content { 
   display: grid; 
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.05fr) minmax(0, 1.15fr) minmax(0, 1.15fr);
+  grid-template-columns: minmax(0, 1.265fr) minmax(0, 1.155fr) minmax(0, 1.265fr) minmax(0, 1.265fr);
   gap: 28px; 
   margin-bottom: 40px;
   align-items: stretch;
@@ -2492,6 +2492,10 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   font-weight: 700;
   font-size: 0.95em;
   text-transform: capitalize;
+}
+
+.profile-edit-password-section {
+  height: 24px;
 }
 
 .profile-edit-form input { 
@@ -2726,9 +2730,21 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   color: var(--text); 
   font-size: 1.05em;
   font-weight: 600;
-  overflow-wrap: anywhere;
   word-break: break-word;
+  overflow-wrap: break-word;
   min-width: 0;
+  max-width: 100%;
+}
+
+.profile-email {
+  font-family: 'Monaco', 'Courier New', monospace;
+  word-break: break-all;
+  font-size: 0.95em;
+}
+
+.profile-fullname {
+  word-spacing: 100vw;
+  hyphens: auto;
 }
 
 .profile-address-preview-card {
