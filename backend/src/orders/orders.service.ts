@@ -2,10 +2,14 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from '../prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async create(createOrderDto: CreateOrderDto) {
     const { userId, items, courier, shippingAddress } = createOrderDto;
@@ -42,7 +46,7 @@ export class OrdersService {
       0,
     );
 
-    return this.prisma.orders.create({
+    const createdOrder = await this.prisma.orders.create({
       data: {
         userId,
         totalPrice,
@@ -52,6 +56,30 @@ export class OrdersService {
       },
       include: { orderItems: true },
     });
+
+    const user = await this.prisma.users.findUnique({
+      where: { id: userId },
+      select: { email: true, name: true },
+    });
+
+    if (user?.email) {
+      try {
+        await this.notificationsService.sendMockPaymentEmail({
+          orderId: createdOrder.id,
+          recipientEmail: user.email,
+          recipientName: user.name,
+          totalPrice,
+          itemCount: orderItemsData.reduce((sum, item) => sum + item.quantity, 0),
+          lineCount: orderItemsData.length,
+          courier: createdOrder.courier,
+          createdAt: (createdOrder as any).createdAt,
+        });
+      } catch (error) {
+        console.warn(`Failed to send order email for order #${createdOrder.id}:`, error);
+      }
+    }
+
+    return createdOrder;
   }
 
   findAll() {
