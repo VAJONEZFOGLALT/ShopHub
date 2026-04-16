@@ -109,13 +109,22 @@ export default function OrdersPage() {
           {orders.map((order) => {
             const items = Array.isArray(order.orderItems) ? order.orderItems : [];
             const itemCount = items.reduce((sum: number, item: any) => sum + Number(item.quantity || 0), 0);
+            const uniqueProducts = items.length;
+            const hasCourier = Boolean(order.courier);
+            const hasTracking = Boolean(order.trackingNumber);
+            const hasShippingAddress = Boolean(order.shippingAddress);
+            const createdAt = new Date(order.createdAt || Date.now()).toLocaleDateString('hu-HU', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            });
             return (
               <div key={order.id} className="order-card">
                 <div className="order-header">
                   <div className="order-id">
                     <span className="order-label">{t('orders.orderNumber')}</span>
                     <span className="order-number">#{order.id}</span>
-                    <span className="order-meta">{new Date(order.createdAt || Date.now()).toLocaleDateString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    <span className="order-meta">{createdAt}</span>
                   </div>
                   <div className="order-status">
                     {(() => {
@@ -131,53 +140,97 @@ export default function OrdersPage() {
                 </div>
                 <div className="order-body">
                   <div className="order-info">
-                    <div className="info-row">
-                      <span className="info-label">{t('orders.items')}</span>
-                      <span className="info-value">{formatItemCount(itemCount)}</span>
+                    <div className="order-info-grid">
+                      <div className="info-row">
+                        <span className="info-label">{t('orders.items')}</span>
+                        <span className="info-value">{formatItemCount(itemCount)}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="info-label">{t('orders.date')}</span>
+                        <span className="info-value">{createdAt}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="info-label">Status</span>
+                        <span className="info-value">{getStatusConfig((order.status || 'PENDING') as OrderStatus, t).label}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="info-label">Products</span>
+                        <span className="info-value">{uniqueProducts}</span>
+                      </div>
                     </div>
-                    {order.courier && (
-                      <div className="info-row">
-                        <span className="info-label">{t('orders.courier')}</span>
-                        <span className="info-value">
-                          <span style={{ marginRight: '8px', fontSize: '1.2em' }}>
-                            {getCourierIcon(order.courier as CourierService).icon}
-                          </span>
-                          {order.courier}
-                        </span>
+
+                    <div className="order-summary-strip">
+                      <div className="summary-pill">
+                        <span>{t('orders.items')}</span>
+                        <strong>{itemCount}</strong>
                       </div>
-                    )}
-                    {order.trackingNumber && (
-                      <div className="info-row">
-                        <span className="info-label">{t('orders.tracking')}</span>
-                        <span className="info-value">{order.trackingNumber}</span>
+                      <div className="summary-pill">
+                        <span>{t('orders.total')}</span>
+                        <strong>${Number(order.totalPrice || 0).toFixed(2)}</strong>
                       </div>
-                    )}
-                    {order.shippingAddress && (
-                      <div className="info-row">
-                        <span className="info-label">{t('orders.shippingTo')}</span>
-                        <span className="info-value">{order.shippingAddress}</span>
+                      <div className="summary-pill">
+                        <span>Products</span>
+                        <strong>{uniqueProducts}</strong>
+                      </div>
+                    </div>
+
+                    {items.length > 0 && (
+                      <div className="order-items">
+                        <div className="items-label">{t('orders.items')}:</div>
+                        <div className="items-grid">
+                          {items.map((item: any) => (
+                            <div key={item.id} className="item-summary">
+                              <span className="item-name">{getProductName(item.productId)}</span>
+                              <span className="item-qty">x{item.quantity}</span>
+                              <span className="item-price">${Number(item.price || 0).toFixed(2)}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
-                  <div className="order-total">
-                    <span className="total-label">{t('orders.total')}</span>
-                    <span className="total-amount">${Number(order.totalPrice || 0).toFixed(2)}</span>
+                  <div className="order-sidebar">
+                    <div className="order-total">
+                      <span className="total-label">{t('orders.total')}</span>
+                      <span className="total-amount">${Number(order.totalPrice || 0).toFixed(2)}</span>
+                    </div>
+
+                    <div className="order-side-panel">
+                      <div className="side-panel-title">{t('orders.shippingTo')}</div>
+                      <div className="side-panel-value">{hasShippingAddress ? order.shippingAddress : '—'}</div>
+                    </div>
+
+                    <div className="order-side-panel">
+                      <div className="side-panel-title">{t('orders.courier')}</div>
+                      <div className="side-panel-value">
+                        {hasCourier ? (
+                          <>
+                            <span style={{ marginRight: '8px', fontSize: '1.05em' }}>
+                              {getCourierIcon(order.courier as CourierService).icon}
+                            </span>
+                            {order.courier}
+                          </>
+                        ) : '—'}
+                      </div>
+                    </div>
+
+                    <div className="order-side-panel">
+                      <div className="side-panel-title">{t('orders.tracking')}</div>
+                      <div className="side-panel-value">{hasTracking ? order.trackingNumber : '—'}</div>
+                    </div>
+
+                    <div className="order-side-panel order-status-side">
+                      <div className="side-panel-title">{t('orders.status')}</div>
+                      <div className="side-panel-value">
+                        {(() => {
+                          const status = (order.status || 'PENDING') as OrderStatus;
+                          const config = getStatusConfig(status, t);
+                          return <span className={`status-badge ${config.class}`}>{config.label}</span>;
+                        })()}
+                      </div>
+                    </div>
                   </div>
                 </div>
-                {items.length > 0 && (
-                  <div className="order-items">
-                    <div className="items-label">{t('orders.items')}:</div>
-                    <div className="items-grid">
-                      {items.map((item: any) => (
-                        <div key={item.id} className="item-summary">
-                          <span className="item-name">{getProductName(item.productId)}</span>
-                          <span className="item-qty">x{item.quantity}</span>
-                          <span className="item-price">${Number(item.price || 0).toFixed(2)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             );
           })}
