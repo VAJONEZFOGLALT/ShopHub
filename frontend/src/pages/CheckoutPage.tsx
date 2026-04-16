@@ -78,6 +78,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
 
   const selectedCourier = couriers.find((c) => c.id === courier) || couriers[0];
   const hasItems = items.length > 0;
+  const emptyCheckout = !hasItems;
   const needsPickup = selectedCourier.type === 'pickup' || (selectedCourier.type === 'both' && deliveryMode === 'pickup');
   const needsAddress = selectedCourier.type === 'address' || (selectedCourier.type === 'both' && deliveryMode === 'address');
   const guestCountryConfig = getCountryAddressConfig(guestAddress.country);
@@ -222,7 +223,12 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
       <div className={`checkout-container ${hasItems ? '' : 'checkout-container-empty'}`.trim()}>
         <div className="checkout-main">
           <h2>{t('checkout.title')}</h2>
-          {error && <div className="error">{error}</div>}
+          {error && (
+            <div className={emptyCheckout ? 'checkout-empty-banner' : 'error'}>
+              {emptyCheckout && <span className="checkout-empty-banner-icon">!</span>}
+              <span>{error}</span>
+            </div>
+          )}
 
           {!hasItems ? (
             <div className="empty-checkout">
@@ -234,14 +240,12 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                   <button
                     className="btn-primary"
                     onClick={() => navigate('/shop/all')}
-                    style={{ marginTop: '20px' }}
                   >
                     {t('profile.continueShopping')}
                   </button>
                   <button
                     className="btn-secondary"
                     onClick={() => navigate('/shop')}
-                    style={{ marginTop: '20px' }}
                   >
                     {t('common.home')}
                   </button>

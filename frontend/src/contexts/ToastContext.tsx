@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, type ReactNode } from 'react';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -18,12 +18,20 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const lastToastRef = useRef<{ key: string; at: number } | null>(null);
 
   const removeToast = useCallback((id: string) => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
   }, []);
 
   const showToast = useCallback((message: string, type: ToastType = 'info') => {
+    const now = Date.now();
+    const key = `${type}:${message}`;
+    if (lastToastRef.current && lastToastRef.current.key === key && now - lastToastRef.current.at < 900) {
+      return;
+    }
+    lastToastRef.current = { key, at: now };
+
     const id = `toast-${Date.now()}-${Math.random()}`;
     const newToast: Toast = { id, message, type };
     
