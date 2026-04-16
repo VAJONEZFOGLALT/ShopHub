@@ -150,27 +150,8 @@ export default function OrdersPage() {
                         <span className="info-value">{createdAt}</span>
                       </div>
                       <div className="info-row">
-                        <span className="info-label">Status</span>
-                        <span className="info-value">{getStatusConfig((order.status || 'PENDING') as OrderStatus, t).label}</span>
-                      </div>
-                      <div className="info-row">
-                        <span className="info-label">Products</span>
+                        <span className="info-label">{t('orders.products')}</span>
                         <span className="info-value">{uniqueProducts}</span>
-                      </div>
-                    </div>
-
-                    <div className="order-summary-strip">
-                      <div className="summary-pill">
-                        <span>{t('orders.items')}</span>
-                        <strong>{itemCount}</strong>
-                      </div>
-                      <div className="summary-pill">
-                        <span>{t('orders.total')}</span>
-                        <strong>${Number(order.totalPrice || 0).toFixed(2)}</strong>
-                      </div>
-                      <div className="summary-pill">
-                        <span>Products</span>
-                        <strong>{uniqueProducts}</strong>
                       </div>
                     </div>
 
@@ -219,16 +200,6 @@ export default function OrdersPage() {
                       <div className="side-panel-value">{hasTracking ? order.trackingNumber : '—'}</div>
                     </div>
 
-                    <div className="order-side-panel order-status-side">
-                      <div className="side-panel-title">{t('orders.status')}</div>
-                      <div className="side-panel-value">
-                        {(() => {
-                          const status = (order.status || 'PENDING') as OrderStatus;
-                          const config = getStatusConfig(status, t);
-                          return <span className={`status-badge ${config.class}`}>{config.label}</span>;
-                        })()}
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
