@@ -150,6 +150,8 @@
   "profile": {
     "title": "My Profile",
     "loginRequired": "Please log in to view your profile",
+    "general": "General",
+    "password": "Password",
     "accountInfo": "Account Information",
     "email": "Email",
     "fullName": "Full Name",
