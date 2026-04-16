@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { api } from '../services/api';
@@ -48,12 +48,18 @@ export function useWishlist() {
   const { showToast } = useToast();
   const [wishlistIds, setWishlistIds] = useState<number[]>([]);
   const [pendingIds, setPendingIds] = useState<number[]>([]);
+  const wishlistIdsRef = useRef<number[]>([]);
+  const pendingIdsRef = useRef<number[]>([]);
+  const mutationVersionRef = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
+    const loadVersion = ++mutationVersionRef.current;
 
     async function load() {
       if (!user) {
+        wishlistIdsRef.current = [];
+        pendingIdsRef.current = [];
         setWishlistIds([]);
         setPendingIds([]);
         return;
@@ -67,12 +73,17 @@ export function useWishlist() {
       try {
         const data = await api.getWishlist(user.id);
         const serverIds = data.map((item: WishlistItem) => item.productId);
+        if (cancelled || loadVersion !== mutationVersionRef.current) {
+          return;
+        }
         persistWishlistCache(user.id, serverIds);
+        wishlistIdsRef.current = serverIds;
         if (!cancelled) {
           setWishlistIds(serverIds);
         }
       } catch {
-        if (!cancelled && cached.length === 0) {
+        if (!cancelled && cached.length === 0 && loadVersion === mutationVersionRef.current) {
+          wishlistIdsRef.current = [];
           setWishlistIds([]);
         }
       }
@@ -91,18 +102,23 @@ export function useWishlist() {
       return;
     }
 
-    if (pendingIds.includes(productId)) {
+    if (pendingIdsRef.current.includes(productId)) {
       return;
     }
 
-    const isCurrentlyWishlisted = wishlistIds.includes(productId);
-    const nextIds = isCurrentlyWishlisted
-      ? wishlistIds.filter((id) => id !== productId)
-      : wishlistIds.includes(productId)
-        ? wishlistIds
-        : [...wishlistIds, productId];
+    mutationVersionRef.current += 1;
 
-    setPendingIds((prev) => [...prev, productId]);
+    const previousIds = wishlistIdsRef.current;
+    const isCurrentlyWishlisted = previousIds.includes(productId);
+    const nextIds = isCurrentlyWishlisted
+      ? previousIds.filter((id) => id !== productId)
+      : previousIds.includes(productId)
+        ? previousIds
+        : [...previousIds, productId];
+
+    pendingIdsRef.current = [...pendingIdsRef.current, productId];
+    setPendingIds(pendingIdsRef.current);
+    wishlistIdsRef.current = nextIds;
     setWishlistIds(nextIds);
     persistWishlistCache(user.id, nextIds);
 
@@ -115,11 +131,13 @@ export function useWishlist() {
         showToast(`❤️ ${productName ? `"${productName}"` : 'Item'} added to wishlist!`, 'success');
       }
     } catch {
-      setWishlistIds(wishlistIds);
-      persistWishlistCache(user.id, wishlistIds);
+      wishlistIdsRef.current = previousIds;
+      setWishlistIds(previousIds);
+      persistWishlistCache(user.id, previousIds);
       showToast('Failed to update wishlist', 'error');
     } finally {
-      setPendingIds((prev) => prev.filter((id) => id !== productId));
+      pendingIdsRef.current = pendingIdsRef.current.filter((id) => id !== productId);
+      setPendingIds(pendingIdsRef.current);
     }
   };
 
@@ -131,7 +149,8 @@ export function useWishlist() {
 
     try {
       await api.removeFromWishlistByProduct(user.id, productId);
-      const nextIds = wishlistIds.filter((id) => id !== productId);
+      const nextIds = wishlistIdsRef.current.filter((id) => id !== productId);
+      wishlistIdsRef.current = nextIds;
       setWishlistIds(nextIds);
       persistWishlistCache(user.id, nextIds);
       showToast(`💔 ${productName ? `"${productName}"` : 'Item'} removed from wishlist`, 'info');

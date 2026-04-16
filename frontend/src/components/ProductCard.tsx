@@ -83,18 +83,17 @@ function ProductCard({
           </button>
         )}
         {showCompare && (
-          <label
+          <button
+            type="button"
             className={`compare-toggle ${isCompared ? 'active' : ''} ${isComparePending ? 'is-loading' : ''}`.trim()}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); onToggleCompare?.(product); }}
+            disabled={isComparePending}
           >
-            <input
-              type="checkbox"
-              checked={!!isCompared}
-              onChange={() => onToggleCompare?.(product)}
-              disabled={isComparePending}
-            />
+            <span className="compare-toggle-check" aria-hidden="true">
+              {isCompared ? '✓' : ''}
+            </span>
             {t('products.compare')}
-          </label>
+          </button>
         )}
       </div>
       <div className="product-header">
