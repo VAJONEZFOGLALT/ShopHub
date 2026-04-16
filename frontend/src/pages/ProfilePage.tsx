@@ -281,7 +281,6 @@ export default function ProfilePage() {
           <div className="profile-info">
             <h1>{user.username || displayName}</h1>
             <p className="profile-role">{roleLabel}</p>
-            <p className="profile-account-type">{accountTypeLabel}</p>
           </div>
           
           <div className={headerStatsClasses}>
