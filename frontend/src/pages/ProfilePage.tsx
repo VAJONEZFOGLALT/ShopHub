@@ -3,8 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
-import { useWishlist } from '../hooks/useWishlist';
-import { getRecentlyViewed } from '../services/storage';
 import { getAvatarUrl, getProductImageUrl } from '../utils/imageOptimization';
 import { useToast } from '../contexts/ToastContext';
 import { COUNTRY_ADDRESS_GROUPS, DEFAULT_COUNTRY_CODE, getCountryAddressConfig } from '../utils/addressing';
@@ -15,10 +13,9 @@ export default function ProfilePage() {
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
-  const { wishlistIds, handleRemoveWishlist, isWishlistLoading } = useWishlist();
+  const [wishlistIds, setWishlistIds] = useState<number[]>([]);
   const [recentlyViewed, setRecentlyViewed] = useState<any[]>([]);
-  const [recentlyViewedLoading, setRecentlyViewedLoading] = useState(true);
-  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [nameInput, setNameInput] = useState('');
   const [emailInput, setEmailInput] = useState('');
@@ -38,7 +35,7 @@ export default function ProfilePage() {
   const accountTypeLabel = user?.role === 'ADMIN' ? t('profile.administrator') : t('profile.customer');
   const displayName = user?.name || user?.username || '';
   const addressButtonText = addresses.length === 0 ? t('profile.addAddress') : t('profile.updateAddress');
-  const isCollectionsLoading = loadingProducts || isWishlistLoading || recentlyViewedLoading;
+  const isCollectionsLoading = pageLoading;
   const preferredAddress = useMemo(() => {
     if (addresses.length === 0) return null;
     return addresses.find((addr) => addr.isDefault) || addresses[0];
@@ -49,70 +46,52 @@ export default function ProfilePage() {
   );
 
   useEffect(() => {
-    const load = async () => {
-      setLoadingProducts(true);
-      try {
-        const data = await api.getProducts(i18n.language);
-        setProducts(data);
-      } finally {
-        setLoadingProducts(false);
-      }
-    };
-    load();
-  }, [i18n.language]);
+    let cancelled = false;
 
-  useEffect(() => {
-    const loadOrders = async () => {
-      if (!user) return;
-      try {
-        const orders = await api.getUserOrders(user.id).catch(async () => {
-          const allOrders = await api.getOrders();
-          return allOrders.filter((order: any) => Number(order.userId) === user.id);
-        });
-        setOrderCount(orders.length);
-        const total = orders.reduce((sum: number, order: any) => sum + Number(order.totalPrice ?? order.total ?? 0), 0);
-        setTotalSpent(total);
-      } catch {
-        // Ignore errors
-      }
-    };
-    loadOrders();
-  }, [user]);
-
-  useEffect(() => {
-    const loadAddresses = async () => {
-      if (!user) return;
-      try {
-        const data = await api.getAddresses(user.id);
-        setAddresses(data);
-      } catch (err) {
-        showToast('Failed to load addresses', 'error');
-      }
-    };
-    loadAddresses();
-  }, [user]);
-
-
-
-  useEffect(() => {
-    const load = async () => {
-      setRecentlyViewedLoading(true);
+    const loadAll = async () => {
       if (!user) {
-        setRecentlyViewed(getRecentlyViewed());
-        setRecentlyViewedLoading(false);
+        setPageLoading(false);
         return;
       }
+
+      setPageLoading(true);
       try {
-        const items = await api.getRecentlyViewed(user.id);
-        setRecentlyViewed(items.map((entry: any) => entry.product));
-      } catch {
-        setRecentlyViewed([]);
+        const [productData, orderData, addressData, recentlyViewedData, wishlistData] = await Promise.all([
+          api.getProducts(i18n.language),
+          api.getUserOrders(user.id).catch(async () => {
+            const allOrders = await api.getOrders();
+            return allOrders.filter((order: any) => Number(order.userId) === user.id);
+          }),
+          api.getAddresses(user.id),
+          api.getRecentlyViewed(user.id).catch(() => []),
+          api.getWishlist(user.id).catch(() => []),
+        ]);
+
+        if (cancelled) return;
+
+        setProducts(productData);
+        setOrderCount(orderData.length);
+        setTotalSpent(orderData.reduce((sum: number, order: any) => sum + Number(order.totalPrice ?? order.total ?? 0), 0));
+        setAddresses(addressData);
+        setRecentlyViewed(recentlyViewedData.map((entry: any) => entry.product));
+        setWishlistIds(wishlistData.map((item: any) => item.productId));
+      } catch (err) {
+        if (!cancelled) {
+          showToast('Failed to load profile data', 'error');
+        }
       } finally {
-        setRecentlyViewedLoading(false);
+        if (!cancelled) {
+          setPageLoading(false);
+        }
       }
     };
-    load();
-  }, [user]);
+
+    loadAll();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, i18n.language, showToast]);
 
   useEffect(() => {
     if (!user) return;
@@ -124,6 +103,21 @@ export default function ProfilePage() {
   const wishlistItems = useMemo(() => {
     return products.filter(p => wishlistIds.includes(p.id));
   }, [products, wishlistIds]);
+
+  const handleRemoveWishlist = async (productId: number, productName?: string) => {
+    if (!user) {
+      return;
+    }
+
+    try {
+      await api.removeFromWishlistByProduct(user.id, productId);
+      const nextIds = wishlistIds.filter((id) => id !== productId);
+      setWishlistIds(nextIds);
+      showToast(`💔 ${productName ? `"${productName}"` : 'Item'} removed from wishlist`, 'info');
+    } catch {
+      showToast('Failed to remove from wishlist', 'error');
+    }
+  };
 
   const handleStartEdit = () => {
     setIsEditing(true);
@@ -243,6 +237,22 @@ export default function ProfilePage() {
     return (
       <div className="view">
         <div className="error">{t('profile.loginRequired')}</div>
+      </div>
+    );
+  }
+
+  if (pageLoading) {
+    return (
+      <div className="view">
+        <div className="profile-page-loading">
+          <div className="profile-page-loading-card" />
+          <div className="profile-page-loading-grid">
+            <div className="profile-page-loading-card" />
+            <div className="profile-page-loading-card" />
+            <div className="profile-page-loading-card" />
+            <div className="profile-page-loading-card" />
+          </div>
+        </div>
       </div>
     );
   }
