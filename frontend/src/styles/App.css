@@ -3499,6 +3499,17 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   gap: 32px;
 }
 
+.checkout-container-empty {
+  max-width: 760px;
+  grid-template-columns: 1fr;
+}
+
+.checkout-container-empty .checkout-main {
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+}
+
 .checkout-main {
   display: flex;
   flex-direction: column;
@@ -3553,6 +3564,18 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 
 .empty-state button {
   margin-top: 12px;
+}
+
+.empty-checkout-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.empty-checkout-actions .btn-primary,
+.empty-checkout-actions .btn-secondary {
+  min-width: 190px;
 }
 
 .checkout-section {
@@ -3681,6 +3704,10 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
     grid-template-columns: 1fr;
   }
 
+  .checkout-container-empty {
+    max-width: 100%;
+  }
+
   .checkout-sidebar {
     position: relative;
     top: 0;
@@ -3688,6 +3715,12 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 
   .checkout-main h2 {
     font-size: 1.4em;
+  }
+
+  .empty-checkout-actions .btn-primary,
+  .empty-checkout-actions .btn-secondary {
+    width: 100%;
+    min-width: 0;
   }
 }
 
