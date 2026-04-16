@@ -2703,19 +2703,11 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 .profile-field { 
   display: grid; 
   grid-template-columns: 1fr;
-  gap: 8px; 
+  gap: 6px; 
   padding: 18px 0; 
   border-bottom: 1px solid var(--border); 
   align-items: flex-start;
   min-width: 0;
-}
-
-@media (min-width: 900px) {
-  .profile-field { 
-    grid-template-columns: 160px 1fr;
-    gap: 20px;
-    align-items: center;
-  }
 }
 
 .profile-field:last-child { 
@@ -2726,8 +2718,8 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   font-weight: 700; 
   color: var(--muted); 
   font-size: 0.95em;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .profile-value { 
@@ -2823,7 +2815,7 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 }
 
 .address-modal-dialog {
-  max-width: 760px;
+  max-width: 620px;
   width: 100%;
   padding: 20px;
 }
@@ -2900,6 +2892,11 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   gap: 12px;
   align-items: flex-start;
   transition: all 0.2s;
+}
+
+.address-modal-item .address-modal-content {
+  display: grid;
+  gap: 4px;
 }
 
 .address-modal-item:hover {
