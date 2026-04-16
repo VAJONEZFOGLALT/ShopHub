@@ -31,7 +31,7 @@ import { useTranslation } from 'react-i18next';
 type Modals = 'none' | 'login' | 'register'
 type AdminTab = 'overview' | 'users' | 'products' | 'orders'
 
-const SUPPORTED_LANGUAGES = ['hu', 'en', 'es'];
+const SUPPORTED_LANGUAGES = ['hu', 'en'];
 const normalizeLanguage = (value: string) => value.toLowerCase().split('-')[0];
 
 function LanguageUrlSync() {
@@ -40,11 +40,17 @@ function LanguageUrlSync() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const isAdminRoute = location.pathname.startsWith('/admin');
+    if (isAdminRoute) {
+      return;
+    }
+
     const params = new URLSearchParams(location.search);
     const rawUrlLang = params.get('lang');
     const urlLang = rawUrlLang ? normalizeLanguage(rawUrlLang) : null;
     const currentI18nLanguage = normalizeLanguage(i18n.language || 'hu');
     const isUrlLangSupported = !!urlLang && SUPPORTED_LANGUAGES.includes(urlLang);
+    const defaultLang = 'hu';
 
     if (isUrlLangSupported && urlLang !== currentI18nLanguage) {
       void i18n.changeLanguage(urlLang);
@@ -52,9 +58,17 @@ function LanguageUrlSync() {
       return;
     }
 
-    const currentLang = SUPPORTED_LANGUAGES.includes(currentI18nLanguage) ? currentI18nLanguage : 'hu';
-    if (!isUrlLangSupported || urlLang !== currentLang) {
-      params.set('lang', currentLang);
+    if (isUrlLangSupported) {
+      return;
+    }
+
+    if (currentI18nLanguage !== defaultLang) {
+      void i18n.changeLanguage(defaultLang);
+      localStorage.setItem('language', defaultLang);
+    }
+
+    if (!isUrlLangSupported || urlLang !== defaultLang) {
+      params.set('lang', defaultLang);
       navigate(`${location.pathname}?${params.toString()}`, { replace: true });
     }
   }, [i18n, i18n.language, location.pathname, location.search, navigate]);

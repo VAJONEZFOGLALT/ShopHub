@@ -46,3 +46,46 @@ export const LanguageSwitcher = () => {
     </div>
   );
 };
+
+export const InlineLanguageSwitcher = () => {
+  const { i18n } = useTranslation();
+
+  const languages = [
+    { code: 'hu', label: 'Magyar' },
+    { code: 'en', label: 'English' },
+  ];
+
+  const handleLanguageChange = (langCode: string) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set('lang', langCode);
+    const query = params.toString();
+    const nextUrl = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`;
+    localStorage.setItem('language', langCode);
+    window.location.href = nextUrl;
+  };
+
+  const currentLanguage = normalizeLanguage(i18n.resolvedLanguage || i18n.language || 'hu');
+  const selectedLanguage = languages.some((lang) => lang.code === currentLanguage)
+    ? currentLanguage
+    : 'hu';
+
+  return (
+    <div className={`${styles.languageSwitcher} ${styles.inline}`}>
+      <label htmlFor="language-select-inline" className={styles.label}>
+        {i18n.t('common.language')}:
+      </label>
+      <select
+        id="language-select-inline"
+        value={selectedLanguage}
+        onChange={(e) => handleLanguageChange(e.target.value)}
+        className={styles.select}
+      >
+        {languages.map((lang) => (
+          <option key={lang.code} value={lang.code}>
+            {lang.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};

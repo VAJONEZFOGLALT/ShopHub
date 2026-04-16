@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
@@ -34,10 +34,15 @@ function ProductCard({
   const { t } = useTranslation();
   const { add } = useCart();
   const navigate = useNavigate();
+  const lastControlInteractionRef = useRef(0);
 
   const canNavigate = !disableNav;
 
   const handleOpen = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (Date.now() - lastControlInteractionRef.current < 320) {
+      return;
+    }
+
     const target = e.target as HTMLElement | null;
     if (target?.closest('[data-card-control="true"]')) {
       return;
@@ -49,9 +54,14 @@ function ProductCard({
   };
 
   const handleAddToCart = (e: React.MouseEvent) => {
+    lastControlInteractionRef.current = Date.now();
     e.stopPropagation();
     const payload = { productId: product.id, name: product.name, price: Number(product.price) };
     add(payload, 1);
+  };
+
+  const markControlInteraction = () => {
+    lastControlInteractionRef.current = Date.now();
   };
 
   const cursorStyle = canNavigate ? 'pointer' : 'default';
@@ -81,10 +91,10 @@ function ProductCard({
             type="button"
             data-card-control="true"
             className={`wishlist-btn ${isWishlisted ? 'active' : ''} ${isWishlistPending ? 'is-loading' : ''}`.trim()}
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={(e) => { e.stopPropagation(); onToggleWishlist?.(product.id, product.name); }}
+            onPointerDown={(e) => { markControlInteraction(); e.stopPropagation(); }}
+            onClick={(e) => { markControlInteraction(); e.stopPropagation(); onToggleWishlist?.(product.id, product.name); }}
             title={isWishlisted ? t('products.removeFromWishlist') : t('products.addToWishlist')}
-            aria-disabled={isWishlistPending}
+            disabled={isWishlistPending}
           >
             ♥
           </button>
@@ -94,9 +104,9 @@ function ProductCard({
             type="button"
             data-card-control="true"
             className={`compare-toggle ${isCompared ? 'active' : ''} ${isComparePending ? 'is-loading' : ''}`.trim()}
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={(e) => { e.stopPropagation(); onToggleCompare?.(product); }}
-            aria-disabled={isComparePending}
+            onPointerDown={(e) => { markControlInteraction(); e.stopPropagation(); }}
+            onClick={(e) => { markControlInteraction(); e.stopPropagation(); onToggleCompare?.(product); }}
+            disabled={isComparePending}
           >
             <span className="compare-toggle-check" aria-hidden="true">
               {isCompared ? '✓' : ''}
