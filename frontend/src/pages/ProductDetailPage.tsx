@@ -21,8 +21,8 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const { add } = useCart();
   const { user, isAuthenticated } = useAuth();
-  const { wishlistIds, handleToggleWishlist, isWishlistPending } = useWishlist();
-  const { compareIds, toggleCompare, isComparePending } = useCompare();
+  const { wishlistIds, handleToggleWishlist, isWishlistPending, isWishlistLoading } = useWishlist();
+  const { compareIds, toggleCompare, isComparePending, isCompareLoading } = useCompare();
   const { showToast } = useToast();
   const [reviews, setReviews] = useState<any[]>([]);
   const [reviewSummary, setReviewSummary] = useState<{ average: number; count: number }>({ average: 0, count: 0 });
@@ -31,7 +31,11 @@ export default function ProductDetailPage() {
   const [addedToCart, setAddedToCart] = useState(false);
 
   useEffect(() => {
+    let active = true;
+
     const load = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const products = await api.getProducts(i18n.language);
         let found: any = null;
@@ -45,33 +49,42 @@ export default function ProductDetailPage() {
         if (!found) {
           throw new Error('Product not found');
         }
+
+        const reviewSummaryPromise = api.getAverageRating(found.id).catch(() => ({ average: 0, count: 0 }));
+        const reviewsPromise = api.getProductReviews(found.id).catch(() => []);
+        const recentlyViewedPromise = user
+          ? api.addRecentlyViewed({ userId: user.id, productId: found.id }).catch(() => null)
+          : Promise.resolve(null);
+
+        const [summary, productReviews] = await Promise.all([
+          reviewSummaryPromise,
+          reviewsPromise,
+          recentlyViewedPromise,
+        ]);
+
+        if (!active) {
+          return;
+        }
+
         setProduct(found);
+        setReviewSummary(summary);
+        setReviews(productReviews);
       } catch (e: any) {
-        setError(e.message);
+        if (active) {
+          setError(e.message);
+        }
       } finally {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     };
     load();
-  }, [id, i18n.language, showToast]);
 
-  useEffect(() => {
-    const loadLists = async () => {
-      if (!product) {
-        return;
-      }
-      const summary = await api.getAverageRating(product.id);
-      setReviewSummary(summary);
-      const productReviews = await api.getProductReviews(product.id);
-      setReviews(productReviews);
-
-      // Only track recently viewed for authenticated users
-      if (user) {
-        await api.addRecentlyViewed({ userId: user.id, productId: product.id });
-      }
+    return () => {
+      active = false;
     };
-    loadLists();
-  }, [product, user]);
+  }, [id, i18n.language, user]);
 
   function handleAdd() {
     if (product) {
@@ -82,7 +95,9 @@ export default function ProductDetailPage() {
     }
   }
 
-  if (loading) return (
+  const pageLoading = loading || isWishlistLoading || isCompareLoading;
+
+  if (pageLoading) return (
     <div className="view product-detail">
       <ProductDetailSkeleton />
     </div>

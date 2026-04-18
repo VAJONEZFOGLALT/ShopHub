@@ -21,8 +21,8 @@ export default function AllProductsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [inStockOnly, setInStockOnly] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const { wishlistIds, handleToggleWishlist, isWishlistPending } = useWishlist();
-  const { compareIds, compareItems, toggleCompare, clearCompare, isComparePending } = useCompare();
+  const { wishlistIds, handleToggleWishlist, isWishlistPending, isWishlistLoading } = useWishlist();
+  const { compareIds, compareItems, toggleCompare, clearCompare, isComparePending, isCompareLoading } = useCompare();
 
   const rawSearch = searchParams.get('search');
   let searchQuery = '';
@@ -44,6 +44,8 @@ export default function AllProductsPage() {
     }
   }
   useEffect(() => { load(); }, [i18n.language]);
+
+  const pageLoading = loading || isWishlistLoading || isCompareLoading;
 
   useEffect(() => {
     if (searchQuery) {
@@ -132,7 +134,7 @@ export default function AllProductsPage() {
 
   return (
     <div className="view category-view">
-            {loading && products.length === 0 ? (
+            {pageLoading && products.length === 0 ? (
               <LoadingSpinner fullScreen={true} />
             ) : (
               <>
@@ -223,7 +225,7 @@ export default function AllProductsPage() {
 
         <main className="category-products">
           {error && <div className="error">{error}</div>}
-          {loading ? (
+          {pageLoading ? (
             <div className="grid-products">
               {Array.from({ length: 8 }).map((_, i) => (
                 <ProductCardSkeleton key={i} />

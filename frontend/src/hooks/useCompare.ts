@@ -57,6 +57,7 @@ export function useCompare() {
   const [compareIds, setCompareIds] = useState<number[]>([]);
   const [compareItems, setCompareItems] = useState<any[]>([]);
   const [pendingIds, setPendingIds] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const compareIdsRef = useRef<number[]>([]);
   const compareItemsRef = useRef<any[]>([]);
   const pendingIdsRef = useRef<number[]>([]);
@@ -74,8 +75,11 @@ export function useCompare() {
         setCompareIds([]);
         setCompareItems([]);
         setPendingIds([]);
+        setIsLoading(false);
         return;
       }
+
+      setIsLoading(true);
 
       const cached = readCachedCompare(user.id);
       if (!cancelled) {
@@ -104,6 +108,10 @@ export function useCompare() {
           emitCompareUpdated(0);
           setCompareIds([]);
           setCompareItems([]);
+        }
+      } finally {
+        if (!cancelled && loadVersion === mutationVersionRef.current) {
+          setIsLoading(false);
         }
       }
     }
@@ -219,5 +227,6 @@ export function useCompare() {
     clearCompare,
     isCompared: (productId: number) => compareIdSet.has(productId),
     isComparePending: (productId: number) => pendingIds.includes(productId),
+    isCompareLoading: isLoading,
   };
 }

@@ -35,8 +35,8 @@ export default function CategoryPage() {
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'name');
   const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
   const [inStockOnly, setInStockOnly] = useState(searchParams.get('stock') === '1');
-  const { wishlistIds, handleToggleWishlist, isWishlistPending } = useWishlist();
-  const { compareIds, compareItems, toggleCompare, clearCompare, isComparePending } = useCompare();
+  const { wishlistIds, handleToggleWishlist, isWishlistPending, isWishlistLoading } = useWishlist();
+  const { compareIds, compareItems, toggleCompare, clearCompare, isComparePending, isCompareLoading } = useCompare();
 
   async function load() {
     setLoading(true);
@@ -51,6 +51,8 @@ export default function CategoryPage() {
     }
   }
   useEffect(() => { load(); }, [i18n.language]);
+
+  const pageLoading = loading || isWishlistLoading || isCompareLoading;
 
   const filtered = useMemo(() => {
     const displayProducts = products;
@@ -231,7 +233,7 @@ export default function CategoryPage() {
 
   return (
     <div className="category-view">
-            {loading && products.length === 0 ? (
+            {pageLoading && products.length === 0 ? (
               <LoadingSpinner fullScreen={true} />
             ) : (
               <>
@@ -319,7 +321,7 @@ export default function CategoryPage() {
         {/* Right Content - Products */}
         <main className="category-products">
           {error && <div className="error">{error}</div>}
-          {loading ? (
+          {pageLoading ? (
             <div className="grid-products">
               {Array.from({ length: 8 }).map((_, i) => (
                 <ProductCardSkeleton key={i} />

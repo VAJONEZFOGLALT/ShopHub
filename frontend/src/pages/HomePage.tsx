@@ -18,6 +18,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const load = async () => {
+      setLoading(true);
       try {
         const showcase = await api.getFeaturedShowcase(i18n.language);
         const featuredProducts = Array.isArray(showcase.products) ? showcase.products : [];

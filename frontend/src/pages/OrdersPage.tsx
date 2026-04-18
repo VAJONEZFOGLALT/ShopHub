@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { useToast } from '../contexts/ToastContext';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 type OrderStatus = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
 type CourierService = 'UPS' | 'PACKETA' | 'DPD' | 'INPOST';
@@ -82,7 +83,7 @@ export default function OrdersPage() {
   }
 
   if (loading) {
-    return <div className="view"><p>{t('orders.loading')}</p></div>;
+    return <LoadingSpinner fullScreen={true} />;
   }
 
   const getProductName = (productId: number) => {
