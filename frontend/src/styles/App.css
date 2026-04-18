@@ -1578,6 +1578,7 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 .categories-bar-right { display: flex; justify-content: flex-end; align-items: center; }
 .categories-item { text-decoration: none; color: var(--muted); font-weight: 500; font-size: 0.95em; white-space: nowrap; transition: all 0.2s; border-bottom: 2px solid transparent; padding: 8px 0; }
 .categories-item:hover { color: var(--text); border-bottom-color: var(--primary); }
+.categories-item-active { color: var(--text); border-bottom-color: var(--primary); font-weight: 700; }
 
 .compare-nav-btn {
   border: 1px solid var(--border);
@@ -2082,6 +2083,37 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 
 .showcase-grid-products {
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.featured-pagination {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.featured-page-list {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.featured-page-list .btn-secondary {
+  min-width: 42px;
+}
+
+.featured-page-active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.featured-page-indicator {
+  font-weight: 700;
+  color: var(--text-secondary);
+  min-width: 120px;
+  text-align: center;
 }
 
 .category-card { 

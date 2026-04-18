@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
@@ -26,7 +26,6 @@ const readCompareCount = (userId?: number): number => {
 
 export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart?: () => void }) {
   const { t, i18n } = useTranslation();
-  const [categories, setCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearch, setShowSearch] = useState(false);
@@ -37,6 +36,7 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
   const { user, logout } = useAuth();
   const { items } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
   const userRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
 
@@ -48,19 +48,86 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
   useEffect(() => {
     api.getProducts(i18n.language).then(p => {
       setProducts(p);
-      const cats: Record<string, boolean> = {};
-      const list: string[] = [];
-      p.forEach(prod => {
-        if (prod.category && !cats[prod.category]) {
-          cats[prod.category] = true;
-          list.push(prod.category);
-        }
-      });
-      setCategories(list.sort());
     }).catch(() => {
       // Silent fail for navbar categories
     });
   }, [i18n.language]);
+
+  const categoryStats = useMemo(() => {
+    const stats = new Map<string, { key: string; label: string; totalCount: number }>();
+    for (let i = 0; i < products.length; i += 1) {
+      const product = products[i];
+      const categoryKey = typeof product?.category === 'string' ? product.category.trim() : '';
+      if (!categoryKey) {
+        continue;
+      }
+
+      const existing = stats.get(categoryKey);
+      if (existing) {
+        existing.totalCount += 1;
+        continue;
+      }
+
+      stats.set(categoryKey, {
+        key: categoryKey,
+        label: product?.categoryLabel || categoryKey,
+        totalCount: 1,
+      });
+    }
+
+    return Array.from(stats.values()).sort((a, b) => a.label.localeCompare(b.label));
+  }, [products]);
+
+  const normalizedActiveCategory = useMemo(() => {
+    const match = location.pathname.match(/^\/shop\/category\/(.+)$/);
+    if (!match) {
+      return '';
+    }
+    return decodeURIComponent(match[1]).trim().toLowerCase();
+  }, [location.pathname]);
+
+  const activeCategoryFilteredCount = useMemo(() => {
+    if (!normalizedActiveCategory) {
+      return 0;
+    }
+
+    const params = new URLSearchParams(location.search);
+    const query = (params.get('q') || '').trim().toLowerCase();
+    const minPrice = Number(params.get('min') || '0');
+    const maxPrice = Number(params.get('max') || String(Number.MAX_SAFE_INTEGER));
+    const inStockOnly = params.get('stock') === '1';
+
+    let count = 0;
+    for (let i = 0; i < products.length; i += 1) {
+      const product = products[i];
+      const categoryKey = typeof product?.category === 'string' ? product.category.trim().toLowerCase() : '';
+      if (categoryKey !== normalizedActiveCategory) {
+        continue;
+      }
+
+      const price = Number(product?.price || 0);
+      if (price < minPrice || price > maxPrice) {
+        continue;
+      }
+
+      if (inStockOnly && Number(product?.stock || 0) <= 0) {
+        continue;
+      }
+
+      if (query) {
+        const name = String(product?.name || '').toLowerCase();
+        const description = String(product?.description || '').toLowerCase();
+        const categoryLabel = String(product?.categoryLabel || product?.category || '').toLowerCase();
+        if (!name.includes(query) && !description.includes(query) && !categoryLabel.includes(query)) {
+          continue;
+        }
+      }
+
+      count += 1;
+    }
+
+    return count;
+  }, [location.search, normalizedActiveCategory, products]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -201,9 +268,19 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
 
           <div className="categories-bar-links">
             <Link to="/shop/all" className="categories-item" style={{ fontWeight: 600 }}>{t('common.all')}</Link>
-            {categories.map(cat => {
-              const categoryLabel = products.find((product) => product.category === cat)?.categoryLabel || cat;
-              return <Link key={cat} className="categories-item" to={`/shop/category/${encodeURIComponent(cat)}`}>{categoryLabel}</Link>;
+            {categoryStats.map((cat) => {
+              const normalized = cat.key.trim().toLowerCase();
+              const isActive = normalizedActiveCategory === normalized;
+              const count = isActive ? activeCategoryFilteredCount : cat.totalCount;
+              return (
+                <Link
+                  key={cat.key}
+                  className={`categories-item ${isActive ? 'categories-item-active' : ''}`.trim()}
+                  to={`/shop/category/${encodeURIComponent(cat.key)}`}
+                >
+                  {cat.label} ({count})
+                </Link>
+              );
             })}
           </div>
 

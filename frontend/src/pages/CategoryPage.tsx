@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import ProductCard from '../components/ProductCard';
@@ -22,15 +22,19 @@ const normalizeCategory = (value: string) => value.trim().toLowerCase();
 export default function CategoryPage() {
   const { t, i18n } = useTranslation();
   const { name } = useParams<{ name: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const decodedCategoryName = decodeURIComponent(name || '');
   const navigate = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-  const [sortBy, setSortBy] = useState('name');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [inStockOnly, setInStockOnly] = useState(false);
+  const [priceRange, setPriceRange] = useState<[number, number]>([
+    Number(searchParams.get('min') || '0'),
+    Number(searchParams.get('max') || '1000'),
+  ]);
+  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'name');
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
+  const [inStockOnly, setInStockOnly] = useState(searchParams.get('stock') === '1');
   const { wishlistIds, handleToggleWishlist, isWishlistPending } = useWishlist();
   const { compareIds, compareItems, toggleCompare, clearCompare, isComparePending } = useCompare();
 
@@ -142,6 +146,62 @@ export default function CategoryPage() {
     }
     return max;
   }, [products, decodedCategoryName]);
+
+  useEffect(() => {
+    const nextMin = Number(searchParams.get('min') || '0');
+    const nextMax = Number(searchParams.get('max') || String(maxPrice));
+    const safeMax = Number.isFinite(nextMax) ? Math.max(nextMin, nextMax) : maxPrice;
+    setPriceRange([Math.max(0, nextMin), Math.min(maxPrice, safeMax)]);
+    setSortBy(searchParams.get('sort') || 'name');
+    setSearchTerm(searchParams.get('q') || '');
+    setInStockOnly(searchParams.get('stock') === '1');
+  }, [decodedCategoryName]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+
+    if (searchTerm.trim()) {
+      params.set('q', searchTerm.trim());
+    } else {
+      params.delete('q');
+    }
+
+    if (priceRange[0] > 0) {
+      params.set('min', String(priceRange[0]));
+    } else {
+      params.delete('min');
+    }
+
+    if (priceRange[1] < maxPrice) {
+      params.set('max', String(priceRange[1]));
+    } else {
+      params.delete('max');
+    }
+
+    if (sortBy !== 'name') {
+      params.set('sort', sortBy);
+    } else {
+      params.delete('sort');
+    }
+
+    if (inStockOnly) {
+      params.set('stock', '1');
+    } else {
+      params.delete('stock');
+    }
+
+    const current = searchParams.toString();
+    const next = params.toString();
+    if (next !== current) {
+      setSearchParams(params, { replace: true });
+    }
+  }, [inStockOnly, maxPrice, priceRange, searchParams, searchTerm, setSearchParams, sortBy]);
+
+  useEffect(() => {
+    if (priceRange[1] > maxPrice) {
+      setPriceRange(([min]) => [min, maxPrice]);
+    }
+  }, [maxPrice, priceRange]);
 
   const handleMinPriceChange = (value: string) => {
     const min = Number(value);
