@@ -57,6 +57,11 @@ export class OrdersService {
       include: { orderItems: true },
     });
 
+    let emailStatus: { emailSent: boolean; reason?: string } = {
+      emailSent: false,
+      reason: 'No email attempt was made',
+    };
+
     const user = await this.prisma.users.findUnique({
       where: { id: userId },
       select: { email: true, name: true },
@@ -64,7 +69,7 @@ export class OrdersService {
 
     if (user?.email) {
       try {
-        await this.notificationsService.sendMockPaymentEmail({
+        emailStatus = await this.notificationsService.sendMockPaymentEmail({
           orderId: createdOrder.id,
           recipientEmail: user.email,
           recipientName: user.name,
@@ -75,11 +80,18 @@ export class OrdersService {
           createdAt: (createdOrder as any).createdAt,
         });
       } catch (error) {
+        emailStatus = {
+          emailSent: false,
+          reason: error instanceof Error ? error.message : 'Failed to send order email',
+        };
         console.warn(`Failed to send order email for order #${createdOrder.id}:`, error);
       }
     }
 
-    return createdOrder;
+    return {
+      ...createdOrder,
+      emailStatus,
+    };
   }
 
   findAll() {

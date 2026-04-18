@@ -2048,6 +2048,7 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 .categories-showcase { 
   margin-bottom: 80px; 
   scroll-margin-top: 80px;
+  text-align: center;
 }
 
 .categories-showcase h2 { 
@@ -2059,10 +2060,28 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   letter-spacing: -0.5px;
 }
 
-.categories-grid { 
+.showcase-intro {
+  margin: -16px auto 24px;
+  max-width: 760px;
+  color: var(--muted);
+  font-size: 0.95em;
+  line-height: 1.6;
+}
+
+.showcase-grid {
   display: grid; 
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
   gap: 20px;
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  justify-items: center;
+}
+
+.showcase-grid-categories {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.showcase-grid-products {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
 .category-card { 
@@ -2078,6 +2097,11 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   flex-direction: column;
   align-items: center;
   gap: 12px;
+}
+
+.category-card-centered {
+  width: 100%;
+  max-width: 280px;
 }
 
 .category-card:hover { 
@@ -2105,6 +2129,21 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   transition: color 0.3s ease;
 }
 
+.showcase-meta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
 .category-card:hover h3 {
   color: var(--primary);
 }
@@ -2112,6 +2151,7 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 .featured-section { 
   margin-bottom: 60px; 
   scroll-margin-top: 80px;
+  text-align: center;
 }
 
 .featured-section h2 { 
@@ -2126,6 +2166,17 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 .featured-footer { 
   text-align: center; 
   margin-top: 48px; 
+}
+
+.product-card-shell {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+
+.product-card-shell .product-card {
+  width: 100%;
 }
 
 .btn-primary { 
@@ -3146,7 +3197,8 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   .hero-banner { padding: 40px 20px; margin-bottom: 40px; }
   .hero-content h1 { font-size: 2em; }
   .hero-content p { font-size: 1em; }
-  .categories-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+  .showcase-grid-categories { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .showcase-grid-products { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
   .featured-section h2 { font-size: 1.4em; }
 }
 

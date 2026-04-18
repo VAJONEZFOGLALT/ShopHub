@@ -285,6 +285,11 @@ export const api = {
       productsInFlight.delete(lang);
     }
   },
+  getFeaturedShowcase: async (language?: string) => {
+    const lang = normalizeLanguage(language || getCurrentLanguage());
+    const data = await request<{ categories: Array<{ key: string; label: string; viewsCount: number; productCount: number }>; products: any[] }>(`/products/featured?lang=${lang}`);
+    return data;
+  },
   getProductById: async (id: number, language?: string) => {
     const lang = normalizeLanguage(language || getCurrentLanguage());
     const data = await request<any>(`/products/${id}?lang=${lang}`);
@@ -322,8 +327,8 @@ export const api = {
     items: { productId: number; quantity: number }[];
     courier?: string;
     shippingAddress?: string;
-  }): Promise<{ id: number; userId: number; total: number; status: string; courier?: string; shippingAddress?: string }> => {
-    const created = await request<{ id: number; userId: number; total: number; status: string; courier?: string; shippingAddress?: string }>('/orders', { method: 'POST', body: JSON.stringify(data) });
+  }): Promise<{ id: number; userId: number; total: number; status: string; courier?: string; shippingAddress?: string; emailStatus?: { emailSent: boolean; reason?: string } }> => {
+    const created = await request<{ id: number; userId: number; total: number; status: string; courier?: string; shippingAddress?: string; emailStatus?: { emailSent: boolean; reason?: string } }>('/orders', { method: 'POST', body: JSON.stringify(data) });
     return created;
   },
   deleteOrder: async (id: number) => {

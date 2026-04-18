@@ -6,57 +6,22 @@ import ProductCard from '../components/ProductCard';
 import { useToast } from '../contexts/ToastContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 
-const getProductCategory = (product: any) => {
-  const rawCategory = product?.category ?? product?.categoryName ?? product?.category?.name;
-  if (typeof rawCategory !== 'string') {
-    return '';
-  }
-  return rawCategory.trim();
-};
-
-const getProductCategoryLabel = (product: any) => {
-  const rawCategory = product?.categoryLabel ?? product?.category ?? product?.categoryName ?? product?.category?.name;
-  if (typeof rawCategory !== 'string') {
-    return '';
-  }
-  return rawCategory.trim();
-};
-
 export default function HomePage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { showToast } = useToast();
   const [products, setProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<Array<{ key: string; label: string }>>([]);
+  const [categories, setCategories] = useState<Array<{ key: string; label: string; viewsCount: number; productCount: number }>>([]);
   const [loading, setLoading] = useState(true);
-  const [carouselIndex, setCarouselIndex] = useState(0);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const prods = await api.getProducts(i18n.language);
-
-        // Safety check: ensure prods is an array
-        if (!Array.isArray(prods)) {
-          showToast('Failed to load products', 'error');
-          return;
-        }
-
-        const featured = prods.slice(0, 12); // Show first 12 products for carousel
-        setProducts(featured);
-
-        const unique: Record<string, boolean> = {};
-        const collected: Array<{ key: string; label: string }> = [];
-        for (let i = 0; i < prods.length; i += 1) {
-          const cat = getProductCategory(prods[i]);
-          const label = getProductCategoryLabel(prods[i]);
-          if (cat && !unique[cat]) {
-            unique[cat] = true;
-            collected.push({ key: cat, label: label || cat });
-          }
-        }
-        collected.sort((a, b) => a.label.localeCompare(b.label));
-        setCategories(collected);
+        const showcase = await api.getFeaturedShowcase(i18n.language);
+        const featuredProducts = Array.isArray(showcase.products) ? showcase.products : [];
+        const featuredCategories = Array.isArray(showcase.categories) ? showcase.categories : [];
+        setProducts(featuredProducts);
+        setCategories(featuredCategories);
       } catch (e) {
         showToast('Failed to load data', 'error');
       } finally {
@@ -66,17 +31,6 @@ export default function HomePage() {
     load();
   }, [i18n.language, showToast]);
 
-  // Auto-scroll carousel
-  useEffect(() => {
-    if (products.length <= 4) return; // Don't auto-scroll if few products
-    
-    const interval = setInterval(() => {
-      setCarouselIndex((prev) => (prev + 1) % Math.ceil(products.length / 4));
-    }, 5000); // Change slide every 5 seconds
-    
-    return () => clearInterval(interval);
-  }, [products.length]);
-
   const handleShopNow = () => {
     navigate('/shop/all');
   };
@@ -84,16 +38,6 @@ export default function HomePage() {
   const handleViewAll = () => {
     navigate('/shop/all');
   };
-
-  const handlePrevCarousel = () => {
-    setCarouselIndex((prev) => (prev - 1 + Math.ceil(products.length / 4)) % Math.ceil(products.length / 4));
-  };
-
-  const handleNextCarousel = () => {
-    setCarouselIndex((prev) => (prev + 1) % Math.ceil(products.length / 4));
-  };
-
-  const carouselProducts = products.slice(carouselIndex * 4, (carouselIndex + 1) * 4);
 
   return (
     <div className="view">
@@ -109,14 +53,16 @@ export default function HomePage() {
       {/* Categories Showcase */}
       <section className="categories-showcase">
         <h2>{t('home.featuredCategories')}</h2>
+        <p className="showcase-intro">A legtöbb megtekintést kapott kategóriák jelennek meg itt.</p>
         {loading ? (
           <LoadingSpinner />
         ) : (
-          <div className="categories-grid">
+          <div className="showcase-grid showcase-grid-categories">
             {categories.map((cat) => (
-              <div key={cat.key} className="category-card" onClick={() => navigate(`/shop/category/${encodeURIComponent(cat.key)}`)}>
+              <div key={cat.key} className="category-card category-card-centered" onClick={() => navigate(`/shop/category/${encodeURIComponent(cat.key)}`)}>
                 <div className="category-card-icon">📦</div>
                 <h3>{cat.label}</h3>
+                <span className="showcase-meta">{cat.productCount} products · {cat.viewsCount} views</span>
               </div>
             ))}
           </div>
@@ -126,34 +72,18 @@ export default function HomePage() {
       {/* Featured Products */}
       <section className="featured-section">
         <h2>{t('home.featuredProducts')}</h2>
+        <p className="showcase-intro">A legnézettebb termékekből válogatva.</p>
         {loading ? (
           <LoadingSpinner />
         ) : (
-          <>
-            <div className="carousel-container">
-              <button className="carousel-btn carousel-btn-prev" onClick={handlePrevCarousel} aria-label="Previous">
-                ❮
-              </button>
-              <div className="grid-products carousel-grid">
-                {carouselProducts.map((p: any) => (
-                  <ProductCard key={p.id} product={p} />
-                ))}
+          <div className="showcase-grid showcase-grid-products">
+            {products.map((p: any) => (
+              <div key={p.id} className="product-card-shell">
+                <ProductCard product={p} />
+                <span className="showcase-meta">{p.viewsCount || 0} views</span>
               </div>
-              <button className="carousel-btn carousel-btn-next" onClick={handleNextCarousel} aria-label="Next">
-                ❯
-              </button>
-            </div>
-            <div className="carousel-indicators">
-              {Array.from({ length: Math.ceil(products.length / 4) }).map((_, idx) => (
-                <button
-                  key={idx}
-                  className={`carousel-dot ${idx === carouselIndex ? 'active' : ''}`}
-                  onClick={() => setCarouselIndex(idx)}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
-            </div>
-          </>
+            ))}
+          </div>
         )}
         <div className="featured-footer">
           <button onClick={handleViewAll} className="btn-secondary">{t('home.viewAllProducts')}</button>

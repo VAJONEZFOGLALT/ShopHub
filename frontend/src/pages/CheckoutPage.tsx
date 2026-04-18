@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import { api } from '../services/api';
 import { COUNTRY_ADDRESS_CONFIGS, DEFAULT_COUNTRY_CODE, formatAddressSingleLine, getCountryAddressConfig } from '../utils/addressing';
 
@@ -56,6 +57,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
   const { t } = useTranslation();
   const { items, remove, clear, total } = useCart();
   const { user } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [courier, setCourier] = useState<CourierOption['id']>('UPS');
   const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>('address');
@@ -208,6 +210,10 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
         : `ADDRESS | ${courier} | ${formatAddressSingleLine(user ? selectedAddress || {} : guestAddress)}`;
 
       const order = await api.createOrder({ userId, items: orderItems, courier, shippingAddress: shipping });
+      if (order.emailStatus && !order.emailStatus.emailSent) {
+        const reason = order.emailStatus.reason || 'Unknown email delivery issue';
+        showToast(`Az email nem ment ki: ${reason}`, 'warning');
+      }
       clear();
       onSuccess?.(order.id);
       navigate('/shop/confirmation');
