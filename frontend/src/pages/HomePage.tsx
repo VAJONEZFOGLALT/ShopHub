@@ -46,13 +46,18 @@ export default function HomePage() {
   const safeFeaturedPage = Math.min(featuredPage, totalFeaturedPages);
   const pageStart = (safeFeaturedPage - 1) * FEATURED_PAGE_SIZE;
   const pagedFeaturedProducts = products.slice(pageStart, pageStart + FEATURED_PAGE_SIZE);
+  const displayedCategories = categories.slice(0, 3);
+  const canNavigateFeatured = totalFeaturedPages > 1;
+  const isPrevDisabled = !canNavigateFeatured || safeFeaturedPage <= 1;
+  const isNextDisabled = !canNavigateFeatured || safeFeaturedPage >= totalFeaturedPages;
+  const featuredColumns = Math.max(1, Math.min(FEATURED_PAGE_SIZE, pagedFeaturedProducts.length));
 
   const goPrevFeatured = () => {
-    setFeaturedPage((prev) => (prev - 1 + totalFeaturedPages) % totalFeaturedPages || totalFeaturedPages);
+    setFeaturedPage((prev) => Math.max(1, prev - 1));
   };
 
   const goNextFeatured = () => {
-    setFeaturedPage((prev) => (prev + 1) % totalFeaturedPages || 1);
+    setFeaturedPage((prev) => Math.min(totalFeaturedPages, prev + 1));
   };
 
   return (
@@ -73,7 +78,7 @@ export default function HomePage() {
           <LoadingSpinner />
         ) : (
           <div className="showcase-grid showcase-grid-categories">
-            {categories.map((cat) => (
+            {displayedCategories.map((cat) => (
               <div key={cat.key} className="category-card category-card-centered" onClick={() => navigate(`/shop/category/${encodeURIComponent(cat.key)}`)}>
                 <div className="category-card-icon">📦</div>
                 <h3>{cat.label}</h3>
@@ -92,15 +97,18 @@ export default function HomePage() {
         ) : (
           <>
             <div className="carousel-container">
-              <button className="carousel-btn carousel-btn-prev" onClick={goPrevFeatured} aria-label="Previous featured products">
+              <button className="carousel-btn carousel-btn-prev" onClick={goPrevFeatured} disabled={isPrevDisabled} aria-label="Previous featured products">
                 ❮
               </button>
-              <div className="grid-products carousel-grid carousel-grid-featured">
+              <div
+                className="grid-products carousel-grid carousel-grid-featured"
+                style={{ ['--featured-cols' as any]: featuredColumns }}
+              >
                 {pagedFeaturedProducts.map((p: any) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
               </div>
-              <button className="carousel-btn carousel-btn-next" onClick={goNextFeatured} aria-label="Next featured products">
+              <button className="carousel-btn carousel-btn-next" onClick={goNextFeatured} disabled={isNextDisabled} aria-label="Next featured products">
                 ❯
               </button>
             </div>

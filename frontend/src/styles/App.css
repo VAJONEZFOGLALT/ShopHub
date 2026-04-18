@@ -2071,14 +2071,15 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 
 .showcase-grid {
   display: grid; 
-  gap: 20px;
+  gap: 14px;
   width: min(100%, 1180px);
   margin: 0 auto;
   justify-items: center;
 }
 
 .showcase-grid-categories {
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(3, minmax(180px, 260px));
+  justify-content: center;
 }
 
 .showcase-grid-products {
@@ -2252,10 +2253,23 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
+.carousel-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .carousel-btn:hover {
   background: var(--primary-hover);
   transform: scale(1.1);
   box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+.carousel-btn:disabled:hover {
+  background: var(--primary);
+  transform: none;
+  box-shadow: none;
 }
 
 .carousel-btn:active {
@@ -2276,8 +2290,9 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 
 .carousel-grid-featured {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--featured-cols, 5), minmax(210px, 240px));
   gap: 16px;
+  justify-content: center;
   align-items: stretch;
 }
 
@@ -3205,7 +3220,7 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   .hero-banner { padding: 40px 20px; margin-bottom: 40px; }
   .hero-content h1 { font-size: 2em; }
   .hero-content p { font-size: 1em; }
-  .showcase-grid-categories { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .showcase-grid-categories { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
   .showcase-grid-products { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
   .carousel-grid-featured { grid-template-columns: repeat(1, minmax(0, 1fr)); }
   .featured-section h2 { font-size: 1.4em; }
@@ -4701,13 +4716,6 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 }
 
 /* Checkout polish */
-.checkout-lead {
-  margin: -8px 0 8px;
-  color: var(--text-secondary);
-  max-width: 64ch;
-  line-height: 1.55;
-  font-size: 0.98em;
-}
 
 .checkout-courier-option,
 .checkout-address-option {
@@ -4808,11 +4816,6 @@ body.packeta-modal-open iframe[src*="widget.packeta.com"] {
 }
 
 @media (max-width: 768px) {
-  .checkout-lead {
-    margin-top: -4px;
-    font-size: 0.94em;
-  }
-
   .checkout-courier-option,
   .checkout-address-option {
     padding: 10px;
