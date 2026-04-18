@@ -35,6 +35,7 @@ export class LibreTranslateService {
     text: string,
     sourceLang: string,
     targetLang: string,
+    context?: string,
   ): Promise<TranslateResponse> {
     if (!text || text.trim().length === 0) {
       throw new BadRequestException('Text to translate cannot be empty');
@@ -62,7 +63,7 @@ export class LibreTranslateService {
       } catch (deepLError) {
         console.warn('⚠ DeepL unavailable, trying OpenAI...');
         try {
-          const translatedText = await this.openaiService.translate(text, source, target);
+          const translatedText = await this.openaiService.translate(text, source, target, context);
           return { translatedText };
         } catch (openaiError) {
           console.warn('⚠ OpenAI unavailable, trying LibreTranslate...');
@@ -84,7 +85,7 @@ export class LibreTranslateService {
 
     // Other language pairs: try all services
     try {
-      const translatedText = await this.openaiService.translate(text, source, target);
+      const translatedText = await this.openaiService.translate(text, source, target, context);
       return { translatedText };
     } catch (openaiError) {
       console.warn('⚠ OpenAI unavailable, trying DeepL...');
@@ -184,6 +185,7 @@ export class LibreTranslateService {
     texts: string[],
     sourceLang: string,
     targetLang: string,
+    context?: string,
   ): Promise<string[]> {
     if (texts.length === 0) {
       return [];
@@ -213,7 +215,7 @@ export class LibreTranslateService {
 
     // Other language pairs: try OpenAI first
     try {
-      const results = await this.openaiService.translateBatch(texts, source, target);
+      const results = await this.openaiService.translateBatch(texts, source, target, context);
       console.log(`✓ OpenAI batch-translated ${texts.length} items`);
       return results;
     } catch (openaiError) {
