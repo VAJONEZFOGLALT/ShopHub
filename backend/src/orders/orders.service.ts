@@ -11,6 +11,21 @@ export class OrdersService {
     private readonly notificationsService: NotificationsService,
   ) {}
 
+  private generateTrackingNumber(courier?: string): string {
+    const normalized = (courier || 'UPS').toUpperCase();
+    const prefixes: Record<string, string> = {
+      UPS: '1Z',
+      DPD: 'DPD',
+      PACKETA: 'PKT',
+      INPOST: 'MPL',
+    };
+
+    const prefix = prefixes[normalized] || 'TRK';
+    const now = Date.now().toString().slice(-8);
+    const random = Math.floor(Math.random() * 1_000_000).toString().padStart(6, '0');
+    return `${prefix}${now}${random}`;
+  }
+
   async create(createOrderDto: CreateOrderDto) {
     const { userId, items, courier, shippingAddress } = createOrderDto;
 
@@ -52,6 +67,7 @@ export class OrdersService {
         totalPrice,
         courier: courier || 'UPS',
         shippingAddress,
+        trackingNumber: this.generateTrackingNumber(courier),
         orderItems: { create: orderItemsData },
       },
       include: { orderItems: true },

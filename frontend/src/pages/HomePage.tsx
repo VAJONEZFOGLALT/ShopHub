@@ -47,6 +47,14 @@ export default function HomePage() {
   const pageStart = (safeFeaturedPage - 1) * FEATURED_PAGE_SIZE;
   const pagedFeaturedProducts = products.slice(pageStart, pageStart + FEATURED_PAGE_SIZE);
 
+  const goPrevFeatured = () => {
+    setFeaturedPage((prev) => (prev - 1 + totalFeaturedPages) % totalFeaturedPages || totalFeaturedPages);
+  };
+
+  const goNextFeatured = () => {
+    setFeaturedPage((prev) => (prev + 1) % totalFeaturedPages || 1);
+  };
+
   return (
     <div className="view">
       {/* Hero Banner */}
@@ -61,7 +69,6 @@ export default function HomePage() {
       {/* Categories Showcase */}
       <section className="categories-showcase">
         <h2>{t('home.featuredCategories')}</h2>
-        <p className="showcase-intro">A legtöbb megtekintést kapott kategóriák jelennek meg itt.</p>
         {loading ? (
           <LoadingSpinner />
         ) : (
@@ -80,53 +87,36 @@ export default function HomePage() {
       {/* Featured Products */}
       <section className="featured-section">
         <h2>{t('home.featuredProducts')}</h2>
-        <p className="showcase-intro">A legnezettebb termekek, oldalakra bontva (5 termek / oldal).</p>
         {loading ? (
           <LoadingSpinner />
         ) : (
           <>
-            <div className="showcase-grid showcase-grid-products">
-            {pagedFeaturedProducts.map((p: any) => (
-              <div key={p.id} className="product-card-shell">
-                <ProductCard product={p} />
-                <span className="showcase-meta">{p.viewsCount || 0} megtekintes</span>
+            <div className="carousel-container">
+              <button className="carousel-btn carousel-btn-prev" onClick={goPrevFeatured} aria-label="Previous featured products">
+                ❮
+              </button>
+              <div className="grid-products carousel-grid carousel-grid-featured">
+                {pagedFeaturedProducts.map((p: any) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
               </div>
-            ))}
+              <button className="carousel-btn carousel-btn-next" onClick={goNextFeatured} aria-label="Next featured products">
+                ❯
+              </button>
             </div>
             {totalFeaturedPages > 1 && (
-              <div className="featured-pagination">
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={() => setFeaturedPage((prev) => Math.max(1, prev - 1))}
-                  disabled={safeFeaturedPage === 1}
-                >
-                  Elozo
-                </button>
-                <div className="featured-page-list" role="group" aria-label="Kiemelt oldalak">
-                  {Array.from({ length: totalFeaturedPages }).map((_, idx) => {
-                    const pageNumber = idx + 1;
-                    return (
-                      <button
-                        key={pageNumber}
-                        type="button"
-                        className={`btn-secondary ${safeFeaturedPage === pageNumber ? 'featured-page-active' : ''}`.trim()}
-                        onClick={() => setFeaturedPage(pageNumber)}
-                      >
-                        {pageNumber}
-                      </button>
-                    );
-                  })}
-                </div>
-                <span className="featured-page-indicator">Oldal {safeFeaturedPage} / {totalFeaturedPages}</span>
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={() => setFeaturedPage((prev) => Math.min(totalFeaturedPages, prev + 1))}
-                  disabled={safeFeaturedPage === totalFeaturedPages}
-                >
-                  Kovetkezo
-                </button>
+              <div className="carousel-indicators">
+                {Array.from({ length: totalFeaturedPages }).map((_, idx) => {
+                  const page = idx + 1;
+                  return (
+                    <button
+                      key={page}
+                      className={`carousel-dot ${page === safeFeaturedPage ? 'active' : ''}`}
+                      onClick={() => setFeaturedPage(page)}
+                      aria-label={`Go to featured page ${page}`}
+                    />
+                  );
+                })}
               </div>
             )}
           </>

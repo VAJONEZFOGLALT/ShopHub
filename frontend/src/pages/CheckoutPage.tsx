@@ -22,14 +22,13 @@ declare global {
 }
 
 const couriers: CourierOption[] = [
-  { id: 'UPS', name: 'UPS Express (hazhoz)', price: 15.99, days: '1-2 nap', type: 'address' },
-  { id: 'DPD', name: 'DPD Home (hazhoz)', price: 7.99, days: '1-2 nap', type: 'address' },
-  { id: 'INPOST', name: 'Magyar Posta (hazhoz)', price: 6.99, days: '2-4 nap', type: 'address' },
-  { id: 'PACKETA', name: 'Packeta (atvevo pont / Z-BOX)', price: 4.99, days: '2-3 nap', type: 'pickup' },
+  { id: 'UPS', name: 'UPS Express', price: 15.99, days: '1-2 nap', type: 'address' },
+  { id: 'INPOST', name: 'Magyar Posta', price: 6.99, days: '2-4 nap', type: 'address' },
+  { id: 'PACKETA', name: 'Packeta', price: 4.99, days: '2-3 nap', type: 'pickup' },
 ];
 
 type CourierOption = {
-  id: 'UPS' | 'DPD' | 'PACKETA' | 'INPOST';
+  id: 'UPS' | 'PACKETA' | 'INPOST';
   name: string;
   price: number;
   days: string;
