@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useToast } from './ToastContext';
 
 export type CartItem = {
@@ -18,10 +18,44 @@ type CartContextType = {
 };
 
 const CartContext = createContext<CartContextType | null>(null);
+const CART_STORAGE_KEY = 'shophub_cart_items';
+
+function readStoredCart(): CartItem[] {
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY);
+    if (!raw) {
+      return [];
+    }
+
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed
+      .map((item) => ({
+        productId: Number(item.productId),
+        name: String(item.name || ''),
+        price: Number(item.price || 0),
+        quantity: Number(item.quantity || 0),
+      }))
+      .filter((item) => Number.isFinite(item.productId) && item.productId > 0 && item.name.length > 0 && item.quantity > 0);
+  } catch {
+    return [];
+  }
+}
 
 export default function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<CartItem[]>(() => readStoredCart());
   const { showToast } = useToast();
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+    } catch {
+      // Ignore storage write failures.
+    }
+  }, [items]);
 
   const add = (item: Omit<CartItem, 'quantity'>, qty = 1) => {
     setItems(prev => {
@@ -47,6 +81,11 @@ export default function CartProvider({ children }: { children: React.ReactNode }
 
   const clear = () => {
     setItems([]);
+    try {
+      localStorage.removeItem(CART_STORAGE_KEY);
+    } catch {
+      // Ignore storage write failures.
+    }
     showToast('🛒 Cart cleared', 'info');
   };
 
