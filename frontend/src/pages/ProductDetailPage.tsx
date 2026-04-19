@@ -173,7 +173,7 @@ export default function ProductDetailPage() {
                 type="button" 
                   className={`compare-action ${compareIds.includes(product.id) ? 'active' : ''} ${isComparePending(product.id) ? 'is-loading' : ''}`.trim()} 
                 onClick={handleToggleCompare}
-                title={!isAuthenticated ? t('products.logInToCompare') : compareIds.includes(product.id) ? 'Remove from compare' : 'Add to compare'}
+                title={!isAuthenticated ? t('products.logInToCompare') : compareIds.includes(product.id) ? t('products.removeFromCompare') : t('products.addToCompare')}
                   disabled={isComparePending(product.id)}
               >
                 {compareIds.includes(product.id) ? t('products.compared') : t('products.compare')}
@@ -198,15 +198,15 @@ export default function ProductDetailPage() {
           <div className="detail-highlights">
             <div className="highlight-item">
               <span className="highlight-label">{t('products.shipping')}</span>
-              <span className="highlight-value">2-4 business days</span>
+              <span className="highlight-value">{t('products.shippingEta')}</span>
             </div>
             <div className="highlight-item">
               <span className="highlight-label">{t('products.returns')}</span>
-              <span className="highlight-value">30-day returns</span>
+              <span className="highlight-value">{t('products.returnsPolicy')}</span>
             </div>
             <div className="highlight-item">
               <span className="highlight-label">{t('products.warranty')}</span>
-              <span className="highlight-value">12 months</span>
+              <span className="highlight-value">{t('products.warrantyPeriod')}</span>
             </div>
           </div>
           <div className="detail-footer">

@@ -33,7 +33,12 @@
     "shopNow": "Vásárolj most",
     "featuredCategories": "Kiemelt Kategóriák",
     "featuredProducts": "Kiemelt Termékek",
-    "viewAllProducts": "Összes Termék Megtekintése"
+    "viewAllProducts": "Összes Termék Megtekintése",
+    "failedToLoadData": "Nem sikerült betölteni az adatokat",
+    "viewsCount": "{count} megtekintés",
+    "previousFeaturedProducts": "Előző kiemelt termékek",
+    "nextFeaturedProducts": "Következő kiemelt termékek",
+    "goToFeaturedPage": "Ugrás a(z) {page}. kiemelt oldalra"
   },
   "products": {
     "title": "Termékek",
@@ -75,6 +80,9 @@
     "shipping": "Szállítás",
     "returns": "Visszaértékelés",
     "warranty": "Garancia",
+    "shippingEta": "2-4 munkanap",
+    "returnsPolicy": "30 napos visszaküldés",
+    "warrantyPeriod": "12 hónap",
     "quantity": "Mennyiség",
     "addedToCart": "Hozzéadva a kosárhoz",
     "customerReviews": "Ügyféli vélemények",
@@ -86,6 +94,8 @@
     "logInToCompare": "Kérjük jelentkezzen be az összehasonlításhoz",
     "compare": "Összehasonlítás",
     "compared": "Összehasonlított",
+    "addToCompare": "Hozzáadás az összehasonlításhoz",
+    "removeFromCompare": "Eltávolítás az összehasonlításból",
     "logInToWishlist": "Jelentkezzen be a kívánságlistához",
     "addToWishlist": "Hozzáadás a kívánságlistához",
     "removeFromWishlist": "Eltávolítás a kívánságlistából",
@@ -105,7 +115,8 @@
     "remove": "Eltávolítás",
     "clear": "Kosár törlése",
     "clearConfirm": "Töröljem az összes tétel a kosárból?",
-    "removeTitle": "Eltávolítás"
+    "removeTitle": "Eltávolítás",
+    "getStarted": "Adj hozzá termékeket az induláshoz!"
   },
   "checkout": {
     "title": "Fizetés",
@@ -121,7 +132,34 @@
     "processing": "Feldolgozás alatt...",
     "selectAddress": "Válassz meglévő címet",
     "newAddress": "Új cím",
-    "remove": "Eltávolítás"
+    "remove": "Eltávolítás",
+    "pickPacketaPoint": "Packeta pont kiválasztása",
+    "loadingPacketa": "Packeta betöltése...",
+    "noSavedAddress": "Nincs mentett szállítási címed. Adj hozzá egyet a profil oldalon.",
+    "openProfile": "Profil megnyitása",
+    "shippingAddress": "Szállítási cím",
+    "couriers": {
+      "ups": {
+        "name": "UPS Expressz",
+        "days": "1-2 nap"
+      },
+      "posta": {
+        "name": "Magyar Posta",
+        "days": "2-4 nap"
+      },
+      "packeta": {
+        "name": "Packeta",
+        "days": "2-3 nap"
+      }
+    },
+    "errors": {
+      "packetaKeyMissing": "Hiányzik a VITE_PACKETA_API_KEY, add meg a .env fájlban.",
+      "packetaUnavailable": "A Packeta widget most nem tölthető be.",
+      "selectPickupPoint": "Válassz átvételi pontot/boxot a kiválasztott futárhoz.",
+      "selectAddress": "Válassz szállítási címet.",
+      "fillRequiredAddressFields": "Töltsd ki a szállítási cím kötelező mezőit.",
+      "emailDeliveryFailed": "Az e-mail nem ment ki: {reason}"
+    }
   },
   "auth": {
     "loginTitle": "Bejelentkezés",
@@ -202,7 +240,14 @@
     "viewCart": "Nézd meg a kosárat",
     "profileUpdatedSuccessfully": "A profil sikeresen frissítve.",
     "failedToLoadAddresses": "Nem sikerült betölteni a címeket",
-    "failedToSaveAddress": "Nem sikerült menteni a címet"
+    "failedToSaveAddress": "Nem sikerült menteni a címet",
+    "passwordMinLength": "A jelszónak legalább 8 karakter hosszúnak kell lennie",
+    "passwordNeedUppercase": "A jelszóban kell lennie nagybetűnek",
+    "passwordNeedLowercase": "A jelszóban kell lennie kisbetűnek",
+    "passwordNeedNumber": "A jelszóban kell lennie számnak",
+    "needOldPasswordForNewOne": "Az új jelszóhoz meg kell adni a régi jelszót is.",
+    "profileUpdateFailed": "A profil frissítése sikertelen",
+    "avatarUploadFailed": "Az avatar feltöltése sikertelen"
   },
   "orders": {
     "title": "Rendeléseim",
@@ -232,6 +277,49 @@
     "backToProfile": "Vissza a profilhoz",
     "continueShopping": "Vásárlás folytatása",
     "failedToLoadOrders": "Nem sikerült betölteni a rendeléseket"
+  },
+  "compare": {
+    "selectProducts": "Válassz termékeket az összehasonlításhoz",
+    "selectedCount": "{count} kiválasztva",
+    "clear": "Törlés",
+    "productComparison": "Termék-összehasonlítás",
+    "selectAtLeastTwo": "Válassz legalább két terméket az összehasonlításhoz.",
+    "feature": "Jellemző",
+    "description": "Leírás",
+    "noImage": "Nincs kép"
+  },
+  "confirmation": {
+    "kicker": "Rendelés visszaigazolás",
+    "title": "Köszönjük a rendelésed",
+    "subtitle": "A rendelésed beérkezett, hamarosan feldolgozzuk.",
+    "orderNumber": "Rendelés #{id}",
+    "orderItems": "Rendelt tételek",
+    "nextStepsTitle": "Mi történik most?",
+    "nextStep1": "A rendelésedet rögzítettük és feldolgozásra előkészítettük.",
+    "nextStep2": "A rendelés állapotát később a rendelési előzményekben követheted.",
+    "nextStep3": "Ha az e-mail értesítés aktív, hamarosan visszaigazoló levelet is kapsz."
+  },
+  "reviewsModal": {
+    "reviewsFor": "Vélemények ehhez: {productName}",
+    "reviewCount": "{count} vélemény",
+    "viewReviews": "Vélemények megtekintése",
+    "writeReview": "Vélemény írása",
+    "signInToWriteReview": "Jelentkezz be a vélemény írásához.",
+    "ratings": "Értékelések",
+    "clearFilter": "Szűrő törlése",
+    "writeReviewCta": "Véleményt írok",
+    "writeYourReview": "Írd meg a véleményed",
+    "rating": "Értékelés",
+    "title": "Cím",
+    "titlePlaceholder": "Foglald össze röviden a tapasztalatod",
+    "yourReview": "Véleményed",
+    "reviewPlaceholder": "Írd le, mit gondolsz erről a termékről...",
+    "submitReview": "Vélemény beküldése",
+    "noReviewsForRating": "Még nincs {rating} csillagos vélemény.",
+    "anonymous": "Névtelen"
+  },
+  "categories": {
+    "failedToLoad": "A kategóriák betöltése sikertelen"
   },
   "footer": {
     "about": "Rólunk",

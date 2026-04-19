@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 
@@ -32,6 +33,7 @@ export function ReviewsModal({
   onReviewSubmitted,
   initialView = 'list',
 }: ReviewsModalProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [rating, setRating] = useState(5);
   const [reviewTitle, setReviewTitle] = useState('');
@@ -83,10 +85,10 @@ export function ReviewsModal({
       <div className="modal-content reviews-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header reviews-modal-header">
           <div className="reviews-modal-title">
-            <h2>Reviews for {productName}</h2>
+            <h2>{t('reviewsModal.reviewsFor', { productName })}</h2>
             <div className="reviews-modal-summary">
               <span className="review-score-large">★ {reviewSummary.average.toFixed(1)}</span>
-              <span className="review-count-text">{reviewSummary.count} reviews</span>
+              <span className="review-count-text">{t('reviewsModal.reviewCount', { count: reviewSummary.count })}</span>
             </div>
           </div>
           <div className="reviews-modal-header-actions">
@@ -96,16 +98,16 @@ export function ReviewsModal({
                 className={`reviews-tab ${viewMode === 'list' ? 'active' : ''}`}
                 onClick={() => setViewMode('list')}
               >
-                View Reviews
+                {t('reviewsModal.viewReviews')}
               </button>
               <button
                 type="button"
                 className={`reviews-tab ${viewMode === 'write' ? 'active' : ''}`}
                 onClick={() => setViewMode('write')}
                 disabled={!user}
-                title={user ? 'Write a review' : 'Sign in to write a review'}
+                title={user ? t('reviewsModal.writeReview') : t('reviewsModal.signInToWriteReview')}
               >
-                Write Review
+                {t('reviewsModal.writeReview')}
               </button>
             </div>
             <button className="modal-close" onClick={onClose}>✕</button>
@@ -115,7 +117,7 @@ export function ReviewsModal({
         <div className="modal-body reviews-modal-body">
           <div className="reviews-modal-sidebar">
             <div className="rating-distribution">
-              <h3>Ratings</h3>
+              <h3>{t('reviewsModal.ratings')}</h3>
               {ratingDistribution.map(({ star, count, percentage }) => (
                 <button
                   key={star}
@@ -131,17 +133,17 @@ export function ReviewsModal({
               ))}
               {filterRating && (
                 <button className="clear-filter-btn" onClick={() => setFilterRating(null)}>
-                  Clear Filter
+                  {t('reviewsModal.clearFilter')}
                 </button>
               )}
             </div>
 
             {user ? (
               <button className="btn-primary" onClick={() => setViewMode('write')}>
-                ✍️ Write a Review
+                {t('reviewsModal.writeReviewCta')}
               </button>
             ) : (
-              <div className="reviews-login-hint">Sign in to write a review.</div>
+              <div className="reviews-login-hint">{t('reviewsModal.signInToWriteReview')}</div>
             )}
           </div>
 
@@ -149,20 +151,20 @@ export function ReviewsModal({
             {viewMode === 'write' && !user && (
               <div className="review-form-modal-card">
                 <div className="review-form-header">
-                  <h3>Write a Review</h3>
+                  <h3>{t('reviewsModal.writeReview')}</h3>
                 </div>
-                <p className="muted">Sign in to write a review.</p>
+                <p className="muted">{t('reviewsModal.signInToWriteReview')}</p>
               </div>
             )}
             {viewMode === 'write' && user && (
               <div className="review-form-modal-card">
                 <div className="review-form-header">
-                  <h3>Write Your Review</h3>
-                  <button className="btn-text" onClick={() => setViewMode('list')}>Cancel</button>
+                  <h3>{t('reviewsModal.writeYourReview')}</h3>
+                  <button className="btn-text" onClick={() => setViewMode('list')}>{t('common.cancel')}</button>
                 </div>
                 <form onSubmit={handleSubmit} className="review-form">
                   <label>
-                    Rating
+                    {t('reviewsModal.rating')}
                     <div className="rating-selector">
                       {[5, 4, 3, 2, 1].map((star) => (
                         <button
@@ -177,25 +179,25 @@ export function ReviewsModal({
                     </div>
                   </label>
                   <label>
-                    Title
+                    {t('reviewsModal.title')}
                     <input
                       required
                       value={reviewTitle}
                       onChange={(e) => setReviewTitle(e.target.value)}
-                      placeholder="Sum up your experience"
+                      placeholder={t('reviewsModal.titlePlaceholder')}
                     />
                   </label>
                   <label>
-                    Your Review
+                    {t('reviewsModal.yourReview')}
                     <textarea
                       required
                       value={reviewComment}
                       onChange={(e) => setReviewComment(e.target.value)}
                       rows={6}
-                      placeholder="Tell us what you think about this product..."
+                      placeholder={t('reviewsModal.reviewPlaceholder')}
                     />
                   </label>
-                  <button type="submit" className="btn-primary">Submit Review</button>
+                  <button type="submit" className="btn-primary">{t('reviewsModal.submitReview')}</button>
                 </form>
               </div>
             )}
@@ -206,18 +208,18 @@ export function ReviewsModal({
                   <div className="empty-reviews">
                     <p className="muted">
                       {filterRating
-                        ? `No ${filterRating}-star reviews yet.`
-                        : 'No reviews yet. Be the first to review!'}
+                        ? t('reviewsModal.noReviewsForRating', { rating: filterRating })
+                        : t('products.noReviewsYet')}
                     </p>
                     {user && (
                       <button className="btn-primary" onClick={() => setViewMode('write')}>
-                        Write the First Review
+                        {t('products.writeFirstReview')}
                       </button>
                     )}
                   </div>
                 ) : (
                   filteredReviews.map((rev) => {
-                    const authorName = rev.userName && rev.userName.trim() ? rev.userName : 'Anonymous';
+                    const authorName = rev.userName && rev.userName.trim() ? rev.userName : t('reviewsModal.anonymous');
                     const authorInitial = authorName[0].toUpperCase();
                     return (
                     <div key={rev.id} className="review-card-modal">

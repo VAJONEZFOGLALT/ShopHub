@@ -291,7 +291,7 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
               onClick={handleOpenCompare}
               disabled={compareCount === 0}
             >
-              Compare {compareCount > 0 ? `(${compareCount})` : ''}
+              {t('products.compare')} {compareCount > 0 ? `(${compareCount})` : ''}
             </button>
           </div>
         </div>

@@ -79,6 +79,18 @@ export default function OrderConfirmationPage({ orderId, onOrderViewed }: { orde
     return (order?.orderItems || []).reduce((sum, item) => sum + Number(item.quantity || 0), 0);
   }, [order]);
 
+  const statusLabel = useMemo(() => {
+    const status = (order?.status || 'PENDING').toUpperCase();
+    const map: Record<string, string> = {
+      PENDING: t('orders.pending'),
+      PROCESSING: t('orders.processing'),
+      SHIPPED: t('orders.shipped'),
+      DELIVERED: t('orders.delivered'),
+      CANCELLED: t('orders.cancelled'),
+    };
+    return map[status] || status;
+  }, [order?.status, t]);
+
   const handleContinue = () => {
     if (onOrderViewed) {
       onOrderViewed();
@@ -125,9 +137,9 @@ export default function OrderConfirmationPage({ orderId, onOrderViewed }: { orde
         <div className="confirmation-hero">
           <div className="checkmark">✓</div>
           <div className="confirmation-hero-copy">
-            <div className="confirmation-kicker">{t('checkout.title')}</div>
-            <h1>{t('orders.title')}</h1>
-            <p>{t('checkout.processing')}</p>
+            <div className="confirmation-kicker">{t('confirmation.kicker')}</div>
+            <h1>{t('confirmation.title')}</h1>
+            <p>{t('confirmation.subtitle')}</p>
           </div>
         </div>
 
@@ -137,36 +149,36 @@ export default function OrderConfirmationPage({ orderId, onOrderViewed }: { orde
           <div className="confirmation-grid">
             <section className="confirmation-card confirmation-order-summary">
               <div className="confirmation-card-header">
-                <h2>Order #{resolvedOrderId}</h2>
-                <span className={`status-badge status-${(order?.status || 'PENDING').toLowerCase()}`}>{order?.status || 'PENDING'}</span>
+                <h2>{t('confirmation.orderNumber', { id: resolvedOrderId })}</h2>
+                <span className={`status-badge status-${(order?.status || 'PENDING').toLowerCase()}`}>{statusLabel}</span>
               </div>
               <div className="confirmation-order-meta">
                 <div>
-                  <span className="confirmation-label">Total</span>
+                  <span className="confirmation-label">{t('checkout.total')}</span>
                   <strong>${Number(order?.totalPrice || 0).toFixed(2)}</strong>
                 </div>
                 <div>
-                  <span className="confirmation-label">Courier</span>
+                  <span className="confirmation-label">{t('orders.courier')}</span>
                   <strong>{order?.courier || 'UPS'}</strong>
                 </div>
                 <div>
-                  <span className="confirmation-label">Items</span>
+                  <span className="confirmation-label">{t('checkout.items')}</span>
                   <strong>{itemCount}</strong>
                 </div>
                 <div>
-                  <span className="confirmation-label">Tracking</span>
+                  <span className="confirmation-label">{t('orders.tracking')}</span>
                   <strong>{order?.trackingNumber || '—'}</strong>
                 </div>
               </div>
 
               <div className="confirmation-address">
-                <span className="confirmation-label">Shipping</span>
+                <span className="confirmation-label">{t('checkout.shipping')}</span>
                 <p>{order?.shippingAddress || '—'}</p>
               </div>
             </section>
 
             <section className="confirmation-card confirmation-items-card">
-              <h2>Order Items</h2>
+              <h2>{t('confirmation.orderItems')}</h2>
               <div className="confirmation-items-list">
                 {(order?.orderItems || []).map((item) => (
                   <div key={item.id} className="confirmation-item-row">
@@ -181,11 +193,11 @@ export default function OrderConfirmationPage({ orderId, onOrderViewed }: { orde
             </section>
 
             <section className="confirmation-card confirmation-next-steps">
-              <h2>What happens next</h2>
+              <h2>{t('confirmation.nextStepsTitle')}</h2>
               <ul>
-                <li>Your order has been accepted and is ready for processing.</li>
-                <li>You can track it later from your order history.</li>
-                <li>If email delivery is configured, you should receive a confirmation email as well.</li>
+                <li>{t('confirmation.nextStep1')}</li>
+                <li>{t('confirmation.nextStep2')}</li>
+                <li>{t('confirmation.nextStep3')}</li>
               </ul>
             </section>
           </div>
@@ -193,7 +205,7 @@ export default function OrderConfirmationPage({ orderId, onOrderViewed }: { orde
 
         <div className="confirmation-actions">
           <button className="btn-primary" onClick={handleViewProducts}>{t('profile.continueShopping')}</button>
-          <button className="btn-secondary" onClick={handleViewOrders}>View My Orders</button>
+          <button className="btn-secondary" onClick={handleViewOrders}>{t('profile.viewMyOrders')}</button>
           <button className="btn-secondary" onClick={handleContinue}>{t('common.home')}</button>
         </div>
       </div>

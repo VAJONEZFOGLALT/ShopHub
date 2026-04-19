@@ -55,7 +55,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
             <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--muted)' }}>
               <p style={{ fontSize: '4em', margin: '0 0 16px 0', lineHeight: '1' }}>🛒</p>
               <p style={{ fontSize: '1.2em', fontWeight: '600', marginBottom: '8px' }}>{t('cart.empty')}</p>
-              <p style={{ fontSize: '0.9em', marginBottom: '24px' }}>Add items to get started!</p>
+              <p style={{ fontSize: '0.9em', marginBottom: '24px' }}>{t('cart.getStarted')}</p>
               <button 
                 className="btn-primary"
                 onClick={() => {
@@ -64,7 +64,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
                   window.location.href = '/shop/all';
                 }}
               >
-                Continue Shopping
+                {t('profile.continueShopping')}
               </button>
             </div>
           ) : (
@@ -95,7 +95,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
                     <button 
                       className="cart-item-remove" 
                       onClick={() => handleRemove(item.productId)}
-                      title="Remove"
+                      title={t('cart.removeTitle')}
                     >
                       🗑️
                     </button>

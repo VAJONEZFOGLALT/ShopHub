@@ -166,10 +166,10 @@ export default function ProfilePage() {
   };
 
   const validatePasswordStrength = (pwd: string): string | null => {
-    if (pwd.length < 8) return 'Jelszó minimum 8 karakter hosszú kell legyen';
-    if (!/[A-Z]/.test(pwd)) return 'Jelszóban kell lennie nagy betűnek';
-    if (!/[a-z]/.test(pwd)) return 'Jelszóban kell lennie kis betűnek';
-    if (!/[0-9]/.test(pwd)) return 'Jelszóban kell lennie számnak';
+    if (pwd.length < 8) return t('profile.passwordMinLength');
+    if (!/[A-Z]/.test(pwd)) return t('profile.passwordNeedUppercase');
+    if (!/[a-z]/.test(pwd)) return t('profile.passwordNeedLowercase');
+    if (!/[0-9]/.test(pwd)) return t('profile.passwordNeedNumber');
     return null;
   };
 
@@ -177,7 +177,7 @@ export default function ProfilePage() {
     e.preventDefault();
     setSaveMessage(null);
     if (passwordInput.trim() && !oldPasswordInput.trim()) {
-      showToast('Az uj jelszohoz meg kell adni a regi jelszot is.', 'error');
+      showToast(t('profile.needOldPasswordForNewOne'), 'error');
       return;
     }
     if (passwordInput.trim()) {
@@ -199,9 +199,9 @@ export default function ProfilePage() {
       setPasswordInput('');
       setOldPasswordInput('');
       setIsEditing(false);
-      setSaveMessage('Profil frissitve.');
+      setSaveMessage(t('profile.profileUpdatedSuccessfully'));
     } catch (err: any) {
-      showToast(err?.message || 'Profile update failed', 'error');
+      showToast(err?.message || t('profile.profileUpdateFailed'), 'error');
     }
   };
 
@@ -226,7 +226,7 @@ export default function ProfilePage() {
         };
         setUserData(nextUser);
       } catch (err) {
-        showToast('Failed to upload avatar', 'error');
+        showToast(t('profile.avatarUploadFailed'), 'error');
       } finally {
         setUploadingAvatar(false);
       }
@@ -337,7 +337,7 @@ export default function ProfilePage() {
                     <div className="profile-product-mini-info">
                       <strong onClick={() => navigate(`/shop/product/${item.id}`)} style={{cursor: 'pointer'}}>{item.name}</strong>
                       <div className="muted">${Number(item.price).toFixed(2)}</div>
-                      <button className="btn-delete" onClick={() => handleRemoveWishlist(item.id, item.name)}>Remove</button>
+                      <button className="btn-delete" onClick={() => handleRemoveWishlist(item.id, item.name)}>{t('cart.remove')}</button>
                     </div>
                   </div>
                 ))}

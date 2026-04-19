@@ -27,7 +27,7 @@ export default function HomePage() {
         setCategories(featuredCategories);
         setFeaturedPage(1);
       } catch (e) {
-        showToast('Failed to load data', 'error');
+        showToast(t('home.failedToLoadData'), 'error');
       } finally {
         setLoading(false);
       }
@@ -83,7 +83,7 @@ export default function HomePage() {
               <div key={cat.key} className="category-card category-card-centered" onClick={() => navigate(`/shop/category/${encodeURIComponent(cat.key)}`)}>
                 <div className="category-card-icon">📦</div>
                 <h3>{cat.label}</h3>
-                <span className="showcase-meta">{cat.viewsCount} megtekintes</span>
+                <span className="showcase-meta">{t('home.viewsCount', { count: cat.viewsCount })}</span>
               </div>
             ))}
           </div>
@@ -98,7 +98,7 @@ export default function HomePage() {
         ) : (
           <>
             <div className="carousel-container">
-              <button className="carousel-btn carousel-btn-prev" onClick={goPrevFeatured} disabled={isPrevDisabled} aria-label="Previous featured products">
+              <button className="carousel-btn carousel-btn-prev" onClick={goPrevFeatured} disabled={isPrevDisabled} aria-label={t('home.previousFeaturedProducts')}>
                 ❮
               </button>
               <div
@@ -109,7 +109,7 @@ export default function HomePage() {
                   <ProductCard key={p.id} product={p} />
                 ))}
               </div>
-              <button className="carousel-btn carousel-btn-next" onClick={goNextFeatured} disabled={isNextDisabled} aria-label="Next featured products">
+              <button className="carousel-btn carousel-btn-next" onClick={goNextFeatured} disabled={isNextDisabled} aria-label={t('home.nextFeaturedProducts')}>
                 ❯
               </button>
             </div>
@@ -122,7 +122,7 @@ export default function HomePage() {
                       key={page}
                       className={`carousel-dot ${page === safeFeaturedPage ? 'active' : ''}`}
                       onClick={() => setFeaturedPage(page)}
-                      aria-label={`Go to featured page ${page}`}
+                      aria-label={t('home.goToFeaturedPage', { page })}
                     />
                   );
                 })}
