@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
@@ -32,6 +32,7 @@ function getCourierIcon(courier: CourierService): { icon: string; name: string }
 
 export default function OrdersPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { showToast } = useToast();
   const [orders, setOrders] = useState<any[]>([]);
@@ -110,7 +111,6 @@ export default function OrdersPage() {
           {orders.map((order) => {
             const items = Array.isArray(order.orderItems) ? order.orderItems : [];
             const itemCount = items.reduce((sum: number, item: any) => sum + Number(item.quantity || 0), 0);
-            const uniqueProducts = items.length;
             const hasCourier = Boolean(order.courier);
             const hasTracking = Boolean(order.trackingNumber);
             const hasShippingAddress = Boolean(order.shippingAddress);
@@ -120,10 +120,9 @@ export default function OrdersPage() {
               day: 'numeric',
             });
             return (
-              <div key={order.id} className="order-card">
+              <div key={order.id} className="order-card" onClick={() => navigate(`/shop/orders/${order.id}`)} style={{cursor: 'pointer'}}>
                 <div className="order-header">
                   <div className="order-id">
-                    <span className="order-label">{t('orders.orderNumber')}</span>
                     <span className="order-number">#{order.id}</span>
                     <span className="order-meta">{createdAt}</span>
                   </div>
@@ -147,61 +146,51 @@ export default function OrdersPage() {
                         <span className="info-value">{formatItemCount(itemCount)}</span>
                       </div>
                       <div className="info-row">
-                        <span className="info-label">{t('orders.date')}</span>
-                        <span className="info-value">{createdAt}</span>
+                        <span className="info-label">{t('orders.total')}</span>
+                        <span className="info-value" style={{fontWeight: 700, color: 'var(--primary)'}}>${Number(order.totalPrice || 0).toFixed(2)}</span>
                       </div>
-                      <div className="info-row">
-                        <span className="info-label">{t('orders.products')}</span>
-                        <span className="info-value">{uniqueProducts}</span>
-                      </div>
+                      {hasCourier && (
+                        <div className="info-row">
+                          <span className="info-label">{t('orders.courier')}</span>
+                          <span className="info-value">
+                            <span style={{ marginRight: '6px' }}>
+                              {getCourierIcon(order.courier as CourierService).icon}
+                            </span>
+                            {getCourierIcon(order.courier as CourierService).name}
+                          </span>
+                        </div>
+                      )}
+                      {hasTracking && (
+                        <div className="info-row">
+                          <span className="info-label">{t('orders.tracking')}</span>
+                          <span className="info-value">{order.trackingNumber}</span>
+                        </div>
+                      )}
                     </div>
 
                     {items.length > 0 && (
-                      <div className="order-items">
-                        <div className="items-label">{t('orders.items')}:</div>
-                        <div className="items-grid">
-                          {items.map((item: any) => (
-                            <div key={item.id} className="item-summary">
+                      <div className="order-items-summary">
+                        <div className="items-header">{items.length} {items.length === 1 ? t('orders.item') : t('orders.itemsCount')}</div>
+                        <div className="items-inline">
+                          {items.map((item: any, idx: number) => (
+                            <div key={item.id} className="item-inline">
+                              <span className="item-badge">{item.quantity}×</span>
                               <span className="item-name">{getProductName(item.productId)}</span>
-                              <span className="item-qty">x{item.quantity}</span>
-                              <span className="item-price">${Number(item.price || 0).toFixed(2)}</span>
+                              {idx < items.length - 1 && <span className="item-sep">•</span>}
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
                   </div>
-                  <div className="order-sidebar">
-                    <div className="order-total">
-                      <span className="total-label">{t('orders.total')}</span>
-                      <span className="total-amount">${Number(order.totalPrice || 0).toFixed(2)}</span>
-                    </div>
-
-                    <div className="order-side-panel">
-                      <div className="side-panel-title">{t('orders.shippingTo')}</div>
-                      <div className="side-panel-value">{hasShippingAddress ? order.shippingAddress : '—'}</div>
-                    </div>
-
-                    <div className="order-side-panel">
-                      <div className="side-panel-title">{t('orders.courier')}</div>
-                      <div className="side-panel-value">
-                        {hasCourier ? (
-                          <>
-                            <span style={{ marginRight: '8px', fontSize: '1.05em' }}>
-                              {getCourierIcon(order.courier as CourierService).icon}
-                            </span>
-                            {getCourierIcon(order.courier as CourierService).name}
-                          </>
-                        ) : '—'}
+                  {hasShippingAddress && (
+                    <div className="order-sidebar">
+                      <div className="order-side-panel">
+                        <div className="side-panel-title">{t('orders.shippingTo')}</div>
+                        <div className="side-panel-value">{order.shippingAddress}</div>
                       </div>
                     </div>
-
-                    <div className="order-side-panel">
-                      <div className="side-panel-title">{t('orders.tracking')}</div>
-                      <div className="side-panel-value">{hasTracking ? order.trackingNumber : '—'}</div>
-                    </div>
-
-                  </div>
+                  )}
                 </div>
               </div>
             );

@@ -1655,7 +1655,7 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   cursor: not-allowed;
 }
 
-@keyframes compare-nav-pulse {
+/* @keyframes compare-nav-pulse {
   0%,
   100% {
     box-shadow: 0 10px 24px rgba(239, 68, 68, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
@@ -1663,7 +1663,7 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   50% {
     box-shadow: 0 14px 30px rgba(249, 115, 22, 0.4), 0 8px 18px rgba(239, 68, 68, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.24);
   }
-}
+} */
 
 /* Category Page Layout */
 .category-view { 
@@ -3228,6 +3228,13 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 .item-name { display: block; color: var(--text); font-weight: 600; font-size: 0.9em; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .item-qty { display: block; color: var(--muted); font-size: 0.85em; }
 .item-price { color: var(--success); font-size: 0.85em; font-weight: 700; }
+.order-items-summary { padding: 14px; background: var(--surface-hover); border-radius: 10px; border: 1px solid var(--border); }
+.items-header { font-size: 0.85em; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+.items-inline { display: flex; flex-direction: column; gap: 6px; }
+.item-inline { display: flex; align-items: baseline; gap: 6px; font-size: 0.9em; }
+.item-badge { background: var(--primary-light); color: var(--primary); font-weight: 700; padding: 2px 6px; border-radius: 4px; font-size: 0.75em; }
+.item-name { margin: 0; }
+.item-sep { color: var(--border); }
 .orders-footer { display: flex; gap: 12px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
 .orders-footer > a { flex: 1; text-align: center; }
 
@@ -4894,4 +4901,212 @@ body.packeta-modal-open.packeta-widget-dark iframe[src*="widget.packeta.com"] {
   .checkout-title-row h2 {
     font-size: 1.45em;
   }
+}
+
+/* Order Detail Page */
+.order-detail-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  margin-bottom: 24px;
+  transition: all 0.2s ease;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.back-link:hover {
+  background: var(--primary-light);
+  transform: translateX(-4px);
+}
+
+.order-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-hover) 100%);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.order-detail-header h1 {
+  margin: 0;
+  font-size: 2em;
+  color: var(--text);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.order-id-detail {
+  margin: 8px 0 0 0;
+  color: var(--muted);
+  font-size: 0.9em;
+  font-weight: 600;
+}
+
+.order-detail-container {
+  display: grid;
+  gap: 28px;
+  margin-bottom: 32px;
+}
+
+.detail-section {
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-hover) 100%);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.detail-section:hover {
+  border-color: var(--primary);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+}
+
+.detail-section h2 {
+  margin: 0 0 24px 0;
+  color: var(--text);
+  font-size: 1.5em;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.detail-item {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.detail-item:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  transform: translateY(-2px);
+}
+
+.detail-label {
+  color: var(--muted);
+  font-size: 0.8em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-value {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1.05em;
+  word-break: break-word;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+}
+
+.items-table thead {
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+}
+
+.items-table th {
+  padding: 14px;
+  text-align: left;
+  color: var(--muted);
+  font-size: 0.85em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+
+.items-table td {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.95em;
+}
+
+.items-table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+.product-name {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.address-box {
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  color: var(--text);
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.95em;
+}
+
+.detail-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.detail-footer > a {
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.95em;
+}
+
+@media (max-width: 768px) {
+  .order-detail-page { padding: 16px; }
+  .order-detail-header { padding: 16px; }
+  .order-detail-header h1 { font-size: 1.6em; }
+  .detail-section { padding: 16px; }
+  .detail-section h2 { font-size: 1.2em; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .items-table { font-size: 0.9em; }
+  .items-table th, .items-table td { padding: 10px; }
+  .detail-footer { flex-direction: column; }
+  .detail-footer > a { width: 100%; text-align: center; }
 }
