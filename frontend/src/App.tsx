@@ -24,6 +24,7 @@ import OrderConfirmationPage from './pages/OrderConfirmationPage'
 import NotFoundPage from './pages/NotFoundPage'
 import ProfilePage from './pages/ProfilePage'
 import OrdersPage from './pages/OrdersPage'
+import OrderDetailPage from './pages/OrderDetailPage'
 import { Toast } from './components/Toast'
 import { ScrollToTop } from './components/ScrollToTop'
 import { useTranslation } from 'react-i18next';
@@ -143,9 +144,10 @@ function App() {
                       <Route path="product/:id" element={<ProductDetailPage />} />
                       <Route path="category/:name" element={<CategoryPage />} />
                       <Route path="checkout" element={<ProtectedRoute onAuthNeeded={() => setModal('login')}><CheckoutPage onSuccess={setOrderConfirmed} /></ProtectedRoute>} />
-                      <Route path="confirmation" element={<ProtectedRoute onAuthNeeded={() => setModal('login')}><OrderConfirmationPage orderId={orderConfirmed} /></ProtectedRoute>} />
+                      <Route path="confirmation" element={<OrderConfirmationPage orderId={orderConfirmed} />} />
                       <Route path="profile" element={<ProtectedRoute onAuthNeeded={() => setModal('login')}><ProfilePage /></ProtectedRoute>} />
                       <Route path="orders" element={<ProtectedRoute onAuthNeeded={() => setModal('login')}><OrdersPage /></ProtectedRoute>} />
+                      <Route path="orders/:orderId" element={<ProtectedRoute onAuthNeeded={() => setModal('login')}><OrderDetailPage /></ProtectedRoute>} />
                       <Route path="*" element={<NotFoundPage />} />
                     </Routes>
                   </Layout>

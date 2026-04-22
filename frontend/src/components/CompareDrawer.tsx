@@ -6,17 +6,30 @@ export default function CompareDrawer({
   items,
   onRemove,
   onClear,
+  isOpen,
+  onOpenChange,
 }: {
   items: any[];
   onRemove: (id: number) => void;
   onClear: () => void;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [showTable, setShowTable] = useState(false);
+  const isControlled = typeof isOpen === 'boolean';
+  const drawerOpen = isControlled ? isOpen : open;
+  const setDrawerOpen = (nextOpen: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(nextOpen);
+      return;
+    }
+    setOpen(nextOpen);
+  };
 
   useEffect(() => {
-    const openHandler = () => setOpen(true);
+    const openHandler = () => setDrawerOpen(true);
     window.addEventListener('open-compare-drawer', openHandler);
     return () => {
       window.removeEventListener('open-compare-drawer', openHandler);
@@ -29,13 +42,13 @@ export default function CompareDrawer({
 
   return (
     <>
-      <div className={`compare-drawer ${open ? 'open' : ''}`}>
+      <div className={`compare-drawer ${drawerOpen ? 'open' : ''}`}>
         <div className="compare-drawer-header">
           <div>
             <strong>{t('products.compare')}</strong>
             <span>{t('compare.selectedCount', { count: items.length })}</span>
           </div>
-          <button type="button" className="modal-close" onClick={() => setOpen(false)}>×</button>
+          <button type="button" className="modal-close" onClick={() => setDrawerOpen(false)}>×</button>
         </div>
         <div className="compare-drawer-body">
           {items.map((item) => (
@@ -63,7 +76,7 @@ export default function CompareDrawer({
           <button type="button" className="btn-primary" onClick={() => setShowTable(true)} disabled={items.length < 2}>{t('products.compare')}</button>
         </div>
       </div>
-      {open && <div className="compare-overlay" onClick={() => setOpen(false)} />}
+      {drawerOpen && <div className="compare-overlay" onClick={() => setDrawerOpen(false)} />}
       {showTable && (
         <div className="modal-overlay" onClick={() => setShowTable(false)}>
           <div className="modal-content compare-modal" onClick={(e) => e.stopPropagation()}>

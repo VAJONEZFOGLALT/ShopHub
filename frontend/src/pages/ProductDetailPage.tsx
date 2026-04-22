@@ -8,6 +8,7 @@ import { useWishlist } from '../hooks/useWishlist';
 import { useCompare } from '../hooks/useCompare';
 import { useToast } from '../contexts/ToastContext';
 import { ReviewsModal } from '../components/ReviewsModal';
+import CompareDrawer from '../components/CompareDrawer';
 import { ProductDetailSkeleton } from '../components/SkeletonLoader';
 import { getDetailImageUrl } from '../utils/imageOptimization';
 
@@ -22,13 +23,14 @@ export default function ProductDetailPage() {
   const { add } = useCart();
   const { user, isAuthenticated } = useAuth();
   const { wishlistIds, handleToggleWishlist, isWishlistPending, isWishlistLoading } = useWishlist();
-  const { compareIds, toggleCompare, isComparePending, isCompareLoading } = useCompare();
+  const { compareItems, toggleCompare, clearCompare } = useCompare();
   const { showToast } = useToast();
   const [reviews, setReviews] = useState<any[]>([]);
   const [reviewSummary, setReviewSummary] = useState<{ average: number; count: number }>({ average: 0, count: 0 });
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
   const [reviewsModalView, setReviewsModalView] = useState<'list' | 'write'>('list');
   const [addedToCart, setAddedToCart] = useState(false);
+  const [compareDrawerOpen, setCompareDrawerOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -95,7 +97,7 @@ export default function ProductDetailPage() {
     }
   }
 
-  const pageLoading = loading || isWishlistLoading || isCompareLoading;
+  const pageLoading = loading || isWishlistLoading;
 
   if (pageLoading) return (
     <div className="view product-detail">
@@ -115,6 +117,7 @@ export default function ProductDetailPage() {
       return;
     }
     await toggleCompare(product);
+    setCompareDrawerOpen(true);
   };
 
   const handleReviewSubmitted = async () => {
@@ -171,12 +174,11 @@ export default function ProductDetailPage() {
               </button>
               <button 
                 type="button" 
-                  className={`compare-action ${compareIds.includes(product.id) ? 'active' : ''} ${isComparePending(product.id) ? 'is-loading' : ''}`.trim()} 
+                  className="compare-action" 
                 onClick={handleToggleCompare}
-                title={!isAuthenticated ? t('products.logInToCompare') : compareIds.includes(product.id) ? t('products.removeFromCompare') : t('products.addToCompare')}
-                  disabled={isComparePending(product.id)}
+                title={!isAuthenticated ? t('products.logInToCompare') : t('products.addToCompare')}
               >
-                {compareIds.includes(product.id) ? t('products.compared') : t('products.compare')}
+                {t('products.compare')}
               </button>
             </div>
           </div>
@@ -304,6 +306,17 @@ export default function ProductDetailPage() {
         reviewSummary={reviewSummary}
         onReviewSubmitted={handleReviewSubmitted}
         initialView={reviewsModalView}
+      />
+
+      <CompareDrawer
+        items={compareItems}
+        onRemove={(productId) => {
+          const matched = compareItems.find((item) => item.id === productId);
+          toggleCompare(matched || { id: productId });
+        }}
+        onClear={clearCompare}
+        isOpen={compareDrawerOpen}
+        onOpenChange={setCompareDrawerOpen}
       />
 
     </div>

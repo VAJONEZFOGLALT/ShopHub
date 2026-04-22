@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useCart } from '../contexts/CartContext';
@@ -71,6 +71,8 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
   const [error, setError] = useState('');
   const [packetaSelecting, setPacketaSelecting] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
+  const [orderSubmitting, setOrderSubmitting] = useState(false);
+  const orderCompletedRef = useRef(false);
 
   const isDarkThemeActive = () => {
     const attrTheme = document.documentElement.getAttribute('data-theme');
@@ -176,12 +178,12 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
   }, [user]);
 
   useEffect(() => {
-    if (!hasItems) {
+    if (!hasItems && !orderSubmitting && !orderCompletedRef.current) {
       navigate('/shop/all', { replace: true });
       return;
     }
     setError('');
-  }, [hasItems, navigate]);
+  }, [hasItems, navigate, orderSubmitting]);
 
   useEffect(() => {
     if (!packetaSelecting) {
@@ -304,6 +306,8 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
   const finalTotal = total + ship;
 
   const handleOrder = async () => {
+    orderCompletedRef.current = false;
+    setOrderSubmitting(true);
     setLoading(true);
     setError('');
     try {
@@ -351,13 +355,15 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
         const reason = order.emailStatus.reason || 'Unknown email delivery issue';
         showToast(t('checkout.errors.emailDeliveryFailed', { reason }), 'warning');
       }
+      orderCompletedRef.current = true;
       clear();
       onSuccess?.(order.id);
-      navigate('/shop/confirmation');
+      navigate('/shop/confirmation', { state: { orderId: order.id } });
     } catch (e: any) {
       setError(e.message);
     } finally {
       setLoading(false);
+      setOrderSubmitting(false);
     }
   };
 

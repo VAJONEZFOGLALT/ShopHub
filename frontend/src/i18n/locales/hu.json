@@ -35,15 +35,17 @@
     "featuredProducts": "Kiemelt Termékek",
     "viewAllProducts": "Összes Termék Megtekintése",
     "failedToLoadData": "Nem sikerült betölteni az adatokat",
-    "viewsCount": "{count} megtekintés",
+    "viewsCount": "{{count}} megtekintés",
     "previousFeaturedProducts": "Előző kiemelt termékek",
     "nextFeaturedProducts": "Következő kiemelt termékek",
-    "goToFeaturedPage": "Ugrás a(z) {page}. kiemelt oldalra"
+    "goToFeaturedPage": "Ugrás a(z) {{page}}. kiemelt oldalra"
   },
   "products": {
     "title": "Termékek",
     "allProducts": "Összes termék",
     "price": "Ár",
+    "product": "Termék",
+    "subtotal": "Részösszeg",
     "stock": "Készlet",
     "addToCart": "Kosárba",
     "viewDetails": "Részletek",
@@ -70,7 +72,7 @@
     "items": "termék",
     "category": "Kategória",
     "allCategories": "Összes kategória",
-    "searchResults": "Keresési eredmények a(z) \"{query}\" kifejezésre",
+    "searchResults": "Keresési eredmények a(z) \"{{query}}\" kifejezésre",
     "logInToCompare": "Kérjük jelentkezzen be az összehasonlításhoz",
     "resetFilters": "Szűrők törlése",
     "noProductsInCategory": "Nincs termék ebben a kategóriában.",
@@ -89,7 +91,7 @@
     "noReviewsYet": "Még nincs értékelés. Légy az első!",
     "writeReview": "Íraj véleményt",
     "writeFirstReview": "Az első vélemény megírása",
-    "viewAllReviews": "Mind a(z) {count} vélemény megjelenítése",
+    "viewAllReviews": "Mind a(z) {{count}} vélemény megjelenítése",
     "reviews": "vélemény",
     "logInToCompare": "Kérjük jelentkezzen be az összehasonlításhoz",
     "compare": "Összehasonlítás",
@@ -158,7 +160,7 @@
       "selectPickupPoint": "Válassz átvételi pontot/boxot a kiválasztott futárhoz.",
       "selectAddress": "Válassz szállítási címet.",
       "fillRequiredAddressFields": "Töltsd ki a szállítási cím kötelező mezőit.",
-      "emailDeliveryFailed": "Az e-mail nem ment ki: {reason}"
+      "emailDeliveryFailed": "Az e-mail nem ment ki: {{reason}}"
     }
   },
   "auth": {
@@ -259,6 +261,11 @@
     "orderNumber": "Rendelés",
     "date": "Dátum",
     "status": "Állapot",
+    "orderDetails": "Rendelés részletei",
+    "orderSummary": "Rendelés összefoglaló",
+    "orderDate": "Rendelés dátuma",
+    "orderItems": "Rendelés tételei",
+    "backToOrders": "Vissza a rendelésekhez",
     "items": "Tételei a rendeléséhez",
     "pending": "⚱ Folyamatban",
     "processing": "⚙️ Feldolgozás alatt",
@@ -272,15 +279,15 @@
     "products": "Termékek",
     "item": "tétel",
     "itemsCount": "tétel",
-    "itemInOrder": "{count} tétel",
-    "itemsInOrder": "{count} tétele",
+    "itemInOrder": "{{count}} tétel",
+    "itemsInOrder": "{{count}} tétele",
     "backToProfile": "Vissza a profilhoz",
     "continueShopping": "Vásárlás folytatása",
     "failedToLoadOrders": "Nem sikerült betölteni a rendeléseket"
   },
   "compare": {
     "selectProducts": "Válassz termékeket az összehasonlításhoz",
-    "selectedCount": "{count} kiválasztva",
+    "selectedCount": "{{count}} kiválasztva",
     "clear": "Törlés",
     "productComparison": "Termék-összehasonlítás",
     "selectAtLeastTwo": "Válassz legalább két terméket az összehasonlításhoz.",
@@ -292,7 +299,7 @@
     "kicker": "Rendelés visszaigazolás",
     "title": "Köszönjük a rendelésed",
     "subtitle": "A rendelésed beérkezett, hamarosan feldolgozzuk.",
-    "orderNumber": "Rendelés #{id}",
+    "orderNumber": "Rendelés #{{id}}",
     "orderItems": "Rendelt tételek",
     "nextStepsTitle": "Mi történik most?",
     "nextStep1": "A rendelésedet rögzítettük és feldolgozásra előkészítettük.",
@@ -300,8 +307,8 @@
     "nextStep3": "Ha az e-mail értesítés aktív, hamarosan visszaigazoló levelet is kapsz."
   },
   "reviewsModal": {
-    "reviewsFor": "Vélemények ehhez: {productName}",
-    "reviewCount": "{count} vélemény",
+    "reviewsFor": "Vélemények ehhez: {{productName}}",
+    "reviewCount": "{{count}} vélemény",
     "viewReviews": "Vélemények megtekintése",
     "writeReview": "Vélemény írása",
     "signInToWriteReview": "Jelentkezz be a vélemény írásához.",
@@ -315,7 +322,7 @@
     "yourReview": "Véleményed",
     "reviewPlaceholder": "Írd le, mit gondolsz erről a termékről...",
     "submitReview": "Vélemény beküldése",
-    "noReviewsForRating": "Még nincs {rating} csillagos vélemény.",
+    "noReviewsForRating": "Még nincs {{rating}} csillagos vélemény.",
     "anonymous": "Névtelen"
   },
   "categories": {
