@@ -1,4 +1,4 @@
-import { IsArray, IsEnum, IsInt, IsNotEmpty, IsOptional, IsPositive, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsEnum, IsIn, IsInt, IsOptional, IsPositive, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum CourierService {
@@ -24,6 +24,10 @@ export class CreateOrderDto {
   @IsOptional()
   @IsString()
   shippingAddress?: string;
+
+  @IsOptional()
+  @IsIn(['hu', 'en'])
+  language?: 'hu' | 'en';
 }
 
 export class OrderItemInput {

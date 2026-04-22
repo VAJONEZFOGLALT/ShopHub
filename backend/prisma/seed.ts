@@ -67,6 +67,70 @@ const productNameByCategory: Record<(typeof categories)[number], string[]> = {
   Audio: ['Bluetooth hangszoro', 'Mikrofon', 'Studio fejhallgato', 'Soundbar', 'Fules'],
 };
 
+const brandByCategory: Record<(typeof categories)[number], string[]> = {
+  Elektronika: ['Samsung', 'Apple', 'Xiaomi', 'Lenovo', 'ASUS', 'HP'],
+  Kiegeszitok: ['Anker', 'UGREEN', 'Baseus', 'Belkin', 'Aukey'],
+  Iroda: ['IKEA', 'Herman Miller', 'Fellowes', 'Leitz', 'Oxford'],
+  Otthon: ['Philips', 'Bosch', 'Tefal', 'Xiaomi', 'Rowenta'],
+  Divat: ['Nike', 'Adidas', 'Puma', 'Reebok', 'Under Armour'],
+  Sport: ['Decathlon', 'Nike', 'Adidas', 'Puma', 'GymBeam'],
+  Gaming: ['Logitech', 'Razer', 'ASUS', 'MSI', 'HyperX'],
+  Audio: ['Sony', 'JBL', 'Marshall', 'Bose', 'Shure'],
+};
+
+const priceRanges: Record<(typeof categories)[number], { min: number; max: number }> = {
+  Elektronika: { min: 35000, max: 650000 },
+  Kiegeszitok: { min: 1490, max: 24990 },
+  Iroda: { min: 2490, max: 189990 },
+  Otthon: { min: 3990, max: 299990 },
+  Divat: { min: 4990, max: 49990 },
+  Sport: { min: 2990, max: 79990 },
+  Gaming: { min: 4990, max: 249990 },
+  Audio: { min: 4990, max: 109990 },
+};
+
+function smartPrice(category: (typeof categories)[number]) {
+  const range = priceRanges[category];
+  const skewed = Math.pow(Math.random(), 0.55);
+  return round2(range.min + (range.max - range.min) * skewed);
+}
+
+const stockRanges: Record<(typeof categories)[number], { min: number; max: number; lowStockChance: number }> = {
+  Elektronika: { min: 3, max: 85, lowStockChance: 0.18 },
+  Kiegeszitok: { min: 20, max: 250, lowStockChance: 0.06 },
+  Iroda: { min: 8, max: 160, lowStockChance: 0.1 },
+  Otthon: { min: 6, max: 90, lowStockChance: 0.12 },
+  Divat: { min: 10, max: 140, lowStockChance: 0.15 },
+  Sport: { min: 8, max: 120, lowStockChance: 0.12 },
+  Gaming: { min: 5, max: 70, lowStockChance: 0.2 },
+  Audio: { min: 4, max: 75, lowStockChance: 0.16 },
+};
+
+const imagePalette: Record<(typeof categories)[number], string> = {
+  Elektronika: '0f172a',
+  Kiegeszitok: '1f2937',
+  Iroda: '334155',
+  Otthon: '14532d',
+  Divat: '7c2d12',
+  Sport: '1d4ed8',
+  Gaming: '4c1d95',
+  Audio: '111827',
+};
+
+function buildProductImageUrl(name: string, category: (typeof categories)[number]) {
+  const shortText = `${category} ${name}`.slice(0, 42);
+  return `https://placehold.co/800x800/${imagePalette[category]}/f8fafc?text=${encodeURIComponent(shortText)}`;
+}
+
+function buildStock(category: (typeof categories)[number]) {
+  const range = stockRanges[category];
+  if (chance(range.lowStockChance)) {
+    return random(0, 5);
+  }
+  const skewed = Math.pow(Math.random(), 0.7);
+  return Math.max(0, Math.round(range.min + (range.max - range.min) * skewed));
+}
+
 const reviewTitles = [
   'Kivalo termek',
   'Ar-ertek aranyban eros',
@@ -136,22 +200,33 @@ function createGeneratedUsers() {
 }
 
 function buildProductCatalog() {
-  const products: Array<{ name: string; category: string; description: string; price: number; stock: number }> = [];
+  const products: Array<{ name: string; category: string; description: string; price: number; stock: number; image: string }> = [];
 
   for (const category of categories) {
     const names = productNameByCategory[category];
+    const brands = brandByCategory[category];
     for (let i = 0; i < 12; i++) {
       const base = randomElement(names);
-      const model = `${randomElement(['Pro', 'Plus', 'Max', 'Lite', 'Eco'])} ${random(100, 999)}`;
-      const name = `${base} ${model}`;
-      const price = round2(random(5000, 280000) / 100);
-      const stock = random(8, 250);
+      const brand = randomElement(brands);
+      const model = `${randomElement(['Pro', 'Plus', 'Max', 'Lite', 'Eco', 'Air'])} ${random(100, 999)}`;
+      const rawName = `${brand} ${base} ${model}`;
+      const name = rawName.slice(0, 95);
+      const price = smartPrice(category);
+      const stock = buildStock(category);
+      const priceHint = category === 'Audio'
+        ? 'A hangtechnikai termekek arai a belso szintu fulhallgatotol a komolyabb studio megoldasokig terjednek.'
+        : category === 'Elektronika'
+          ? 'A kategoria arszintje a kozepkategorias es felso szegmens kozott mozog.'
+          : 'Az ar a termek valos piaci poziciojahoz igazodik.';
+      const rawDescription = `${name} - ${category} kategoriaban, modern kivitelben es megbizhato minosegben. ${priceHint}`;
+      const description = rawDescription.slice(0, 180);
       products.push({
         name,
         category,
-        description: `${name} - ${category} kategoriaban, modern kivitelben es megbizhato minosegben.`,
+        description,
         price,
         stock,
+        image: buildProductImageUrl(name, category),
       });
     }
   }
@@ -205,23 +280,34 @@ async function main() {
   ] as const;
 
   let addressCount = 0;
+  const createdAddresses: Array<{
+    userId: number;
+    label: string;
+    fullName: string;
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  }> = [];
   for (const user of createdUsers) {
     const addressTotal = chance(0.35) ? 2 : 1;
     for (let i = 0; i < addressTotal; i++) {
       const location = randomElement(cityByCountry);
+      const address = {
+        userId: user.id,
+        label: i === 0 ? 'Home' : 'Work',
+        fullName: user.name || user.username,
+        street: `${random(1, 140)} ${faker.location.street()}`,
+        city: location.city,
+        state: faker.location.state(),
+        zipCode: faker.location.zipCode(),
+        country: location.country,
+      };
       await prisma.address.create({
-        data: {
-          userId: user.id,
-          label: i === 0 ? 'Home' : 'Work',
-          fullName: user.name || user.username,
-          street: `${random(1, 140)} ${faker.location.street()}`,
-          city: location.city,
-          state: faker.location.state(),
-          zipCode: faker.location.zipCode(),
-          country: location.country,
-          isDefault: i === 0,
-        },
+        data: { ...address, isDefault: i === 0 },
       });
+      createdAddresses.push(address);
       addressCount++;
     }
   }
@@ -238,7 +324,7 @@ async function main() {
         category: productData.category,
         price: productData.price,
         stock: productData.stock,
-        image: null,
+        image: productData.image,
       },
     });
     createdProducts.push(created);
@@ -267,9 +353,27 @@ async function main() {
     }
 
     const createdAt = randomPastDate(160);
+    const userAddresses = createdAddresses.filter((address) => address.userId === user.id);
+    const shippingAddress = userAddresses.length > 0 && chance(0.78)
+      ? randomElement(userAddresses)
+      : null;
+    const courier = shippingAddress?.country === 'Hungary'
+      ? randomElement([CourierService.UPS, CourierService.PACKETA, CourierService.DPD, CourierService.INPOST])
+      : randomElement([CourierService.UPS, CourierService.DPD]);
     const trackingNumber = chance(0.2)
       ? null
       : `${randomElement(couriers)}-${random(100000, 999999)}-${String(i + 1).padStart(3, '0')}`;
+
+    const shippingAddressText = shippingAddress
+      ? `${shippingAddress.fullName}, ${shippingAddress.street}, ${shippingAddress.city}, ${shippingAddress.state}, ${shippingAddress.zipCode}, ${shippingAddress.country}`
+      : `${faker.location.streetAddress()}, ${faker.location.city()}, ${faker.location.zipCode()}`;
+    const trackingPrefix = courier === CourierService.UPS
+      ? 'UPS'
+      : courier === CourierService.DPD
+        ? 'DPD'
+        : courier === CourierService.INPOST
+          ? 'MPL'
+          : 'PKT';
 
     await prisma.orders.create({
       data: {
@@ -277,9 +381,9 @@ async function main() {
         totalPrice: round2(total),
         createdAt,
         status: weightedStatus(),
-        courier: randomElement(couriers),
-        shippingAddress: `${faker.location.streetAddress()}, ${faker.location.city()}, ${faker.location.zipCode()}`,
-        trackingNumber,
+        courier,
+        shippingAddress: shippingAddressText,
+        trackingNumber: trackingNumber ? `${trackingPrefix}-${trackingNumber.split('-').slice(1).join('-')}` : null,
         teljesitve: chance(0.55),
         orderItems: { create: orderItems },
       },

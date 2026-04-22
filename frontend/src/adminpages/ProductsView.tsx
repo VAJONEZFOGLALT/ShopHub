@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
+import { formatPriceHUF } from '../utils/currency';
 
 export default function ProductsView() {
   const { t } = useTranslation();
@@ -265,7 +266,7 @@ export default function ProductsView() {
                   </td>
                   <td>{p.name}</td>
                   <td>{p.category}</td>
-                  <td>{p.price}</td>
+                  <td>{formatPriceHUF(Number(p.price || 0))}</td>
                   <td>{p.stock}</td>
                   <td>
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>

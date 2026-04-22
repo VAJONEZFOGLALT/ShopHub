@@ -43,6 +43,7 @@
       "userId": "User ID",
       "userName": "User Name",
       "productId": "Product ID",
+      "quantity": "Quantity",
       "orderId": "Order ID",
       "username": "Username",
       "email": "Email",

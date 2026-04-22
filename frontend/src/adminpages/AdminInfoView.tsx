@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
+import { formatPriceHUF } from '../utils/currency';
 
 type UserSummary = {
   id: number;
@@ -202,7 +203,7 @@ export default function AdminInfoView({ onNavigateToTab }: AdminInfoViewProps) {
                   <td>{order.id}</td>
                   <td>{order.userId ?? '-'}</td>
                   <td>{order.status || '-'}</td>
-                  <td>{typeof order.totalPrice === 'number' ? `$${order.totalPrice.toFixed(2)}` : '-'}</td>
+                  <td>{typeof order.totalPrice === 'number' ? formatPriceHUF(order.totalPrice) : '-'}</td>
                   <td>{order.createdAt ? new Date(order.createdAt).toLocaleString() : '-'}</td>
                 </tr>
               ))}

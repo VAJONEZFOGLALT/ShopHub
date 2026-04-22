@@ -27,7 +27,7 @@ export class OrdersService {
   }
 
   async create(createOrderDto: CreateOrderDto) {
-    const { userId, items, courier, shippingAddress } = createOrderDto;
+    const { userId, items, courier, shippingAddress, language } = createOrderDto;
 
     // fetch product prices for items
     const productIds = Array.from(new Set(items.map((i) => i.productId)));
@@ -96,6 +96,7 @@ export class OrdersService {
           orderId: createdOrder.id,
           recipientEmail: user.email,
           recipientName: user.name,
+          language,
           totalPrice,
           itemCount: orderItemsData.reduce((sum, item) => sum + item.quantity, 0),
           lineCount: orderItemsData.length,
@@ -121,13 +122,31 @@ export class OrdersService {
   }
 
   findAll() {
-    return this.prisma.orders.findMany({ include: { orderItems: true } });
+    return this.prisma.orders.findMany({
+      include: {
+        orderItems: {
+          include: {
+            product: {
+              select: { id: true, name: true, price: true, image: true, category: true },
+            },
+          },
+        },
+      },
+    });
   }
 
   findByUser(userId: number) {
     return this.prisma.orders.findMany({
       where: { userId },
-      include: { orderItems: true },
+      include: {
+        orderItems: {
+          include: {
+            product: {
+              select: { id: true, name: true, price: true, image: true, category: true },
+            },
+          },
+        },
+      },
       orderBy: { id: 'desc' },
     });
   }

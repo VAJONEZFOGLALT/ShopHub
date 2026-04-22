@@ -32,19 +32,23 @@ export default function OrderConfirmationPage({ orderId, onOrderViewed }: { orde
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const queryOrderId = Number(searchParams.get('orderId'));
   const locationOrderId = Number((location.state as { orderId?: number } | null)?.orderId);
   const [resolvedOrderId, setResolvedOrderId] = useState<number | undefined>(() => {
     if (orderId) {
       return orderId;
     }
 
+    if (Number.isFinite(queryOrderId) && queryOrderId > 0) {
+      return queryOrderId;
+    }
+
     if (Number.isFinite(locationOrderId) && locationOrderId > 0) {
       return locationOrderId;
     }
 
-    const stored = localStorage.getItem('lastConfirmedOrderId');
-    const parsed = Number(stored);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+    return undefined;
   });
   
   useEffect(() => {
@@ -53,20 +57,31 @@ export default function OrderConfirmationPage({ orderId, onOrderViewed }: { orde
       return;
     }
 
+    if (!orderId && Number.isFinite(queryOrderId) && queryOrderId > 0 && queryOrderId !== resolvedOrderId) {
+      setResolvedOrderId(queryOrderId);
+      return;
+    }
+
     if (!orderId && Number.isFinite(locationOrderId) && locationOrderId > 0 && locationOrderId !== resolvedOrderId) {
       setResolvedOrderId(locationOrderId);
     }
-  }, [orderId, locationOrderId, resolvedOrderId]);
+  }, [orderId, locationOrderId, queryOrderId, resolvedOrderId]);
   const [order, setOrder] = useState<ConfirmedOrder | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!resolvedOrderId && !loading) {
+      navigate('/shop/orders', { replace: true });
+    }
+  }, [loading, navigate, resolvedOrderId]);
 
   useEffect(() => {
     let active = true;
 
     const loadOrder = async () => {
       if (!resolvedOrderId) {
-        navigate('/shop', { replace: true });
+        navigate('/shop/orders', { replace: true });
         return;
       }
 
@@ -75,9 +90,9 @@ export default function OrderConfirmationPage({ orderId, onOrderViewed }: { orde
         const data = await api.getOrder(resolvedOrderId);
         if (!active) return;
         setOrder(data);
-      } catch {
+      } catch (err: any) {
         if (active) {
-          setError(t('orders.failedToLoadOrders'));
+          setError(err?.message?.includes('403') ? t('toasts.orderNotFound') : t('orders.failedToLoadOrders'));
         }
       } finally {
         if (active) {

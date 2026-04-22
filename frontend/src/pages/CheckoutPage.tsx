@@ -24,9 +24,9 @@ declare global {
 }
 
 const couriers: CourierOption[] = [
-  { id: 'UPS', nameKey: 'checkout.couriers.ups.name', price: 15.99, daysKey: 'checkout.couriers.ups.days', type: 'address' },
-  { id: 'INPOST', nameKey: 'checkout.couriers.posta.name', price: 6.99, daysKey: 'checkout.couriers.posta.days', type: 'address' },
-  { id: 'PACKETA', nameKey: 'checkout.couriers.packeta.name', price: 4.99, daysKey: 'checkout.couriers.packeta.days', type: 'pickup' },
+  { id: 'UPS', nameKey: 'checkout.couriers.ups.name', price: 5990, daysKey: 'checkout.couriers.ups.days', type: 'address' },
+  { id: 'INPOST', nameKey: 'checkout.couriers.posta.name', price: 2990, daysKey: 'checkout.couriers.posta.days', type: 'address' },
+  { id: 'PACKETA', nameKey: 'checkout.couriers.packeta.name', price: 1990, daysKey: 'checkout.couriers.packeta.days', type: 'pickup' },
 ];
 
 type CourierOption = {
@@ -48,7 +48,7 @@ type GuestAddressDraft = {
 
 
 export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) => void }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { items, remove, clear, total } = useCart();
   const { user } = useAuth();
   const { showToast } = useToast();
@@ -346,7 +346,8 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
         ? `PICKUP | ${courier} | ${pickupPointCode || 'N/A'} | ${pickupPointLabel}`
         : `ADDRESS | ${courier} | ${formatAddressSingleLine(user ? selectedAddress || {} : guestAddress)}`;
 
-      const order = await api.createOrder({ userId, items: orderItems, courier, shippingAddress: shipping });
+      const selectedLanguage = i18n.resolvedLanguage?.toLowerCase().startsWith('en') ? 'en' : 'hu';
+      const order = await api.createOrder({ userId, items: orderItems, courier, shippingAddress: shipping, language: selectedLanguage });
       try {
         localStorage.setItem('lastConfirmedOrderId', String(order.id));
       } catch {
@@ -359,7 +360,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
       orderCompletedRef.current = true;
       clear();
       onSuccess?.(order.id);
-      navigate('/shop/confirmation', { state: { orderId: order.id } });
+      navigate(`/shop/confirmation?lang=${selectedLanguage}&orderId=${order.id}`, { state: { orderId: order.id } });
     } catch (e: any) {
       setError(e.message);
     } finally {

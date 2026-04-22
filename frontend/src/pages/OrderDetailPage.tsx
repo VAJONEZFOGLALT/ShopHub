@@ -98,7 +98,10 @@ export default function OrderDetailPage() {
     day: 'numeric',
   });
 
-  const getProductName = (productId: number) => {
+  const getProductName = (productId: number, fallbackName?: string) => {
+    if (fallbackName && fallbackName.trim().length > 0) {
+      return fallbackName;
+    }
     const product = products.find((p) => p.id === productId);
     return product?.name || `Product #${productId}`;
   };
@@ -170,7 +173,7 @@ export default function OrderDetailPage() {
               <tbody>
                 {items.map((item: any) => (
                   <tr key={item.id}>
-                    <td className="product-name">{getProductName(item.productId)}</td>
+                    <td className="product-name">{getProductName(item.productId, item.product?.name)}</td>
                     <td className="text-center">{item.quantity}</td>
                     <td className="text-right">{formatPriceHUF(Number(item.price || 0))}</td>
                     <td className="text-right" style={{fontWeight: 600}}>
