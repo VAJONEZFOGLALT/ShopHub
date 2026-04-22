@@ -142,12 +142,10 @@ export default function ProfilePage() {
     }
   };
 
-  const validatePasswordStrength = (pwd: string): string | null => {
-    if (pwd.length < 8) return 'Jelszó minimum 8 karakter hosszú kell legyen';
-    if (!/[A-Z]/.test(pwd)) return 'Jelszóban kell lennie nagy betűnek';
-    if (!/[a-z]/.test(pwd)) return 'Jelszóban kell lennie kis betűnek';
-    if (!/[0-9]/.test(pwd)) return 'Jelszóban kell lennie számnak';
-    return null;
+  const formatEmailForDisplay = (email: string): string => {
+    const atIndex = email.indexOf('@');
+    if (atIndex === -1) return email;
+    return email.substring(0, atIndex) + '@***';
   };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
@@ -320,7 +318,7 @@ export default function ProfilePage() {
               </div>
               <div className="profile-field">
                 <label>{t('profile.email')}</label>
-                <div className="profile-value profile-email">{user.email}</div>
+                <div className="profile-value profile-email">{formatEmailForDisplay(user.email)}</div>
               </div>
               <div className="profile-field">
                 <label>{t('profile.fullName')}</label>
@@ -350,7 +348,7 @@ export default function ProfilePage() {
                   <strong>{preferredAddress.label}</strong>
                   {preferredAddress.isDefault && <span className="default-badge">{t('profile.defaultAddress')}</span>}
                 </div>
-                <div className="profile-address-line">{preferredAddress.fullName}</div>
+                <div className="profile-address-line address-line-fullname">{preferredAddress.fullName}</div>
                 <div className="profile-address-line">{preferredAddress.street}</div>
                 <div className="profile-address-line">{preferredAddress.city}, {preferredAddress.state} {preferredAddress.zipCode}</div>
                 <div className="profile-address-line">{preferredAddress.country}</div>
@@ -412,29 +410,6 @@ export default function ProfilePage() {
                 setEditingAddress(null);
               }}>✕</button>
             </div>
-
-            {!editingAddress && preferredAddress && (
-              <div className="profile-address-preview-card address-modal-current-card">
-                <div className="profile-address-preview-title">
-                  <strong>{preferredAddress.label}</strong>
-                  {preferredAddress.isDefault && <span className="default-badge">{t('profile.defaultAddress')}</span>}
-                </div>
-                <div className="profile-address-line">{preferredAddress.street}</div>
-                <div className="profile-address-line">{preferredAddress.city} {preferredAddress.state ? `, ${preferredAddress.state}` : ''} {preferredAddress.zipCode}</div>
-                <div className="profile-address-line">{preferredAddress.country}</div>
-                <div className="address-modal-current-actions">
-                  <button className="btn-sm" onClick={() => {
-                    setEditingAddress(preferredAddress);
-                    setAddressCountry((preferredAddress.country || DEFAULT_COUNTRY_CODE).toUpperCase());
-                  }}>{t('common.edit')}</button>
-                  <button className="btn-sm danger" onClick={async () => {
-                    await api.deleteAddress(preferredAddress.id);
-                    const updated = await api.getAddresses(user!.id);
-                    setAddresses(updated);
-                  }}>{t('common.delete')}</button>
-                </div>
-              </div>
-            )}
 
             {!editingAddress && (
               <button className="btn-primary" style={{marginBottom: '16px', width: '100%'}} onClick={() => {
