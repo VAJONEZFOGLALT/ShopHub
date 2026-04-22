@@ -2268,68 +2268,26 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-height: 500px;
+  max-height: 600px;
   overflow-y: auto;
+  padding-right: 8px;
 }
 
-.profile-carousel {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.profile-product-list::-webkit-scrollbar {
+  width: 6px;
 }
 
-.carousel-track {
-  display: flex;
-  gap: 12px;
-  transition: transform 0.3s ease;
-  overflow: hidden;
+.profile-product-list::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.carousel-item {
-  flex: 0 0 calc(100% / 5 - 9.6px);
-  min-width: 0;
+.profile-product-list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
 }
 
-.carousel-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.carousel-btn {
-  background: var(--surface-hover);
-  border: 1px solid var(--border);
-  color: var(--text);
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.carousel-btn:hover:not(:disabled) {
+.profile-product-list::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-}
-
-.carousel-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.carousel-counter {
-  font-size: 0.85em;
-  color: var(--muted);
-  font-weight: 600;
-  min-width: 50px;
-  text-align: center;
 }
 
 .profile-product-mini {

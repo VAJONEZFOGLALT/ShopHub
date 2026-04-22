@@ -28,8 +28,6 @@ export default function ProfilePage() {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [editingAddress, setEditingAddress] = useState<any>(null);
-  const [wishlistSlide, setWishlistSlide] = useState(0);
-  const [recentlyViewedSlide, setRecentlyViewedSlide] = useState(0);
 
   const roleLabel = user?.role === 'ADMIN' ? t('profile.adminAccount') : `👤 ${t('profile.customer')}`;
   const accountTypeLabel = user?.role === 'ADMIN' ? t('profile.administrator') : t('profile.customer');
@@ -233,46 +231,23 @@ export default function ProfilePage() {
             ) : wishlistItems.length === 0 ? (
               <p className="muted">{t('profile.emptyWishlist')}</p>
             ) : (
-              <div className="profile-carousel">
-                <div className="carousel-track" style={{ transform: `translateX(calc(-${wishlistSlide * 100}% / ${Math.min(wishlistItems.length, 5)}))` }}>
-                  {wishlistItems.map((item) => (
-                    <div key={item.id} className="carousel-item">
-                      <div className="profile-product-mini">
-                        <div className="profile-product-mini-img" onClick={() => navigate(`/shop/product/${item.id}`)}>
-                          {item.image ? (
-                            <img src={getProductImageUrl(item.image)} alt={item.name} loading="lazy" />
-                          ) : (
-                            <div className="profile-product-placeholder-mini">{item.name}</div>
-                          )}
-                        </div>
-                        <div className="profile-product-mini-info">
-                          <strong onClick={() => navigate(`/shop/product/${item.id}`)} style={{cursor: 'pointer'}}>{item.name}</strong>
-                          <div className="muted">${Number(item.price).toFixed(2)}</div>
-                          <button className="btn-delete" onClick={() => handleRemoveWishlist(item.id, item.name)}>Remove</button>
-                        </div>
-                      </div>
+              <div className="profile-product-list">
+                {wishlistItems.map((item) => (
+                  <div key={item.id} className="profile-product-mini">
+                    <div className="profile-product-mini-img" onClick={() => navigate(`/shop/product/${item.id}`)}>
+                      {item.image ? (
+                        <img src={getProductImageUrl(item.image)} alt={item.name} loading="lazy" />
+                      ) : (
+                        <div className="profile-product-placeholder-mini">{item.name}</div>
+                      )}
                     </div>
-                  ))}
-                </div>
-                {wishlistItems.length > 5 && (
-                  <div className="carousel-controls">
-                    <button 
-                      className="carousel-btn" 
-                      onClick={() => setWishlistSlide(Math.max(0, wishlistSlide - 1))}
-                      disabled={wishlistSlide === 0}
-                    >
-                      ◀
-                    </button>
-                    <span className="carousel-counter">{wishlistSlide + 1} / {Math.ceil(wishlistItems.length / 5)}</span>
-                    <button 
-                      className="carousel-btn"
-                      onClick={() => setWishlistSlide(Math.min(wishlistItems.length - 5, wishlistSlide + 1))}
-                      disabled={wishlistSlide >= wishlistItems.length - 5}
-                    >
-                      ▶
-                    </button>
+                    <div className="profile-product-mini-info">
+                      <strong onClick={() => navigate(`/shop/product/${item.id}`)} style={{cursor: 'pointer'}}>{item.name}</strong>
+                      <div className="muted">${Number(item.price).toFixed(2)}</div>
+                      <button className="btn-delete" onClick={() => handleRemoveWishlist(item.id, item.name)}>Remove</button>
+                    </div>
                   </div>
-                )}
+                ))}
               </div>
             )}
           </div>
@@ -438,45 +413,22 @@ export default function ProfilePage() {
             {recentlyViewed.length === 0 ? (
               <p className="muted">{t('profile.noRecentlyViewed')}</p>
             ) : (
-              <div className="profile-carousel">
-                <div className="carousel-track" style={{ transform: `translateX(calc(-${recentlyViewedSlide * 100}% / ${Math.min(recentlyViewed.length, 5)}))` }}>
-                  {recentlyViewed.map((item: any) => (
-                    <div key={item.id} className="carousel-item">
-                      <div className="profile-product-mini">
-                        <div className="profile-product-mini-img" onClick={() => navigate(`/shop/product/${item.id}`)}>
-                          {item.image ? (
-                            <img src={getProductImageUrl(item.image)} alt={item.name} loading="lazy" />
-                          ) : (
-                            <div className="profile-product-placeholder-mini">{item.name}</div>
-                          )}
-                        </div>
-                        <div className="profile-product-mini-info">
-                          <strong onClick={() => navigate(`/shop/product/${item.id}`)} style={{cursor: 'pointer'}}>{item.name}</strong>
-                          <div className="muted">${Number(item.price).toFixed(2)}</div>
-                        </div>
-                      </div>
+              <div className="profile-product-list">
+                {recentlyViewed.map((item: any) => (
+                  <div key={item.id} className="profile-product-mini">
+                    <div className="profile-product-mini-img" onClick={() => navigate(`/shop/product/${item.id}`)}>
+                      {item.image ? (
+                        <img src={getProductImageUrl(item.image)} alt={item.name} loading="lazy" />
+                      ) : (
+                        <div className="profile-product-placeholder-mini">{item.name}</div>
+                      )}
                     </div>
-                  ))}
-                </div>
-                {recentlyViewed.length > 5 && (
-                  <div className="carousel-controls">
-                    <button 
-                      className="carousel-btn"
-                      onClick={() => setRecentlyViewedSlide(Math.max(0, recentlyViewedSlide - 1))}
-                      disabled={recentlyViewedSlide === 0}
-                    >
-                      ◀
-                    </button>
-                    <span className="carousel-counter">{recentlyViewedSlide + 1} / {Math.ceil(recentlyViewed.length / 5)}</span>
-                    <button 
-                      className="carousel-btn"
-                      onClick={() => setRecentlyViewedSlide(Math.min(recentlyViewed.length - 5, recentlyViewedSlide + 1))}
-                      disabled={recentlyViewedSlide >= recentlyViewed.length - 5}
-                    >
-                      ▶
-                    </button>
+                    <div className="profile-product-mini-info">
+                      <strong onClick={() => navigate(`/shop/product/${item.id}`)} style={{cursor: 'pointer'}}>{item.name}</strong>
+                      <div className="muted">${Number(item.price).toFixed(2)}</div>
+                    </div>
                   </div>
-                )}
+                ))}
               </div>
             )}
           </div>
