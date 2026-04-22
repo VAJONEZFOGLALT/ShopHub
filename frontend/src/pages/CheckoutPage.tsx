@@ -23,16 +23,16 @@ declare global {
 }
 
 const couriers: CourierOption[] = [
-  { id: 'UPS', name: 'UPS Express', price: 15.99, days: '1-2 nap', type: 'address' },
-  { id: 'INPOST', name: 'Magyar Posta', price: 6.99, days: '2-4 nap', type: 'address' },
-  { id: 'PACKETA', name: 'Packeta', price: 4.99, days: '2-3 nap', type: 'pickup' },
+  { id: 'UPS', nameKey: 'checkout.couriers.ups.name', price: 15.99, daysKey: 'checkout.couriers.ups.days', type: 'address' },
+  { id: 'INPOST', nameKey: 'checkout.couriers.posta.name', price: 6.99, daysKey: 'checkout.couriers.posta.days', type: 'address' },
+  { id: 'PACKETA', nameKey: 'checkout.couriers.packeta.name', price: 4.99, daysKey: 'checkout.couriers.packeta.days', type: 'pickup' },
 ];
 
 type CourierOption = {
   id: 'UPS' | 'PACKETA' | 'INPOST';
-  name: string;
+  nameKey: string;
   price: number;
-  days: string;
+  daysKey: string;
   type: 'address' | 'pickup';
 };
 
@@ -263,12 +263,12 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
     const isDarkTheme = isDarkThemeActive();
 
     if (!apiKey) {
-      setError('Hianyzik a VITE_PACKETA_API_KEY, add meg .env-ben.');
+      setError(t('checkout.errors.packetaKeyMissing'));
       return;
     }
 
     if (!window.Packeta?.Widget?.pick) {
-      setError('A Packeta widget nem toltheto be most.');
+      setError(t('checkout.errors.packetaUnavailable'));
       return;
     }
 
@@ -313,17 +313,17 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
       }
 
       if (needsPickup && !pickupPointLabel.trim()) {
-        setError('Valassz atvevo pontot/boxot a kivalasztott futarhoz.');
+        setError(t('checkout.errors.selectPickupPoint'));
         return;
       }
 
       if (needsAddress && user && !selectedAddr) {
-        setError('Valassz szallitasi cimet.');
+        setError(t('checkout.errors.selectAddress'));
         return;
       }
 
       if (needsAddress && !validateGuestAddress()) {
-        setError('Toltsd ki a szallitasi cim kotelezo mezoit.');
+        setError(t('checkout.errors.fillRequiredAddressFields'));
         return;
       }
 
@@ -349,7 +349,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
       }
       if (order.emailStatus && !order.emailStatus.emailSent) {
         const reason = order.emailStatus.reason || 'Unknown email delivery issue';
-        showToast(`Az email nem ment ki: ${reason}`, 'warning');
+        showToast(t('checkout.errors.emailDeliveryFailed', { reason }), 'warning');
       }
       clear();
       onSuccess?.(order.id);
@@ -390,7 +390,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                     <div key={it.productId} className="checkout-item">
                       <div className="checkout-item-info">
                         <strong>{it.name}</strong>
-                        <span className="muted">Mennyiseg: {it.quantity}</span>
+                        <span className="muted">{t('cart.quantity')}: {it.quantity}</span>
                         <span>${(it.price * it.quantity).toFixed(2)}</span>
                       </div>
                       <button className="btn-text" onClick={() => remove(it.productId)}>{t('checkout.remove')}</button>
@@ -412,8 +412,8 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                       }}
                     />
                     <div className="checkout-courier-content">
-                      <div><strong>{c.name}</strong> - ${c.price.toFixed(2)}</div>
-                      <div className="muted checkout-courier-days">{c.days}</div>
+                      <div><strong>{t(c.nameKey)}</strong> - ${c.price.toFixed(2)}</div>
+                      <div className="muted checkout-courier-days">{t(c.daysKey)}</div>
                     </div>
                   </label>
                 ))}
@@ -421,7 +421,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                 {needsPickup && courier === 'PACKETA' && (
                   <div className="courier-picker-box">
                     <button className="btn-secondary" onClick={handlePickPacketaPoint} disabled={!packetaReady}>
-                      {packetaReady ? 'Packeta pont valasztasa' : 'Packeta betoltese...'}
+                      {packetaReady ? t('checkout.pickPacketaPoint') : t('checkout.loadingPacketa')}
                     </button>
                     {pickupPointLabel && <p className="muted courier-picked-point">📍 {pickupPointLabel}</p>}
                   </div>
@@ -446,14 +446,14 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
               {needsAddress && user && addresses.length === 0 && (
                 <div className="checkout-section">
                   <h3>{t('checkout.address')}</h3>
-                  <p className="muted">Nincs mentett szallitasi cimed. Adj hozza egyet a profil oldalon.</p>
-                  <button className="btn-secondary" onClick={() => navigate('/shop/profile')}>Profil megnyitasa</button>
+                  <p className="muted">{t('checkout.noSavedAddress')}</p>
+                  <button className="btn-secondary" onClick={() => navigate('/shop/profile')}>{t('checkout.openProfile')}</button>
                 </div>
               )}
 
               {needsAddress && !user && (
                 <div className="checkout-section">
-                  <h3>Szallitasi cim</h3>
+                  <h3>{t('checkout.shippingAddress')}</h3>
                   <input
                     className="checkout-input"
                     placeholder={t('profile.fullName')}

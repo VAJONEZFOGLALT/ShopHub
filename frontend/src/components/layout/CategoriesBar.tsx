@@ -25,7 +25,7 @@ export default function CategoriesBar() {
         list.sort((a, b) => a.label.localeCompare(b.label));
         setCategories(list);
       } catch (e) {
-        showToast('Failed to load categories', 'error');
+        showToast(t('categories.failedToLoad'), 'error');
       }
     };
     loadCategories();

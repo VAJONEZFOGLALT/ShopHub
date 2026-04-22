@@ -33,7 +33,12 @@
     "shopNow": "Shop Now",
     "featuredCategories": "Featured Categories",
     "featuredProducts": "Featured Products",
-    "viewAllProducts": "View All Products"
+    "viewAllProducts": "View All Products",
+    "failedToLoadData": "Failed to load data",
+    "viewsCount": "{count} views",
+    "previousFeaturedProducts": "Previous featured products",
+    "nextFeaturedProducts": "Next featured products",
+    "goToFeaturedPage": "Go to featured page {page}"
   },
   "products": {
     "title": "Products",
@@ -75,6 +80,9 @@
     "shipping": "Shipping",
     "returns": "Returns",
     "warranty": "Warranty",
+    "shippingEta": "2-4 business days",
+    "returnsPolicy": "30-day returns",
+    "warrantyPeriod": "12 months",
     "quantity": "Quantity",
     "addedToCart": "Added to Cart",
     "customerReviews": "Customer Reviews",
@@ -86,6 +94,8 @@
     "logInToCompare": "Please log in to compare products",
     "compare": "Compare",
     "compared": "Compared",
+    "addToCompare": "Add to compare",
+    "removeFromCompare": "Remove from compare",
     "logInToWishlist": "Log in to add to wishlist",
     "addToWishlist": "Add to wishlist",
     "removeFromWishlist": "Remove from wishlist",
@@ -105,7 +115,8 @@
     "remove": "Remove",
     "clear": "Clear Cart",
     "clearConfirm": "Clear all items from cart?",
-    "removeTitle": "Remove"
+    "removeTitle": "Remove",
+    "getStarted": "Add items to get started!"
   },
   "checkout": {
     "title": "Checkout",
@@ -121,7 +132,34 @@
     "processing": "Processing...",
     "selectAddress": "Select existing address",
     "newAddress": "New address",
-    "remove": "Remove"
+    "remove": "Remove",
+    "pickPacketaPoint": "Choose Packeta pickup point",
+    "loadingPacketa": "Loading Packeta...",
+    "noSavedAddress": "You don't have a saved shipping address yet. Add one on your profile page.",
+    "openProfile": "Open Profile",
+    "shippingAddress": "Shipping address",
+    "couriers": {
+      "ups": {
+        "name": "UPS Express",
+        "days": "1-2 days"
+      },
+      "posta": {
+        "name": "Hungarian Post",
+        "days": "2-4 days"
+      },
+      "packeta": {
+        "name": "Packeta",
+        "days": "2-3 days"
+      }
+    },
+    "errors": {
+      "packetaKeyMissing": "VITE_PACKETA_API_KEY is missing, set it in your .env file.",
+      "packetaUnavailable": "The Packeta widget cannot be loaded right now.",
+      "selectPickupPoint": "Select a pickup point/locker for the chosen courier.",
+      "selectAddress": "Select a shipping address.",
+      "fillRequiredAddressFields": "Fill in all required shipping address fields.",
+      "emailDeliveryFailed": "Email could not be sent: {reason}"
+    }
   },
   "auth": {
     "loginTitle": "Login",
@@ -204,7 +242,14 @@
     "failedToLoadAddresses": "Failed to load addresses",
     "failedToSaveAddress": "Failed to save address",
     "uploadAvatar": "Upload",
-    "uploading": "..."
+    "uploading": "...",
+    "passwordMinLength": "Password must be at least 8 characters long",
+    "passwordNeedUppercase": "Password must contain an uppercase letter",
+    "passwordNeedLowercase": "Password must contain a lowercase letter",
+    "passwordNeedNumber": "Password must contain a number",
+    "needOldPasswordForNewOne": "To set a new password, you must provide your current password.",
+    "profileUpdateFailed": "Profile update failed",
+    "avatarUploadFailed": "Failed to upload avatar"
   },
   "orders": {
     "title": "My Orders",
@@ -232,6 +277,49 @@
     "backToProfile": "Back to Profile",
     "continueShopping": "Continue Shopping",
     "failedToLoadOrders": "Failed to load orders"
+  },
+  "compare": {
+    "selectProducts": "Select products to compare",
+    "selectedCount": "{count} selected",
+    "clear": "Clear",
+    "productComparison": "Product Comparison",
+    "selectAtLeastTwo": "Select at least two products to compare.",
+    "feature": "Feature",
+    "description": "Description",
+    "noImage": "No image"
+  },
+  "confirmation": {
+    "kicker": "Order confirmation",
+    "title": "Thank you for your order",
+    "subtitle": "Your order has been received and will be processed shortly.",
+    "orderNumber": "Order #{id}",
+    "orderItems": "Order items",
+    "nextStepsTitle": "What happens next",
+    "nextStep1": "Your order has been accepted and is ready for processing.",
+    "nextStep2": "You can track it later from your order history.",
+    "nextStep3": "If email delivery is configured, you should receive a confirmation email as well."
+  },
+  "reviewsModal": {
+    "reviewsFor": "Reviews for {productName}",
+    "reviewCount": "{count} reviews",
+    "viewReviews": "View Reviews",
+    "writeReview": "Write Review",
+    "signInToWriteReview": "Sign in to write a review.",
+    "ratings": "Ratings",
+    "clearFilter": "Clear Filter",
+    "writeReviewCta": "Write a Review",
+    "writeYourReview": "Write Your Review",
+    "rating": "Rating",
+    "title": "Title",
+    "titlePlaceholder": "Sum up your experience",
+    "yourReview": "Your Review",
+    "reviewPlaceholder": "Tell us what you think about this product...",
+    "submitReview": "Submit Review",
+    "noReviewsForRating": "No {rating}-star reviews yet.",
+    "anonymous": "Anonymous"
+  },
+  "categories": {
+    "failedToLoad": "Failed to load categories"
   },
   "footer": {
     "about": "About",

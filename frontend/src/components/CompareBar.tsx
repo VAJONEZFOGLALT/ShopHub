@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function CompareBar({
   items,
@@ -9,15 +10,16 @@ export default function CompareBar({
   onRemove: (id: number) => void;
   onClear: () => void;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const canCompare = items.length >= 2;
   const summary = useMemo(() => {
     if (items.length === 0) {
-      return 'Select products to compare';
+      return t('compare.selectProducts');
     }
-    return `${items.length} selected`; 
-  }, [items.length]);
+    return t('compare.selectedCount', { count: items.length });
+  }, [items.length, t]);
 
   if (items.length === 0) {
     return null;
@@ -27,7 +29,7 @@ export default function CompareBar({
     <>
       <div className="compare-bar">
         <div className="compare-summary">
-          <strong>Compare</strong>
+          <strong>{t('products.compare')}</strong>
           <span>{summary}</span>
         </div>
         <div className="compare-items">
@@ -39,8 +41,8 @@ export default function CompareBar({
           ))}
         </div>
         <div className="compare-actions">
-          <button type="button" className="btn-secondary" onClick={onClear}>Clear</button>
-          <button type="button" className="btn-primary" onClick={() => setOpen(true)} disabled={!canCompare}>Compare</button>
+          <button type="button" className="btn-secondary" onClick={onClear}>{t('compare.clear')}</button>
+          <button type="button" className="btn-primary" onClick={() => setOpen(true)} disabled={!canCompare}>{t('products.compare')}</button>
         </div>
       </div>
 
@@ -48,40 +50,40 @@ export default function CompareBar({
         <div className="modal-overlay" onClick={() => setOpen(false)}>
           <div className="modal-content compare-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Product Comparison</h2>
+              <h2>{t('compare.productComparison')}</h2>
               <button className="modal-close" onClick={() => setOpen(false)}>×</button>
             </div>
             <div className="modal-body">
               {items.length < 2 ? (
-                <p>Select at least two products to compare.</p>
+                <p>{t('compare.selectAtLeastTwo')}</p>
               ) : (
                 <div className="compare-table">
                   <div className="compare-row compare-head">
-                    <div className="compare-cell">Feature</div>
+                    <div className="compare-cell">{t('compare.feature')}</div>
                     {items.map((item) => (
                       <div key={item.id} className="compare-cell">{item.name}</div>
                     ))}
                   </div>
                   <div className="compare-row">
-                    <div className="compare-cell">Price</div>
+                    <div className="compare-cell">{t('products.price')}</div>
                     {items.map((item) => (
                       <div key={item.id} className="compare-cell">${Number(item.price).toFixed(2)}</div>
                     ))}
                   </div>
                   <div className="compare-row">
-                    <div className="compare-cell">Stock</div>
+                    <div className="compare-cell">{t('products.stock')}</div>
                     {items.map((item) => (
                       <div key={item.id} className="compare-cell">{item.stock ?? '—'}</div>
                     ))}
                   </div>
                   <div className="compare-row">
-                    <div className="compare-cell">Category</div>
+                    <div className="compare-cell">{t('products.category')}</div>
                     {items.map((item) => (
                       <div key={item.id} className="compare-cell">{item.category}</div>
                     ))}
                   </div>
                   <div className="compare-row">
-                    <div className="compare-cell">Description</div>
+                    <div className="compare-cell">{t('compare.description')}</div>
                     {items.map((item) => (
                       <div key={item.id} className="compare-cell">{item.description || '—'}</div>
                     ))}
