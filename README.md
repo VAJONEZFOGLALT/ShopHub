@@ -1,198 +1,215 @@
-# ShopHub – Fejlesztői Dokumentáció
+# ShopHub
 
-## 1. Projekt áttekintés
-A ShopHub egy teljes stackes webáruház-rendszer, amely valós e-kereskedelmi folyamatokat fed le:
+ShopHub egy teljes stackes webáruház alkalmazás NestJS backenddel és React/Vite frontenddel. A projekt egy működő e-kereskedelmi alapot ad: felhasználókezelés, termékek, rendelések, címek, vélemények, kívánságlista, összehasonlítás, legutóbb megtekintett termékek, fordítások és admin funkciók.
 
-- felhasználókezelés (regisztráció, bejelentkezés, profil)
-- terméklista és termékadatlap
-- kosár és rendelésleadás
-- rendeléskövetés
-- vélemények, kívánságlista, összehasonlítás, legutóbb megtekintett elemek
-- adminisztrációs műveletek
-- többnyelvű felület
+## Projekt felépítése
 
-A projekt célja egy gyakorlatban is használható, bővíthető architektúra bemutatása frontend és backend oldalon.
+- backend: NestJS API, Prisma, migrációk, seed, Swagger
+- frontend: React + TypeScript + Vite kliens
+- database/exports: adatbázis exportok `.sql` formátumban
 
-## 2. Technológiai stack
+## Rendszerkövetelmények
+
+- Node.js 18 vagy újabb
+- npm 9 vagy újabb
+- MySQL vagy MySQL-kompatibilis adatbázis
+- internetkapcsolat a külső szolgáltatásokhoz, ha használod őket
+
+## Technológiai stack
+
 ### Backend
-- Node.js
-- NestJS
-- Prisma ORM
-- JWT autentikáció (Passport)
-- Swagger / OpenAPI dokumentáció
-- Multer fájlfeltöltés (termék- és avatarképek)
+
+- NestJS 11
+- Prisma 6
+- JWT / Passport
+- Swagger / OpenAPI
+- Multer fájlfeltöltés
+- Cloudinary képfeltöltéshez
 
 ### Frontend
-- React
+
+- React 19
 - TypeScript
 - Vite
 - React Router
 - i18next
 
-### Adatbázis és egyéb integrációk
-- MySQL-kompatibilis adatbázis (Prisma datasource)
-- Cloudinary (képtárolás)
-- SMTP/Nodemailer (értesítő e-mailek)
+## Indítás előtti beállítások
 
-Megjegyzés: a jelenlegi kódbázisban nincs aktív WebSocket Gateway.
+A repó már tartalmazza a használt backend `.env` példát és a projektben ténylegesen használt Vite környezeti változókat. Ne régi, idegen példák alapján állítsd be, hanem a jelenlegi kódban használt neveket használd.
 
-## 3. Rendszerkövetelmények
-- Node.js 18+
-- npm 9+
-- MySQL vagy MySQL-kompatibilis szerver
-- (Opcionális) Cloudinary és SMTP hozzáférés, ha képfeltöltést és e-mail küldést is használnál
+### Backend környezeti változók
 
-## 4. Projektstruktúra
-- backend: NestJS API, Prisma séma, migrációk, seed
-- frontend: React/Vite kliensalkalmazás
-- database/exports: adatbázis exportok (immár közvetlen .sql fájlok)
+Hozz létre egy `backend/.env` fájlt, és töltsd ki legalább ezeket:
 
-## 5. Környezeti változók
-Hozz létre egy .env fájlt a backend könyvtárban.
+- `PORT`
+- `DATABASE_URL`
+- `FRONTEND_URL`
+- `JWT_SECRET`
 
-Ajánlott minta:
+Opcionálisan, ha a megfelelő funkciókat is használod:
 
-DATABASE_URL="mysql://root:password@localhost:3306/shophub"
-JWT_SECRET="ide-egy-hosszú-véletlen-jelszó"
-PORT=3000
-FRONTEND_URL="http://localhost:5173"
+- `OPENAI_API_KEY`
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+- `PACKETA_API_KEY`
+- `PACKETA_API_PASSWORD`
+- `PACKETA_API_LOCALE`
+- `PACKETA_INVOICE_LOCALE`
+- `LIBRETRANSLATE_API_URL`
+- `LIBRETRANSLATE_API_KEY`
 
-# Opcionális, ha képfeltöltést is használsz
-CLOUDINARY_CLOUD_NAME=""
-CLOUDINARY_API_KEY=""
-CLOUDINARY_API_SECRET=""
+A helyi fejlesztéshez a backend az `http://localhost:3000` portot használja, a frontend pedig alapból az `http://localhost:5173` címen fut.
 
-# Opcionális, ha e-mail küldést is használsz
-SMTP_HOST=""
-SMTP_PORT=587
-SMTP_USER=""
-SMTP_PASS=""
-SMTP_FROM=""
+### Frontend környezeti változók
 
-Erős JWT kulcs generálása:
+A frontend a következő Vite env változókat használja:
 
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+- `VITE_API_URL`
+- `VITE_PACKETA_API_KEY`
+- `VITE_PACKETA_API_LOCALE`
 
-## 6. Indítási útmutató
-### 6.1 Függőségek telepítése
+Ha ezek nincsenek megadva, a frontend a helyi alapértékekkel próbál működni, de a Packeta widgethez és az API célpontjához érdemes beállítani őket.
+
+## Telepítés
+
 A projekt gyökerében:
 
+```bash
 npm install
+```
 
-Megjegyzés: a gyökér postinstall script automatikusan futtatja a setup.js lépéseit (backend/frontend install, Prisma generate, migráció deploy).
+A gyökér `postinstall` script lefuttatja a `setup.js`-t, ami külön telepíti a backend és frontend függőségeket, majd Prisma generate és migrate lépéseket is futtat.
 
-### 6.2 Adatbázis inicializálása (ha szükséges)
+## Fejlesztői indítás
 
+### Teljes alkalmazás
+
+```bash
+npm run dev
+```
+
+### Csak backend
+
+```bash
+npm run dev:backend
+```
+
+### Csak frontend
+
+```bash
+npm run dev:frontend
+```
+
+## Adatbázis
+
+### Prisma
+
+```bash
 npm run db:generate
 npm run db:migrate
 npm run db:seed
+```
 
-Ez legenerálja a Prisma klienst, lefuttatja a migrációkat, majd feltölti az adatokat.
+### Mit csinálnak ezek
 
-### 6.3 Teljes rendszer indítása (frontend + backend)
+- `db:generate`: legenerálja a Prisma klienst
+- `db:migrate`: lefuttatja a migrációkat
+- `db:seed`: feltölti a tesztadatokat
 
-npm run dev
+## Hasznos parancsok
 
-Elérési címek helyi futásnál:
-
-- frontend: http://localhost:5173
-- backend API: http://localhost:3000/api
-- Swagger: http://localhost:3000/api/docs
-
-## 7. Hasznos parancsok
-Gyökér könyvtárból:
-
-- npm run dev:backend – csak backend
-- npm run dev:frontend – csak frontend
-- npm run build – teljes build
-- npm run build:backend – backend build
-- npm run build:frontend – frontend build
-- npm run db:generate – Prisma kliens generálás
-- npm run db:migrate – migrációk futtatása
-- npm run db:seed – seed futtatása
+```bash
+npm run build
+npm run build:backend
+npm run build:frontend
+```
 
 Backend könyvtárból:
 
-- npm run start:dev
-- npm run test:api
+```bash
+npm run start:dev
+npm run test:api
+```
 
-## 8. API dokumentáció
-A backend indulása után a Swagger UI itt érhető el:
+## Elérési címek lokálisan
 
-http://localhost:3000/api/docs
+- frontend: `http://localhost:5173`
+- backend API: `http://localhost:3000/api`
+- Swagger: `http://localhost:3000/api/docs`
 
-Az API globális prefixe: /api
+## Swagger / API dokumentáció
 
-## 9. Adatbázis séma és fő entitások
-Főbb modellek:
+A backend indulása után az OpenAPI dokumentáció a következő címen érhető el:
 
-- Users
-- Products
-- Orders
-- OrderItems
-- Address
-- Reviews
-- Wishlist
-- CompareItems
-- RecentlyViewed
-- Translation
+`http://localhost:3000/api/docs`
 
-Kapcsolatok röviden:
+Az API globális prefixe: `/api`
 
-- egy felhasználónak több rendelése lehet
-- egy rendelés több tételből áll
-- termékhez tartozhat vélemény, wishlist, compare és recently-viewed kapcsolat
-- címek felhasználóhoz kapcsolódnak
+## Fő modulok és funkciók
 
-## 10. Biztonság és jogosultság
-- JWT alapú autentikáció
-- role alapú hozzáférés (USER / ADMIN)
-- érzékeny végpontok guardolva
-- saját adatokhoz tulajdonosi ellenőrzés
+- auth: regisztráció, belépés, tokenfrissítés
+- users: felhasználók, profil, avatar feltöltés
+- products: termékek, featured lista, képfeltöltés
+- orders: rendelések, státusz, teljesítés
+- order-items: admin rendelési tételek
+- reviews: termékértékelések
+- wishlist: kívánságlista
+- compare: összehasonlító lista
+- addresses: szállítási címek
+- recently-viewed: legutóbb megtekintett termékek
+- translations: szövegfordítási segédvégpontok
 
-## 11. Fordítás és lokalizáció
-A frontend i18next-et használ.
+## Adatmodell röviden
 
-Fő locale fájlok:
+A backend Prisma sémája az e-kereskedelmi működés köré épül:
 
-- frontend/src/i18n/locales/hu.json
-- frontend/src/i18n/locales/en.json
+- felhasználók és szerepkörök
+- termékek és fordítások
+- rendelések és rendeléstételek
+- címek
+- vélemények
+- wishlist és compare elemek
+- legutóbb megtekintett termékek
 
-A backend oldalon a terméknév/kategória fordításokhoz a Translation tábla és fordítási szolgáltatás is használatban van.
+## Seed és mintaadatok
 
-## 12. Seed és demó adatok
-A seed script valószerű mintaadatokat tölt fel:
+A seed célja, hogy fejlesztéshez és bemutatóhoz azonnal használható adatok legyenek:
 
-- termékek több kategóriában
+- több kategóriás termékek
 - felhasználók különböző szerepkörrel
 - rendelések és rendeléstételek
-- címek, vélemények, wishlist, compare, recently viewed
+- címek, vélemények, wishlist, compare, recently viewed adatok
 
-Ez megkönnyíti a fejlesztést és a bemutatást lokális környezetben.
+## SQL exportok
 
-## 13. SQL exportok
-A database/exports mappában a dumpok közvetlen .sql formátumban érhetők el, így nem kell .gz fájlokat kicsomagolni import előtt.
+A `database/exports` mappában az exportok közvetlen `.sql` fájlok, ezért import előtt nem kell tömörített állományokat bontani.
 
-## 14. Hibaelhárítás
-### Backend nem indul
-- ellenőrizd a backend .env fájlt
-- ellenőrizd, hogy a DATABASE_URL elérhető adatbázisra mutat-e
-- futtasd újra: npm run db:generate
+## Hibaelhárítás
 
-### Frontend nem éri el az API-t
+### A backend nem indul
+
+- ellenőrizd a `backend/.env` tartalmát
+- nézd meg, hogy a `DATABASE_URL` elérhető adatbázisra mutat-e
+- futtasd újra: `npm run db:generate`
+
+### A frontend nem éri el az API-t
+
 - ellenőrizd, hogy a backend fut-e a 3000-es porton
-- ellenőrizd a CORS és FRONTEND_URL beállítást
+- nézd meg, hogy a `VITE_API_URL` helyes-e
+- ellenőrizd a CORS és a `FRONTEND_URL` értékét
 
-### Swagger nem elérhető
-- ellenőrizd a backend indulási logját
-- helyes útvonal: /api/docs
+### A Packeta widget nem jelenik meg
 
-## 15. További fejlesztési ötletek
-- online fizetési szolgáltató integráció
-- kupon- és kedvezményrendszer
-- részletesebb admin riportok
-- E2E tesztelés bővítése
-- cache/performancia finomhangolás nagy adatmennyiségre
+- ellenőrizd a `VITE_PACKETA_API_KEY` értékét
+- ellenőrizd a `VITE_PACKETA_API_LOCALE` értékét
 
-## 16. Rövid összegzés
-A ShopHub egy jól szeparált, modern webalkalmazás, amely alkalmas fejlesztői dokumentáció, vizsgaremek-bemutató és további bővítés alapjaként is.
+### A Swagger nem nyílik meg
+
+- ellenőrizd, hogy a backend elindult-e
+- nézd meg a `http://localhost:3000/api/docs` címet
+
+## Megjegyzés
+
+A projektben nincs külön WebSocket réteg, ezért ehhez nem érdemes külön dokumentációt vagy környezeti változót keresni.
