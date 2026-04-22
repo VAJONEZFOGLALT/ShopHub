@@ -70,7 +70,9 @@ npm run dev:frontend
 
 ## Adatbázis
 
-### Prisma
+A projekt adatbázisa TiDB Cloudon fut, és a jelenlegi alapadatok már fel vannak töltve.
+
+### Prisma és seed
 
 ```bash
 npm run db:generate
@@ -81,8 +83,8 @@ npm run db:seed
 ### Mit csinálnak ezek
 
 - `db:generate`: legenerálja a Prisma klienst
-- `db:migrate`: lefuttatja a migrációkat
-- `db:seed`: feltölti a tesztadatokat
+- `db:migrate`: backend oldali migrációs parancs
+- `db:seed`: seed script, ha a mintaadatokat újra akarod tölteni
 
 ## Hasznos Parancsok
 
@@ -129,7 +131,7 @@ Az API globális prefixe: `/api`
 
 ## Adatmodell Röviden
 
-A backend Prisma sémája az e-kereskedelmi működés köré épül:
+A backend Prisma sémája az e-kereskedelmi működés köré épül, a tényleges adatbázis pedig TiDB Cloudon van.
 
 - felhasználók és szerepkörök
 - termékek és fordítások
@@ -141,7 +143,7 @@ A backend Prisma sémája az e-kereskedelmi működés köré épül:
 
 ## Seed és Mintaadatok
 
-A seed célja, hogy fejlesztéshez és bemutatóhoz azonnal használható adatok legyenek:
+A seed a mintaadatok kezelésére szolgál; a jelenlegi alapadatok már fent vannak a TiDB Cloud adatbázisban.
 
 - több kategóriás termékek
 - felhasználók különböző szerepkörrel
