@@ -12,7 +12,6 @@ async function bootstrap() {
     process.env.FRONTEND_URL,
     'http://localhost:5173',
     'http://localhost:5174',
-    'https://project-i7v3.vercel.app', // Vercel frontend
   ].filter((origin): origin is string => Boolean(origin));
 
   app.enableCors({
