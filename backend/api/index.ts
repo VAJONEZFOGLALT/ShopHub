@@ -67,11 +67,21 @@ async function bootstrapServer(): Promise<express.Express> {
 }
 
 export default async function handler(req: Request, res: Response) {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, PUT, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.status(200).send('');
+    return;
+  }
+
   try {
     const server = await bootstrapServer();
     server(req, res);
   } catch (error) {
     console.error('Handler error:', error);
-    res.status(500).json({ error: 'Server initialization failed' });
+    res.status(500).json({ error: 'Server initialization failed', message: error instanceof Error ? error.message : 'Unknown error' });
   }
 }

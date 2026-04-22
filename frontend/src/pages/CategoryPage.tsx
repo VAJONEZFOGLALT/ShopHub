@@ -10,10 +10,21 @@ import { useAuth } from '../contexts/AuthContext';
 import { useWishlist } from '../hooks/useWishlist';
 import { useToast } from '../contexts/ToastContext';
 
+const getProductCategory = (product: any) => {
+  const rawCategory = product?.category ?? product?.categoryName ?? product?.category?.name;
+  if (typeof rawCategory !== 'string') {
+    return '';
+  }
+  return rawCategory.trim();
+};
+
+const normalizeCategory = (value: string) => value.trim().toLowerCase();
+
 export default function CategoryPage() {
   const { t, i18n } = useTranslation();
   const { translateBatch } = useTranslateDynamic();
   const { name } = useParams<{ name: string }>();
+  const decodedCategoryName = decodeURIComponent(name || '');
   const navigate = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
   const [translatedProducts, setTranslatedProducts] = useState<any[]>([]);
@@ -89,7 +100,7 @@ export default function CategoryPage() {
     const byCategory: any[] = [];
     for (let i = 0; i < displayProducts.length; i += 1) {
       const p = displayProducts[i];
-      if (p.category === name) {
+      if (normalizeCategory(getProductCategory(p)) === normalizeCategory(decodedCategoryName)) {
         byCategory.push(p);
       }
     }
@@ -138,7 +149,7 @@ export default function CategoryPage() {
     }
 
     return filteredBySearch;
-  }, [translatedProducts, products, name, priceRange, sortBy, inStockOnly, searchTerm]);
+  }, [translatedProducts, products, decodedCategoryName, priceRange, sortBy, inStockOnly, searchTerm]);
 
   const compareItemsFallback = useMemo(() => {
     return products.filter(p => compareIds.includes(p.id));
@@ -186,7 +197,7 @@ export default function CategoryPage() {
     const matched: number[] = [];
     for (let i = 0; i < products.length; i += 1) {
       const p = products[i];
-      if (p.category === name) {
+      if (normalizeCategory(getProductCategory(p)) === normalizeCategory(decodedCategoryName)) {
         matched.push(p.price);
       }
     }
@@ -200,7 +211,7 @@ export default function CategoryPage() {
       max = localMax;
     }
     return max;
-  }, [products, name]);
+  }, [products, decodedCategoryName]);
 
   const handleMinPriceChange = (value: string) => {
     const min = Number(value);
@@ -232,7 +243,7 @@ export default function CategoryPage() {
     <div className="category-view">
       <div className="category-header">
         <button className="back-btn" onClick={() => navigate('/shop')}>{t('common.backToShop')}</button>
-        <h1>{name}</h1>
+        <h1>{decodedCategoryName}</h1>
         <p className="category-count">{filtered.length} {t('products.items')}</p>
       </div>
 
