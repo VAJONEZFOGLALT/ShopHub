@@ -34,7 +34,13 @@ export default function ProfilePage() {
   const roleLabel = user?.role === 'ADMIN' ? t('profile.adminAccount') : `👤 ${t('profile.customer')}`;
   const accountTypeLabel = user?.role === 'ADMIN' ? t('profile.administrator') : t('profile.customer');
   const displayName = user?.name || user?.username || '';
-  const shouldWrapHeaderStats = (user?.username?.length ?? 0) > 8;
+  const usernameLength = user?.username?.length ?? 0;
+  const shouldWrapHeaderStats = usernameLength > 8;
+  const headerStatsClasses = [
+    'profile-header-stats',
+    shouldWrapHeaderStats ? 'two-rows' : 'one-row',
+    usernameLength > 12 ? 'username-xl' : usernameLength > 8 ? 'username-l' : 'username-s',
+  ].join(' ');
   const addressButtonText = addresses.length === 0 ? t('profile.addAddress') : t('profile.updateAddress');
   const isCollectionsLoading = pageLoading;
   const preferredAddress = useMemo(() => {
@@ -283,7 +289,7 @@ export default function ProfilePage() {
             <p className="profile-role">{roleLabel}</p>
           </div>
           
-          <div className={`profile-header-stats${shouldWrapHeaderStats ? ' two-rows' : ''}`}>
+          <div className={headerStatsClasses}>
             <div className="header-stat">
               <span className="header-stat-icon">📦</span>
               <div>
