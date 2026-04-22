@@ -53,7 +53,7 @@ let productsCache: any[] | null = null;
 let productsCacheExpiresAt = 0;
 let productsRequestInFlight: Promise<any[]> | null = null;
 
-const PRODUCTS_CACHE_KEY = 'shophub_products_cache_v1';
+const PRODUCTS_CACHE_KEY = 'shophub_products_cache_v2';
 const PRODUCTS_CACHE_TTL_MS = 60 * 1000;
 
 const processQueue = (err: Error | null, token: string | null) => {
