@@ -1,128 +1,198 @@
-# ShopHub - Vizsgaremek dokumentacio
+# ShopHub – Fejlesztői Dokumentáció
 
-## Projekt rovid bemutatasa
-A ShopHub egy teljes stackes webaruhaz alkalmazas, amely valos e-kereskedelmi mukodest modellez: termeklistazas, kosar, rendeles, felhasznaloi fiok es admin kezeles.
+## 1. Projekt áttekintés
+A ShopHub egy teljes stackes webáruház-rendszer, amely valós e-kereskedelmi folyamatokat fed le:
 
-A projekt celja, hogy gyakorlati peldan mutassa be egy modern webes rendszer tervezeset es megvalositasat frontend es backend oldalon egyarant.
+- felhasználókezelés (regisztráció, bejelentkezés, profil)
+- terméklista és termékadatlap
+- kosár és rendelésleadás
+- rendeléskövetés
+- vélemények, kívánságlista, összehasonlítás, legutóbb megtekintett elemek
+- adminisztrációs műveletek
+- többnyelvű felület
 
-## Projekt celjai
-- korszeru, felhasznalobarat webshop felulet kialakitasa
-- stabil backend API letrehozasa jogosultsagkezelessel
-- adatbazis alapu termek- es rendeleskezeles
-- admin oldali menedzsment funkciok biztositas
-- tobbnyelvu tamogatas es valoszeru adatokkal valo mukodes
+A projekt célja egy gyakorlatban is használható, bővíthető architektúra bemutatása frontend és backend oldalon.
 
-## Funkcionalis kovetelmenyek
-Felhasznaloi oldal:
-- regisztracio, bejelentkezes
-- termekek bongeszese kategoriak szerint
-- szures, kereses, rendezes
-- kosar kezeles
-- rendeles letrehozasa es rendelesek megtekintese
+## 2. Technológiai stack
+### Backend
+- Node.js
+- NestJS
+- Prisma ORM
+- JWT autentikáció (Passport)
+- Swagger / OpenAPI dokumentáció
+- Multer fájlfeltöltés (termék- és avatarképek)
 
-Admin oldal:
-- felhasznalok kezelese
-- termekek kezelese
-- rendelesek allapotanak kezelese
-- alap statisztikai attekintes
-
-Kozos funkciok:
-- tobbnyelvu felulet
-- kepkezeles
-- e-mailertesitesek
-
-## Nem funkcionalis kovetelmenyek
-- jol tagolt, bovitheto kodstruktura
-- tipusos fejlesztes TypeScript alapon
-- API es kliens oldali hibakezeles
-- tesztelheto endpoint szerkezet
-
-## Technologiai kornyezet
-Frontend:
+### Frontend
 - React
 - TypeScript
 - Vite
 - React Router
 - i18next
 
-Backend:
-- NestJS
-- TypeScript
-- Prisma
-- JWT alapu autentikacio
+### Adatbázis és egyéb integrációk
+- MySQL-kompatibilis adatbázis (Prisma datasource)
+- Cloudinary (képtárolás)
+- SMTP/Nodemailer (értesítő e-mailek)
 
-Adattarolas es integraciok:
-- MySQL kompatibilis adatbazis
-- Cloudinary (kepkezeles)
-- SMTP (ertesito e-mailek)
+Megjegyzés: a jelenlegi kódbázisban nincs aktív WebSocket Gateway.
 
-## Rendszerfelépites
-A megoldas ket fo reszre bontva mukodik:
+## 3. Rendszerkövetelmények
+- Node.js 18+
+- npm 9+
+- MySQL vagy MySQL-kompatibilis szerver
+- (Opcionális) Cloudinary és SMTP hozzáférés, ha képfeltöltést és e-mail küldést is használnál
 
-1. Frontend kliensalkalmazas
-- felhasznaloi felulet
-- allapotkezeles
-- API kommunikacio
+## 4. Projektstruktúra
+- backend: NestJS API, Prisma séma, migrációk, seed
+- frontend: React/Vite kliensalkalmazás
+- database/exports: adatbázis exportok (immár közvetlen .sql fájlok)
 
-2. Backend REST API
-- uzleti logika
-- adatbazis muveletek
-- hitelesites es jogosultsagkezeles
+## 5. Környezeti változók
+Hozz létre egy .env fájlt a backend könyvtárban.
 
-## Adatmodell (magas szintu)
-Legfontosabb entitasok:
+Ajánlott minta:
+
+DATABASE_URL="mysql://root:password@localhost:3306/shophub"
+JWT_SECRET="ide-egy-hosszú-véletlen-jelszó"
+PORT=3000
+FRONTEND_URL="http://localhost:5173"
+
+# Opcionális, ha képfeltöltést is használsz
+CLOUDINARY_CLOUD_NAME=""
+CLOUDINARY_API_KEY=""
+CLOUDINARY_API_SECRET=""
+
+# Opcionális, ha e-mail küldést is használsz
+SMTP_HOST=""
+SMTP_PORT=587
+SMTP_USER=""
+SMTP_PASS=""
+SMTP_FROM=""
+
+Erős JWT kulcs generálása:
+
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+## 6. Indítási útmutató
+### 6.1 Függőségek telepítése
+A projekt gyökerében:
+
+npm install
+
+Megjegyzés: a gyökér postinstall script automatikusan futtatja a setup.js lépéseit (backend/frontend install, Prisma generate, migráció deploy).
+
+### 6.2 Adatbázis inicializálása (ha szükséges)
+
+npm run db:generate
+npm run db:migrate
+npm run db:seed
+
+Ez legenerálja a Prisma klienst, lefuttatja a migrációkat, majd feltölti az adatokat.
+
+### 6.3 Teljes rendszer indítása (frontend + backend)
+
+npm run dev
+
+Elérési címek helyi futásnál:
+
+- frontend: http://localhost:5173
+- backend API: http://localhost:3000/api
+- Swagger: http://localhost:3000/api/docs
+
+## 7. Hasznos parancsok
+Gyökér könyvtárból:
+
+- npm run dev:backend – csak backend
+- npm run dev:frontend – csak frontend
+- npm run build – teljes build
+- npm run build:backend – backend build
+- npm run build:frontend – frontend build
+- npm run db:generate – Prisma kliens generálás
+- npm run db:migrate – migrációk futtatása
+- npm run db:seed – seed futtatása
+
+Backend könyvtárból:
+
+- npm run start:dev
+- npm run test:api
+
+## 8. API dokumentáció
+A backend indulása után a Swagger UI itt érhető el:
+
+http://localhost:3000/api/docs
+
+Az API globális prefixe: /api
+
+## 9. Adatbázis séma és fő entitások
+Főbb modellek:
+
 - Users
 - Products
 - Orders
 - OrderItems
+- Address
 - Reviews
 - Wishlist
-- RecentlyViewed
 - CompareItems
-- Address
+- RecentlyViewed
 - Translation
 
-A modell ugy lett kialakitva, hogy valos webshop szcenariokat tudjon kiszolgalni.
+Kapcsolatok röviden:
 
-## Biztonsag es jogosultsag
-- JWT alapu tokenes hitelesites
-- vedett vegpontok
-- rendeles-hozzaferes tulajdonos alapon (vagy admin jogosultsaggal)
+- egy felhasználónak több rendelése lehet
+- egy rendelés több tételből áll
+- termékhez tartozhat vélemény, wishlist, compare és recently-viewed kapcsolat
+- címek felhasználóhoz kapcsolódnak
 
-## Valoszeru adatok (seed)
-A projekt tartalmaz automatikus adatfeltoltest, amely:
-- valoszerubb termekneveket es arkategoriakat general
-- kategoriankent elteto keszletmintakat hasznal
-- rendelesi es felhasznaloi adatsorokat hoz letre
+## 10. Biztonság és jogosultság
+- JWT alapú autentikáció
+- role alapú hozzáférés (USER / ADMIN)
+- érzékeny végpontok guardolva
+- saját adatokhoz tulajdonosi ellenőrzés
 
-Ez lehetove teszi, hogy a rendszer demo korulmenyek kozott is hitelesen viselkedjen.
+## 11. Fordítás és lokalizáció
+A frontend i18next-et használ.
 
-## Futtatasi alaplepesek
-Gyoker konyvtarbol:
+Fő locale fájlok:
 
-1. Fuggosegek telepitese:
-- npm install
+- frontend/src/i18n/locales/hu.json
+- frontend/src/i18n/locales/en.json
 
-2. Helyi fejlesztes inditasa:
-- npm run dev
+A backend oldalon a terméknév/kategória fordításokhoz a Translation tábla és fordítási szolgáltatás is használatban van.
 
-3. Build ellenorzes:
-- npm run build
+## 12. Seed és demó adatok
+A seed script valószerű mintaadatokat tölt fel:
 
-## Teszteles
-A projekt tamogat API endpoint lefedettsegi ellenorzest, valamint forditasi/build ellenorzeseket.
+- termékek több kategóriában
+- felhasználók különböző szerepkörrel
+- rendelések és rendeléstételek
+- címek, vélemények, wishlist, compare, recently viewed
 
-Alap ellenorzesek:
-- backend TypeScript check
-- backend API endpoint tesztek
-- frontend build
+Ez megkönnyíti a fejlesztést és a bemutatást lokális környezetben.
 
-## Tovabbfejlesztesi lehetosegek
-- online fizetesi szolgaltato integracio
-- szallitasi dij dinamikus szamitas
-- kupon- es kedvezmeny modul
-- fejlettebb riportok admin oldalon
-- automatizalt E2E tesztek
+## 13. SQL exportok
+A database/exports mappában a dumpok közvetlen .sql formátumban érhetők el, így nem kell .gz fájlokat kicsomagolni import előtt.
 
-## Osszegzes
-A ShopHub vizsgaremek projekt bemutatja, hogyan epitheto fel egy modern, valos problemat megcelzo webes rendszer a teljes fejlesztesi lanc menten: adatmodell, backend logika, frontend UX, jogosultsagkezeles es uzemeltethetoseg.
+## 14. Hibaelhárítás
+### Backend nem indul
+- ellenőrizd a backend .env fájlt
+- ellenőrizd, hogy a DATABASE_URL elérhető adatbázisra mutat-e
+- futtasd újra: npm run db:generate
+
+### Frontend nem éri el az API-t
+- ellenőrizd, hogy a backend fut-e a 3000-es porton
+- ellenőrizd a CORS és FRONTEND_URL beállítást
+
+### Swagger nem elérhető
+- ellenőrizd a backend indulási logját
+- helyes útvonal: /api/docs
+
+## 15. További fejlesztési ötletek
+- online fizetési szolgáltató integráció
+- kupon- és kedvezményrendszer
+- részletesebb admin riportok
+- E2E tesztelés bővítése
+- cache/performancia finomhangolás nagy adatmennyiségre
+
+## 16. Rövid összegzés
+A ShopHub egy jól szeparált, modern webalkalmazás, amely alkalmas fejlesztői dokumentáció, vizsgaremek-bemutató és további bővítés alapjaként is.
