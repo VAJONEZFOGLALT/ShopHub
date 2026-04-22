@@ -20,6 +20,16 @@ const getProductCategory = (product: any) => {
 
 const normalizeCategory = (value: string) => value.trim().toLowerCase();
 
+const getSliderCeiling = (maxProductPrice: number) => {
+  if (!Number.isFinite(maxProductPrice) || maxProductPrice <= 0) {
+    return 1000;
+  }
+
+  const buffered = maxProductPrice * 1.1;
+  const step = buffered < 10000 ? 500 : 1000;
+  return Math.ceil(buffered / step) * step;
+};
+
 export default function CategoryPage() {
   const { t, i18n } = useTranslation();
   const { name } = useParams<{ name: string }>();
@@ -29,10 +39,7 @@ export default function CategoryPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [priceRange, setPriceRange] = useState<[number, number]>([
-    Number(searchParams.get('min') || '0'),
-    Number(searchParams.get('max') || '1000'),
-  ]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'name');
   const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
   const [inStockOnly, setInStockOnly] = useState(searchParams.get('stock') === '1');
@@ -130,7 +137,7 @@ export default function CategoryPage() {
   }, [compareItems, compareItemsFallback]);
 
   const maxPrice = useMemo(() => {
-    let max = 1000;
+    let max = 0;
     const matched: number[] = [];
     for (let i = 0; i < products.length; i += 1) {
       const p = products[i];
@@ -147,7 +154,7 @@ export default function CategoryPage() {
       }
       max = localMax;
     }
-    return max;
+    return getSliderCeiling(max);
   }, [products, decodedCategoryName]);
 
   useEffect(() => {
