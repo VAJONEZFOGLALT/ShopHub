@@ -30,29 +30,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Check if user is already authenticated on mount
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    const refreshToken = localStorage.getItem('refreshToken');
-    if (token) {
+    let cancelled = false;
+
+    const clearStoredAuth = () => {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userData');
+    };
+
+    const bootstrapUser = async () => {
+      const token = localStorage.getItem('authToken');
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (!token) {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+        return;
+      }
+
       api.setTokens(token, refreshToken || undefined);
 
-      // In a real app, verify token with backend
-      // For now, just assume valid
       const raw = localStorage.getItem('userData');
-      if (raw) {
-        try {
-          const parsed = JSON.parse(raw);
-          if (parsed && parsed.id) {
-            setUser(parsed);
-          }
-        } catch (e) {
-          // Token is invalid
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('refreshToken');
-          localStorage.removeItem('userData');
+      if (!raw) {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.id) {
+          throw new Error('Invalid user data');
+        }
+
+        await api.getUser(parsed.id);
+        if (!cancelled) {
+          setUser(parsed);
+        }
+      } catch {
+        clearStoredAuth();
+        if (!cancelled) {
+          setUser(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
         }
       }
-    }
-    setIsLoading(false);
+    };
+
+    bootstrapUser();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const login = async (identifier: string, password: string) => {

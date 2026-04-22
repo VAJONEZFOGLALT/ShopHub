@@ -233,6 +233,10 @@ export const api = {
   },
 
   // Users
+  getUser: async (id: number) => {
+    const data = await request<any>(`/users/${id}`);
+    return data;
+  },
   getUsers: async () => {
     const data = await request<any[]>('/users');
     return data;
