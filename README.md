@@ -36,45 +36,9 @@ ShopHub egy teljes stackes webáruház alkalmazás NestJS backenddel és React/V
 
 ## Környezeti Változók
 
-A repóban már benne vannak a használt [backend/.env](backend/.env) és [frontend/.env](frontend/.env) fájlok. Ezeket nem kell külön legenerálni, csak ellenőrizd és szükség esetén írd felül a saját helyi értékeiddel.
+A projekt a repóban már commitolt [backend/.env](backend/.env) és [frontend/.env](frontend/.env) fájlokat használja. Ezek a jelenlegi backend és frontend konfigurációk, a kód ezekből olvas induláskor.
 
-### Backend
-
-A backend `.env` legalább ezeket tartalmazza:
-
-- `PORT`
-- `DATABASE_URL`
-- `FRONTEND_URL`
-- `JWT_SECRET`
-
-Opcionálisan, ha a megfelelő funkciókat is használod:
-
-- `OPENAI_API_KEY`
-- `CLOUDINARY_CLOUD_NAME`
-- `CLOUDINARY_API_KEY`
-- `CLOUDINARY_API_SECRET`
-- `PACKETA_API_KEY`
-- `PACKETA_API_PASSWORD`
-- `PACKETA_API_LOCALE`
-- `PACKETA_INVOICE_LOCALE`
-- `LIBRETRANSLATE_API_URL`
-- `LIBRETRANSLATE_API_KEY`
-
-Helyi fejlesztésnél a backend alapból a `http://localhost:3000` címen fut.
-
-### Frontend
-
-A frontend `.env` a következő változókat használja:
-
-- `VITE_API_URL`
-- `VITE_PACKETA_API_KEY`
-- `VITE_PACKETA_API_LOCALE`
-- `VITE_PACKETA_INVOICE_LOCALE`
-- `FRONTEND_URL`
-- `NODE_ENV`
-- `PORT`
-
-Helyi fejlesztésnél a frontend alapból a `http://localhost:5173` címen fut.
+A backend oldalon a fontos kulcsok a `PORT`, `DATABASE_URL`, `FRONTEND_URL` és `JWT_SECRET`, plusz az opcionális külső szolgáltatás kulcsok. A frontend oldalon a fontos kulcsok a `VITE_API_URL`, `VITE_PACKETA_API_KEY`, `VITE_PACKETA_API_LOCALE` és `VITE_PACKETA_INVOICE_LOCALE`.
 
 ## Telepítés
 
