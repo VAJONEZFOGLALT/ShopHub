@@ -11,6 +11,20 @@ async function bootstrapServer(): Promise<express.Express> {
   if (!cachedServer) {
     try {
       const expressApp = express();
+      
+      // Rewrite routes to ensure API prefix is consistent
+      expressApp.use((req: Request, res: any, next: any) => {
+        // Remove /api prefix if present but don't add yet (Nest will do it)
+        if (req.url.startsWith('/api/')) {
+          req.url = req.url.replace(/^\/api/, '');
+        }
+        // Ensure routes without leading slash have it
+        if (!req.url.startsWith('/')) {
+          req.url = '/' + req.url;
+        }
+        next();
+      });
+
       const adapter = new ExpressAdapter(expressApp);
       
       const app = await NestFactory.create(AppModule, adapter);
@@ -30,6 +44,8 @@ async function bootstrapServer(): Promise<express.Express> {
         optionsSuccessStatus: 200,
       });
 
+      app.setGlobalPrefix('api');
+
       const config = new DocumentBuilder()
         .setTitle('WebShop API')
         .setDescription('Complete API documentation for the WebShop e-commerce platform')
@@ -46,14 +62,13 @@ async function bootstrapServer(): Promise<express.Express> {
         .build();
 
       const document = SwaggerModule.createDocument(app, config);
-      SwaggerModule.setup('api/docs', app, document, {
+      SwaggerModule.setup('docs', app, document, {
         swaggerOptions: {
           persistAuthorization: true,
         },
       });
 
       app.useGlobalPipes(new ValidationPipe());
-      app.setGlobalPrefix('api');
       
       await app.init();
       
