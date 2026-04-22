@@ -1,0 +1,28 @@
+{
+  "common": {
+    "home": "Home",
+    "products": "Prodotti",
+    "cart": "Carrello",
+    "account": "Il Mio Account",
+    "logout": "Esci",
+    "login": "Accedi",
+    "register": "Iscriviti",
+    "search": "Cerca",
+    "language": "Lingua",
+    "currency": "Valuta"
+  },
+  "products": {
+    "title": "Prodotti",
+    "price": "Prezzo",
+    "stock": "Giacenza",
+    "addToCart": "Aggiungi al Carrello",
+    "viewDetails": "Dettagli",
+    "noProducts": "Nessun prodotto trovato"
+  },
+  "footer": {
+    "about": "Chi Siamo",
+    "contact": "Contatti",
+    "privacy": "Privacy",
+    "terms": "Termini"
+  }
+}

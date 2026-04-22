@@ -1,0 +1,28 @@
+{
+  "common": {
+    "home": "Domů",
+    "products": "Produkty",
+    "cart": "Nákupní Košík",
+    "account": "Můj Účet",
+    "logout": "Odhlásit se",
+    "login": "Přihlášení",
+    "register": "Registrace",
+    "search": "Hledat",
+    "language": "Jazyk",
+    "currency": "Měna"
+  },
+  "products": {
+    "title": "Produkty",
+    "price": "Cena",
+    "stock": "Zásoba",
+    "addToCart": "Přidat do Košíku",
+    "viewDetails": "Podrobnosti",
+    "noProducts": "Nebyly nalezeny žádné produkty"
+  },
+  "footer": {
+    "about": "O nás",
+    "contact": "Kontakt",
+    "privacy": "Soukromí",
+    "terms": "Podmínky"
+  }
+}

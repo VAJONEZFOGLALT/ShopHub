@@ -1,0 +1,28 @@
+{
+  "common": {
+    "home": "Inicio",
+    "products": "Productos",
+    "cart": "Carrito",
+    "account": "Mi Cuenta",
+    "logout": "Cerrar Sesión",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "search": "Buscar",
+    "language": "Idioma",
+    "currency": "Moneda"
+  },
+  "products": {
+    "title": "Productos",
+    "price": "Precio",
+    "stock": "Stock",
+    "addToCart": "Añadir al Carrito",
+    "viewDetails": "Detalles",
+    "noProducts": "No hay productos disponibles"
+  },
+  "footer": {
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "privacy": "Privacidad",
+    "terms": "Términos"
+  }
+}

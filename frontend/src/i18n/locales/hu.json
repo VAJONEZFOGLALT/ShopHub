@@ -1,0 +1,28 @@
+{
+  "common": {
+    "home": "Főoldal",
+    "products": "Termékek",
+    "cart": "Kosár",
+    "account": "Fiókom",
+    "logout": "Kijelentkezés",
+    "login": "Bejelentkezés",
+    "register": "Regisztráció",
+    "search": "Keresés",
+    "language": "Nyelv",
+    "currency": "Pénznem"
+  },
+  "products": {
+    "title": "Termékek",
+    "price": "Ár",
+    "stock": "Készlet",
+    "addToCart": "Kosárba",
+    "viewDetails": "Részletek",
+    "noProducts": "Nincsenek termékek"
+  },
+  "footer": {
+    "about": "Rólunk",
+    "contact": "Kapcsolat",
+    "privacy": "Adatvédelem",
+    "terms": "Feltételek"
+  }
+}

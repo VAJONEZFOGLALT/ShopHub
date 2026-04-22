@@ -1,0 +1,28 @@
+{
+  "common": {
+    "home": "Strona główna",
+    "products": "Produkty",
+    "cart": "Koszyk",
+    "account": "Moje Konto",
+    "logout": "Wyloguj",
+    "login": "Zaloguj",
+    "register": "Zarejestruj",
+    "search": "Szukaj",
+    "language": "Język",
+    "currency": "Waluta"
+  },
+  "products": {
+    "title": "Produkty",
+    "price": "Cena",
+    "stock": "Zapas",
+    "addToCart": "Dodaj do Koszyka",
+    "viewDetails": "Szczegóły",
+    "noProducts": "Brak dostępnych produktów"
+  },
+  "footer": {
+    "about": "O nas",
+    "contact": "Kontakt",
+    "privacy": "Prywatność",
+    "terms": "Warunki"
+  }
+}
