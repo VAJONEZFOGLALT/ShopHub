@@ -8,19 +8,44 @@ import { AuthGuard } from '@nestjs/passport';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  private isAdmin(req: any) {
+    return req?.user?.role === 'ADMIN';
+  }
+
+  private assertSelfOrAdmin(req: any, targetUserId: number, message = 'Forbidden') {
+    if (this.isAdmin(req)) {
+      return;
+    }
+    if (Number(req?.user?.id) !== Number(targetUserId)) {
+      throw new ForbiddenException(message);
+    }
+  }
+
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  @UseGuards(AuthGuard('jwt'))
+  create(@Body() createOrderDto: CreateOrderDto, @Req() req: any) {
+    this.assertSelfOrAdmin(req, Number(createOrderDto.userId), 'You can only create orders for your own account');
+    return this.ordersService.create({
+      ...createOrderDto,
+      userId: this.isAdmin(req) ? createOrderDto.userId : Number(req.user.id),
+    });
   }
 
   @Get()
-  findAll() {
+  @UseGuards(AuthGuard('jwt'))
+  findAll(@Req() req: any) {
+    if (!this.isAdmin(req)) {
+      return this.ordersService.findByUser(Number(req.user.id));
+    }
     return this.ordersService.findAll();
   }
 
   @Get('user/:userId')
-  findByUser(@Param('userId') userId: string) {
-    return this.ordersService.findByUser(+userId);
+  @UseGuards(AuthGuard('jwt'))
+  findByUser(@Param('userId') userId: string, @Req() req: any) {
+    const targetUserId = Number(userId);
+    this.assertSelfOrAdmin(req, targetUserId, 'You are not allowed to access these orders');
+    return this.ordersService.findByUser(targetUserId);
   }
 
   @Get(':id')
@@ -41,22 +66,38 @@ export class OrdersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
+  @UseGuards(AuthGuard('jwt'))
+  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto, @Req() req: any) {
+    if (!this.isAdmin(req)) {
+      throw new ForbiddenException('Admin access required');
+    }
     return this.ordersService.update(+id, updateOrderDto);
   }
 
   @Patch(':id/status')
-  updateStatus(@Param('id') id: string, @Body() body: { status: string }) {
+  @UseGuards(AuthGuard('jwt'))
+  updateStatus(@Param('id') id: string, @Body() body: { status: string }, @Req() req: any) {
+    if (!this.isAdmin(req)) {
+      throw new ForbiddenException('Admin access required');
+    }
     return this.ordersService.update(+id, { status: body.status as any });
   }
 
   @Patch(':id/fulfill')
-  fulfillOrder(@Param('id') id: string, @Body() body: { teljesitve?: boolean }) {
+  @UseGuards(AuthGuard('jwt'))
+  fulfillOrder(@Param('id') id: string, @Body() body: { teljesitve?: boolean }, @Req() req: any) {
+    if (!this.isAdmin(req)) {
+      throw new ForbiddenException('Admin access required');
+    }
     return this.ordersService.update(+id, { teljesitve: typeof body.teljesitve === 'boolean' ? body.teljesitve : true });
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  @UseGuards(AuthGuard('jwt'))
+  remove(@Param('id') id: string, @Req() req: any) {
+    if (!this.isAdmin(req)) {
+      throw new ForbiddenException('Admin access required');
+    }
     return this.ordersService.remove(+id);
   }
 }

@@ -22,6 +22,10 @@ export class ReviewsService {
 		});
 	}
 
+	findOne(id: number) {
+		return this.prisma.reviews.findUnique({ where: { id } });
+	}
+
 	async getAverage(productId: number) {
 		const agg = await this.prisma.reviews.aggregate({
 			where: { productId },
