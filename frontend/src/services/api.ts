@@ -228,12 +228,12 @@ export const api = {
 
   // Products
   getProducts: async (language?: string) => {
-    const lang = language || getCurrentLanguage();
+    const lang = normalizeLanguage(language || getCurrentLanguage());
     const data = await request<any[]>(`/products?lang=${lang}`);
     return Array.isArray(data) ? data : [];
   },
   getProductById: async (id: number, language?: string) => {
-    const lang = language || getCurrentLanguage();
+    const lang = normalizeLanguage(language || getCurrentLanguage());
     const data = await request<any>(`/products/${id}?lang=${lang}`);
     return data;
   },

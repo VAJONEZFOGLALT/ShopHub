@@ -63,7 +63,7 @@ export default function HomePage() {
       }
     };
     load();
-  }, [i18n.language]);
+  }, [i18n.language, showToast]);
 
   // Auto-scroll carousel
   useEffect(() => {

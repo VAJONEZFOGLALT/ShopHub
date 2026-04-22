@@ -46,7 +46,7 @@ export default function AllProductsPage() {
       setLoading(false);
     }
   }
-  useEffect(() => { load(); }, [i18n.language]);
+  useEffect(() => { load(); }, [i18n.language, showToast]);
 
   useEffect(() => {
     const loadLists = async () => {

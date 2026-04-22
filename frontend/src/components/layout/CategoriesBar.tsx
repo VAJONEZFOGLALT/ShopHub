@@ -29,7 +29,7 @@ export default function CategoriesBar() {
       }
     };
     loadCategories();
-  }, [showToast, i18n.language]);
+  }, [i18n.language, showToast]);
 
   return (
     <div className="categories-bar">

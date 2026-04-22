@@ -13,14 +13,21 @@ export interface TranslateResponse {
 
 @Injectable()
 export class LibreTranslateService {
-  private readonly apiUrl = process.env.LIBRETRANSLATE_API_URL || 'https://api.libretranslate.de';
-  private readonly apiKey = process.env.LIBRETRANSLATE_API_KEY;
+  private readonly libApiUrl = process.env.LIBRETRANSLATE_API_URL || 'https://api.libretranslate.de';
+  private readonly libApiKey = process.env.LIBRETRANSLATE_API_KEY;
+  private readonly deepLApiUrl = 'https://api-free.deepl.com/v1/translate';
   private readonly myMemoryApiUrl = 'https://api.mymemory.translated.net/get';
 
   private readonly languageMap: Record<string, string> = {
     hu: 'hu',
     en: 'en',
     es: 'es',
+  };
+
+  private readonly deepLLanguageMap: Record<string, string> = {
+    hu: 'HU',
+    en: 'EN',
+    es: 'ES',
   };
 
   async translate(
@@ -39,44 +46,74 @@ export class LibreTranslateService {
       throw new BadRequestException(`Unsupported target language: ${targetLang}`);
     }
 
+    // Try services in order of quality: DeepL > LibreTranslate > MyMemory
     try {
-      const translatedText = await this.translateWithMyMemory(text, source, target);
-      return {
-        translatedText,
-      };
-    } catch (primaryError) {
+      const translatedText = await this.translateWithDeepL(text, source, target);
+      return { translatedText };
+    } catch (deepLError) {
       try {
-        const payload: Record<string, any> = {
-          q: text,
-          source,
-          target,
-        };
-
-        if (this.apiKey) {
-          payload.api_key = this.apiKey;
+        const translatedText = await this.translateWithLibreTranslate(text, source, target);
+        return { translatedText };
+      } catch (libError) {
+        try {
+          const translatedText = await this.translateWithMyMemory(text, source, target);
+          return { translatedText };
+        } catch (memoryError) {
+          console.error('All translation services failed:', { deepLError, libError, memoryError });
+          throw new BadRequestException('All translation services unavailable');
         }
-
-        const response = await axios.post(`${this.apiUrl}/translate`, payload, {
-          timeout: 10000,
-        });
-
-        return {
-          translatedText: response.data.translatedText,
-        };
-      } catch (fallbackError) {
-        if (axios.isAxiosError(primaryError)) {
-          throw new BadRequestException(
-            `Translation failed: ${primaryError.response?.data?.message || primaryError.message}`,
-          );
-        }
-        if (axios.isAxiosError(fallbackError)) {
-          throw new BadRequestException(
-            `Translation failed: ${fallbackError.response?.data?.message || fallbackError.message}`,
-          );
-        }
-        throw new BadRequestException('Translation service error');
       }
     }
+  }
+
+  private async translateWithDeepL(text: string, source: string, target: string): Promise<string> {
+    const deepLSource = source === 'hu' ? 'HU' : source.toUpperCase();
+    const deepLTarget = this.deepLLanguageMap[target] || target.toUpperCase();
+
+    const response = await axios.post(
+      this.deepLApiUrl,
+      {
+        text: [text],
+        source_lang: deepLSource,
+        target_lang: deepLTarget,
+      },
+      {
+        timeout: 10000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0',
+        },
+      },
+    );
+
+    const translated = response?.data?.translations?.[0]?.text;
+    if (typeof translated !== 'string' || translated.trim().length === 0) {
+      throw new Error('DeepL returned empty translation');
+    }
+
+    return translated;
+  }
+
+  private async translateWithLibreTranslate(text: string, source: string, target: string): Promise<string> {
+    const payload: Record<string, any> = {
+      q: text,
+      source,
+      target,
+    };
+
+    if (this.libApiKey) {
+      payload.api_key = this.libApiKey;
+    }
+
+    const response = await axios.post(`${this.libApiUrl}/translate`, payload, {
+      timeout: 10000,
+    });
+
+    const translated = response?.data?.translatedText;
+    if (typeof translated !== 'string' || translated.trim().length === 0) {
+      throw new Error('LibreTranslate returned empty translation');
+    }
+
+    return translated;
   }
 
   private async translateWithMyMemory(text: string, source: string, target: string): Promise<string> {
