@@ -94,13 +94,33 @@ function AdminPanel() {
     orders: 'Orders',
   }
 
+  const [theme, setTheme] = useState<string>(() => {
+    const stored = localStorage.getItem('theme');
+    if (stored) return stored;
+    const attr = document.documentElement.getAttribute('data-theme');
+    return attr || 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
   return (
     <div className="app">
       <header className="header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <h1>Admin Dashboard</h1>
-          <button onClick={() => navigate('/shop')} style={{ padding: '8px 14px', cursor: 'pointer' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <h1 style={{ marginRight: 12 }}>Admin Dashboard</h1>
+          <button className="back-btn" onClick={() => navigate('/shop')}>
             ← Back to Shop
+          </button>
+          <button
+            className="mode-toggle"
+            onClick={() => setTheme(prev => (prev === 'light' ? 'dark' : 'light'))}
+            title="Toggle theme"
+            style={{ marginLeft: 8 }}
+          >
+            {theme === 'light' ? '🌙' : '☀️'}
           </button>
         </div>
         <nav className="nav">
