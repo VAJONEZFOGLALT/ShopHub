@@ -78,7 +78,6 @@ export default function ProductDetailPage() {
       const payload = { productId: product.id, name: product.name, price: Number(product.price) };
       add(payload, quantity);
       setAddedToCart(true);
-      showToast(`Added ${quantity} × ${product.name} to cart`, 'success');
       setTimeout(() => setAddedToCart(false), 2000);
     }
   }
