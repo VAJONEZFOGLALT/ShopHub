@@ -14,6 +14,10 @@ export class ProductsService {
       otthon: 'Home',
     },
   };
+  private readonly productNameTranslationContext =
+    'These are product names in a webshop. Keep them short, natural, and product-like. Do not turn them into sentences or verb phrases. Prefer conventional e-commerce naming for product titles.';
+  private readonly productDescriptionTranslationContext =
+    'These are product descriptions for an e-commerce store. Translate naturally and accurately. Keep marketing tone and technical meaning, but do not add extra claims or shorten meaningful details.';
   private readonly categoryTranslationContext =
     'These are website product category labels for an e-commerce store. Translate them as short category names, not verbs or sentences. Prefer common storefront category terms such as Home, Electronics, Clothing, Accessories, Shoes, Beauty, Toys, Furniture, Sports, Garden, Books, or Pet Supplies when appropriate.';
 
@@ -91,8 +95,8 @@ export class ProductsService {
       const categories = products.map((p) => p.category || '');
 
       const [translatedNames, translatedDescriptions, translatedCategories] = await Promise.all([
-        this.translateService.translateBatch(names, 'hu', normalizedLang),
-        this.translateService.translateBatch(descriptions, 'hu', normalizedLang),
+        this.translateService.translateBatch(names, 'hu', normalizedLang, this.productNameTranslationContext),
+        this.translateService.translateBatch(descriptions, 'hu', normalizedLang, this.productDescriptionTranslationContext),
         this.translateService.translateBatch(categories, 'hu', normalizedLang, this.categoryTranslationContext),
       ]);
 
@@ -236,8 +240,8 @@ export class ProductsService {
       }
 
       const [translatedName, translatedDescription, translatedCategory] = await Promise.all([
-        this.translateService.translate(product.name || '', 'hu', normalizedLang),
-        this.translateService.translate(product.description || '', 'hu', normalizedLang),
+        this.translateService.translate(product.name || '', 'hu', normalizedLang, this.productNameTranslationContext),
+        this.translateService.translate(product.description || '', 'hu', normalizedLang, this.productDescriptionTranslationContext),
         this.translateService.translate(product.category || '', 'hu', normalizedLang, this.categoryTranslationContext),
       ]);
 
