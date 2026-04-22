@@ -37,7 +37,12 @@ function ProductCard({
 
   const canNavigate = !disableNav;
 
-  const handleOpen = () => {
+  const handleOpen = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement | null;
+    if (target?.closest('[data-card-control="true"]')) {
+      return;
+    }
+
     if (canNavigate) {
       navigate(`/shop/product/${product.id}`);
     }
@@ -74,10 +79,12 @@ function ProductCard({
         {showWishlist && (
           <button
             type="button"
+            data-card-control="true"
             className={`wishlist-btn ${isWishlisted ? 'active' : ''} ${isWishlistPending ? 'is-loading' : ''}`.trim()}
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); onToggleWishlist?.(product.id, product.name); }}
             title={isWishlisted ? t('products.removeFromWishlist') : t('products.addToWishlist')}
-            disabled={isWishlistPending}
+            aria-disabled={isWishlistPending}
           >
             ♥
           </button>
@@ -85,9 +92,11 @@ function ProductCard({
         {showCompare && (
           <button
             type="button"
+            data-card-control="true"
             className={`compare-toggle ${isCompared ? 'active' : ''} ${isComparePending ? 'is-loading' : ''}`.trim()}
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); onToggleCompare?.(product); }}
-            disabled={isComparePending}
+            aria-disabled={isComparePending}
           >
             <span className="compare-toggle-check" aria-hidden="true">
               {isCompared ? '✓' : ''}
@@ -105,7 +114,7 @@ function ProductCard({
         {typeof product.stock === 'number' && <div className="stock">{isOutOfStock ? t('products.outOfStock') : `${t('products.stock')}: ${product.stock}`}</div>}
       </div>
       <div className="product-actions">
-        <button onClick={handleAddToCart} disabled={isOutOfStock}>{t('products.addToCart')}</button>
+        <button data-card-control="true" onClick={handleAddToCart} disabled={isOutOfStock}>{t('products.addToCart')}</button>
       </div>
     </div>
   );
