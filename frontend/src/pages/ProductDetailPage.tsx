@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useTranslateDynamic } from '../hooks/useTranslateDynamic';
 import { api } from '../services/api';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -11,10 +12,12 @@ import { ProductDetailSkeleton } from '../components/SkeletonLoader';
 import { getDetailImageUrl } from '../utils/imageOptimization';
 
 export default function ProductDetailPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { translate } = useTranslateDynamic();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<any>(null);
+  const [translatedProduct, setTranslatedProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -53,6 +56,34 @@ export default function ProductDetailPage() {
     };
     load();
   }, [id]);
+
+  // Translate product name and description
+  useEffect(() => {
+    const translateProduct = async () => {
+      if (!product || i18n.language === 'en') {
+        setTranslatedProduct(product);
+        return;
+      }
+
+      try {
+        const [translatedName, translatedDesc] = await Promise.all([
+          translate(product.name),
+          product.description ? translate(product.description) : Promise.resolve(product.description),
+        ]);
+
+        setTranslatedProduct({
+          ...product,
+          name: translatedName,
+          description: translatedDesc || product.description,
+        });
+      } catch (err) {
+        console.error('Failed to translate product:', err);
+        setTranslatedProduct(product);
+      }
+    };
+
+    translateProduct();
+  }, [product, i18n.language, translate]);
 
   useEffect(() => {
     const loadLists = async () => {
@@ -101,6 +132,9 @@ export default function ProductDetailPage() {
   );
   if (error) return <div className="view"><div className="error">{error}</div></div>;
   if (!product) return <div className="view"><p>{t('products.notFound')}</p></div>;
+  
+  // Use translated product for display, but keep original for data
+  const displayProduct = translatedProduct || product;
   const isOutOfStock = product.stock <= 0;
   const isLowStock = product.stock > 0 && product.stock <= 5;
 
@@ -159,12 +193,12 @@ export default function ProductDetailPage() {
             {product.image ? (
               <img 
                 src={getDetailImageUrl(product.image)} 
-                alt={product.name} 
+                alt={displayProduct.name} 
                 className="detail-image"
                 loading="lazy"
               />
             ) : (
-              <div className="detail-image-placeholder">{product.name}</div>
+              <div className="detail-image-placeholder">{displayProduct.name}</div>
             )}
             <div className="detail-media-actions">
               <button 
@@ -187,7 +221,7 @@ export default function ProductDetailPage() {
           </div>
         </div>
         <div className="detail-right">
-          <h1>{product.name}</h1>
+          <h1>{displayProduct.name}</h1>
           <div className="detail-meta">
             <span className="category">{t('products.category')}: {product.category}</span>
             <span className={`stock ${product.stock > 0 ? 'in-stock' : 'out-stock'}`}>
@@ -199,7 +233,7 @@ export default function ProductDetailPage() {
             <span className="review-score">★ {reviewSummary.average.toFixed(1)}</span>
             <span className="review-count">{reviewSummary.count} {t('products.reviews')}</span>
           </div>
-          <p className="description">{product.description || t('products.noDescription')}</p>
+          <p className="description">{displayProduct.description || t('products.noDescription')}</p>
           <div className="detail-highlights">
             <div className="highlight-item">
               <span className="highlight-label">{t('products.shipping')}</span>
