@@ -6,19 +6,19 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `reviews` DROP FOREIGN KEY `Reviews_productId_fkey`;
+ALTER TABLE `Reviews` DROP FOREIGN KEY `Reviews_productId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `reviews` DROP FOREIGN KEY `Reviews_userId_fkey`;
+ALTER TABLE `Reviews` DROP FOREIGN KEY `Reviews_userId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `wishlist` DROP FOREIGN KEY `Wishlist_productId_fkey`;
+ALTER TABLE `Wishlist` DROP FOREIGN KEY `Wishlist_productId_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `wishlist` DROP FOREIGN KEY `Wishlist_userId_fkey`;
+ALTER TABLE `Wishlist` DROP FOREIGN KEY `Wishlist_userId_fkey`;
 
 -- DropTable
-DROP TABLE `reviews`;
+DROP TABLE `Reviews`;
 
 -- DropTable
-DROP TABLE `wishlist`;
+DROP TABLE `Wishlist`;

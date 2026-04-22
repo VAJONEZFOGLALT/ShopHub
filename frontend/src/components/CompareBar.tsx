@@ -1,0 +1,97 @@
+import { useMemo, useState } from 'react';
+
+export default function CompareBar({
+  items,
+  onRemove,
+  onClear,
+}: {
+  items: any[];
+  onRemove: (id: number) => void;
+  onClear: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  const canCompare = items.length >= 2;
+  const summary = useMemo(() => {
+    if (items.length === 0) {
+      return 'Select products to compare';
+    }
+    return `${items.length} selected`; 
+  }, [items.length]);
+
+  if (items.length === 0) {
+    return null;
+  }
+
+  return (
+    <>
+      <div className="compare-bar">
+        <div className="compare-summary">
+          <strong>Compare</strong>
+          <span>{summary}</span>
+        </div>
+        <div className="compare-items">
+          {items.map((item) => (
+            <div key={item.id} className="compare-chip">
+              <span title={item.name}>{item.name}</span>
+              <button type="button" onClick={() => onRemove(item.id)}>×</button>
+            </div>
+          ))}
+        </div>
+        <div className="compare-actions">
+          <button type="button" className="btn-secondary" onClick={onClear}>Clear</button>
+          <button type="button" className="btn-primary" onClick={() => setOpen(true)} disabled={!canCompare}>Compare</button>
+        </div>
+      </div>
+
+      {open && (
+        <div className="modal-overlay" onClick={() => setOpen(false)}>
+          <div className="modal-content compare-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Product Comparison</h2>
+              <button className="modal-close" onClick={() => setOpen(false)}>×</button>
+            </div>
+            <div className="modal-body">
+              {items.length < 2 ? (
+                <p>Select at least two products to compare.</p>
+              ) : (
+                <div className="compare-table">
+                  <div className="compare-row compare-head">
+                    <div className="compare-cell">Feature</div>
+                    {items.map((item) => (
+                      <div key={item.id} className="compare-cell">{item.name}</div>
+                    ))}
+                  </div>
+                  <div className="compare-row">
+                    <div className="compare-cell">Price</div>
+                    {items.map((item) => (
+                      <div key={item.id} className="compare-cell">${Number(item.price).toFixed(2)}</div>
+                    ))}
+                  </div>
+                  <div className="compare-row">
+                    <div className="compare-cell">Stock</div>
+                    {items.map((item) => (
+                      <div key={item.id} className="compare-cell">{item.stock ?? '—'}</div>
+                    ))}
+                  </div>
+                  <div className="compare-row">
+                    <div className="compare-cell">Category</div>
+                    {items.map((item) => (
+                      <div key={item.id} className="compare-cell">{item.category}</div>
+                    ))}
+                  </div>
+                  <div className="compare-row">
+                    <div className="compare-cell">Description</div>
+                    {items.map((item) => (
+                      <div key={item.id} className="compare-cell">{item.description || '—'}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

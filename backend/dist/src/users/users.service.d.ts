@@ -4,50 +4,51 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export declare class UsersService {
     private readonly prisma;
     constructor(prisma: PrismaService);
-    create(createUserDto: CreateUserDto): import("../../generated/prisma/models").Prisma__UsersClient<{
-        name: string;
+    create(createUserDto: CreateUserDto): Promise<{
         id: number;
         username: string;
         email: string;
         password_hash: string;
+        name: string;
+        avatar: string | null;
         role: string;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
     findAll(): import("../../generated/prisma/internal/prismaNamespace").PrismaPromise<{
-        name: string;
         id: number;
         username: string;
         email: string;
         password_hash: string;
+        name: string;
+        avatar: string | null;
         role: string;
     }[]>;
     findOne(id: number): import("../../generated/prisma/models").Prisma__UsersClient<{
-        name: string;
         id: number;
         username: string;
         email: string;
         password_hash: string;
+        name: string;
+        avatar: string | null;
         role: string;
     } | null, null, import("@prisma/client/runtime/library").DefaultArgs, {
         omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
-    update(id: number, updateUserDto: UpdateUserDto): import("../../generated/prisma/models").Prisma__UsersClient<{
-        name: string;
+    update(id: number, updateUserDto: UpdateUserDto): Promise<{
         id: number;
         username: string;
         email: string;
         password_hash: string;
+        name: string;
+        avatar: string | null;
         role: string;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
     remove(id: number): import("../../generated/prisma/models").Prisma__UsersClient<{
-        name: string;
         id: number;
         username: string;
         email: string;
         password_hash: string;
+        name: string;
+        avatar: string | null;
         role: string;
     }, never, import("@prisma/client/runtime/library").DefaultArgs, {
         omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;

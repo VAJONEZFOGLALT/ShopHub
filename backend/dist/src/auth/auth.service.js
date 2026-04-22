@@ -54,7 +54,36 @@ let AuthService = class AuthService {
         this.prisma = prisma;
         this.jwtService = jwtService;
     }
+    createTokens(user) {
+        const token = this.jwtService.sign({ sub: user.id, email: user.email }, { expiresIn: '7d' });
+        const refreshToken = this.jwtService.sign({ sub: user.id, type: 'refresh' }, { expiresIn: '30d' });
+        return { token, refreshToken };
+    }
+    buildAuthResponse(user) {
+        const { token, refreshToken } = this.createTokens(user);
+        return {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            name: user.name,
+            role: user.role,
+            token,
+            refreshToken,
+        };
+    }
+    validatePassword(password) {
+        if (password.length < 8) {
+            throw new common_1.BadRequestException('Password must be at least 8 characters');
+        }
+        if (!/[A-Z]/.test(password)) {
+            throw new common_1.BadRequestException('Password must contain an uppercase letter');
+        }
+        if (!/[0-9]/.test(password)) {
+            throw new common_1.BadRequestException('Password must contain a number');
+        }
+    }
     async register(email, password, username, name) {
+        this.validatePassword(password);
         const existingUser = await this.prisma.users.findFirst({
             where: {
                 OR: [
@@ -75,18 +104,17 @@ let AuthService = class AuthService {
                 name: name || username,
             },
         });
-        const token = this.jwtService.sign({ sub: user.id, email: user.email });
-        return {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            name: user.name,
-            role: user.role,
-            token,
-        };
+        return this.buildAuthResponse(user);
     }
-    async login(email, password) {
-        const user = await this.prisma.users.findUnique({ where: { email } });
+    async login(identifier, password) {
+        const user = await this.prisma.users.findFirst({
+            where: {
+                OR: [
+                    { email: identifier },
+                    { username: identifier },
+                ],
+            },
+        });
         if (!user) {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
@@ -94,15 +122,23 @@ let AuthService = class AuthService {
         if (!isPasswordValid) {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
-        const token = this.jwtService.sign({ sub: user.id, email: user.email });
-        return {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            name: user.name,
-            role: user.role,
-            token,
-        };
+        return this.buildAuthResponse(user);
+    }
+    async refresh(refreshToken) {
+        try {
+            const payload = this.jwtService.verify(refreshToken);
+            if (payload.type !== 'refresh') {
+                throw new common_1.UnauthorizedException('Invalid refresh token');
+            }
+            const user = await this.prisma.users.findUnique({ where: { id: payload.sub } });
+            if (!user) {
+                throw new common_1.UnauthorizedException('Invalid refresh token');
+            }
+            return this.buildAuthResponse(user);
+        }
+        catch (err) {
+            throw new common_1.UnauthorizedException('Invalid refresh token');
+        }
     }
     async validateUser(userId) {
         return this.prisma.users.findUnique({ where: { id: userId } });

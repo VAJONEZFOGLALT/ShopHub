@@ -8,5 +8,10 @@ export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts exten
 export { Prisma };
 export type Users = Prisma.UsersModel;
 export type Products = Prisma.ProductsModel;
+export type Reviews = Prisma.ReviewsModel;
+export type Wishlist = Prisma.WishlistModel;
+export type RecentlyViewed = Prisma.RecentlyViewedModel;
+export type CompareItems = Prisma.CompareItemsModel;
 export type Orders = Prisma.OrdersModel;
 export type OrderItems = Prisma.OrderItemsModel;
+export type Address = Prisma.AddressModel;

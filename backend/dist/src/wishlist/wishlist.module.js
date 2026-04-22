@@ -10,13 +10,14 @@ exports.WishlistModule = void 0;
 const common_1 = require("@nestjs/common");
 const wishlist_controller_1 = require("./wishlist.controller");
 const wishlist_service_1 = require("./wishlist.service");
+const prisma_service_1 = require("../prisma.service");
 let WishlistModule = class WishlistModule {
 };
 exports.WishlistModule = WishlistModule;
 exports.WishlistModule = WishlistModule = __decorate([
     (0, common_1.Module)({
         controllers: [wishlist_controller_1.WishlistController],
-        providers: [wishlist_service_1.WishlistService]
+        providers: [wishlist_service_1.WishlistService, prisma_service_1.PrismaService]
     })
 ], WishlistModule);
 //# sourceMappingURL=wishlist.module.js.map

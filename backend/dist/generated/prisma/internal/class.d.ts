@@ -34,10 +34,25 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
     get products(): Prisma.ProductsDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
+    get reviews(): Prisma.ReviewsDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get wishlist(): Prisma.WishlistDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get recentlyViewed(): Prisma.RecentlyViewedDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get compareItems(): Prisma.CompareItemsDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
     get orders(): Prisma.OrdersDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
     get orderItems(): Prisma.OrderItemsDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    get address(): Prisma.AddressDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
 }

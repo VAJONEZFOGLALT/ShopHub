@@ -51,8 +51,13 @@ export const AnyNull = runtime.objectEnumValues.instances.AnyNull
 export const ModelName = {
   Users: 'Users',
   Products: 'Products',
+  Reviews: 'Reviews',
+  Wishlist: 'Wishlist',
+  RecentlyViewed: 'RecentlyViewed',
+  CompareItems: 'CompareItems',
   Orders: 'Orders',
-  OrderItems: 'OrderItems'
+  OrderItems: 'OrderItems',
+  Address: 'Address'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -77,6 +82,7 @@ export const UsersScalarFieldEnum = {
   email: 'email',
   password_hash: 'password_hash',
   name: 'name',
+  avatar: 'avatar',
   role: 'role'
 } as const
 
@@ -96,12 +102,58 @@ export const ProductsScalarFieldEnum = {
 export type ProductsScalarFieldEnum = (typeof ProductsScalarFieldEnum)[keyof typeof ProductsScalarFieldEnum]
 
 
+export const ReviewsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  productId: 'productId',
+  rating: 'rating',
+  title: 'title',
+  comment: 'comment',
+  createdAt: 'createdAt'
+} as const
+
+export type ReviewsScalarFieldEnum = (typeof ReviewsScalarFieldEnum)[keyof typeof ReviewsScalarFieldEnum]
+
+
+export const WishlistScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  productId: 'productId',
+  createdAt: 'createdAt'
+} as const
+
+export type WishlistScalarFieldEnum = (typeof WishlistScalarFieldEnum)[keyof typeof WishlistScalarFieldEnum]
+
+
+export const RecentlyViewedScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  productId: 'productId',
+  viewedAt: 'viewedAt'
+} as const
+
+export type RecentlyViewedScalarFieldEnum = (typeof RecentlyViewedScalarFieldEnum)[keyof typeof RecentlyViewedScalarFieldEnum]
+
+
+export const CompareItemsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  productId: 'productId',
+  createdAt: 'createdAt'
+} as const
+
+export type CompareItemsScalarFieldEnum = (typeof CompareItemsScalarFieldEnum)[keyof typeof CompareItemsScalarFieldEnum]
+
+
 export const OrdersScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   totalPrice: 'totalPrice',
   createdAt: 'createdAt',
-  status: 'status'
+  status: 'status',
+  courier: 'courier',
+  shippingAddress: 'shippingAddress',
+  trackingNumber: 'trackingNumber'
 } as const
 
 export type OrdersScalarFieldEnum = (typeof OrdersScalarFieldEnum)[keyof typeof OrdersScalarFieldEnum]
@@ -118,23 +170,29 @@ export const OrderItemsScalarFieldEnum = {
 export type OrderItemsScalarFieldEnum = (typeof OrderItemsScalarFieldEnum)[keyof typeof OrderItemsScalarFieldEnum]
 
 
+export const AddressScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  label: 'label',
+  fullName: 'fullName',
+  street: 'street',
+  city: 'city',
+  state: 'state',
+  zipCode: 'zipCode',
+  country: 'country',
+  isDefault: 'isDefault',
+  createdAt: 'createdAt'
+} as const
+
+export type AddressScalarFieldEnum = (typeof AddressScalarFieldEnum)[keyof typeof AddressScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
-
-
-export const UsersOrderByRelevanceFieldEnum = {
-  username: 'username',
-  email: 'email',
-  password_hash: 'password_hash',
-  name: 'name',
-  role: 'role'
-} as const
-
-export type UsersOrderByRelevanceFieldEnum = (typeof UsersOrderByRelevanceFieldEnum)[keyof typeof UsersOrderByRelevanceFieldEnum]
 
 
 export const NullsOrder = {
@@ -145,6 +203,18 @@ export const NullsOrder = {
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
+export const UsersOrderByRelevanceFieldEnum = {
+  username: 'username',
+  email: 'email',
+  password_hash: 'password_hash',
+  name: 'name',
+  avatar: 'avatar',
+  role: 'role'
+} as const
+
+export type UsersOrderByRelevanceFieldEnum = (typeof UsersOrderByRelevanceFieldEnum)[keyof typeof UsersOrderByRelevanceFieldEnum]
+
+
 export const ProductsOrderByRelevanceFieldEnum = {
   name: 'name',
   description: 'description',
@@ -153,4 +223,33 @@ export const ProductsOrderByRelevanceFieldEnum = {
 } as const
 
 export type ProductsOrderByRelevanceFieldEnum = (typeof ProductsOrderByRelevanceFieldEnum)[keyof typeof ProductsOrderByRelevanceFieldEnum]
+
+
+export const ReviewsOrderByRelevanceFieldEnum = {
+  title: 'title',
+  comment: 'comment'
+} as const
+
+export type ReviewsOrderByRelevanceFieldEnum = (typeof ReviewsOrderByRelevanceFieldEnum)[keyof typeof ReviewsOrderByRelevanceFieldEnum]
+
+
+export const OrdersOrderByRelevanceFieldEnum = {
+  shippingAddress: 'shippingAddress',
+  trackingNumber: 'trackingNumber'
+} as const
+
+export type OrdersOrderByRelevanceFieldEnum = (typeof OrdersOrderByRelevanceFieldEnum)[keyof typeof OrdersOrderByRelevanceFieldEnum]
+
+
+export const AddressOrderByRelevanceFieldEnum = {
+  label: 'label',
+  fullName: 'fullName',
+  street: 'street',
+  city: 'city',
+  state: 'state',
+  zipCode: 'zipCode',
+  country: 'country'
+} as const
+
+export type AddressOrderByRelevanceFieldEnum = (typeof AddressOrderByRelevanceFieldEnum)[keyof typeof AddressOrderByRelevanceFieldEnum]
 

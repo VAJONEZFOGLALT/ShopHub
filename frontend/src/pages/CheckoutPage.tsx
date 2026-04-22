@@ -1,0 +1,144 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
+import { api } from '../services/api';
+
+const couriers = [
+  { id: 'UPS', name: 'UPS Express', price: 15.99, days: '2-3 days' },
+  { id: 'PACKETA', name: 'Packeta', price: 4.99, days: '3-5 days' },
+  { id: 'DPD', name: 'DPD Express', price: 12.99, days: '1-2 days' },
+  { id: 'INPOST', name: 'InPost Locker', price: 3.99, days: '2-4 days' },
+];
+
+export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) => void }) {
+  const { items, remove, clear, total } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [courier, setCourier] = useState('UPS');
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [selectedAddr, setSelectedAddr] = useState<number | null>(null);
+  const [newUser, setNewUser] = useState({ username: '', email: '', password: '' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      api.getAddresses(user.id).then(setAddresses).catch(() => {});
+    }
+  }, [user]);
+
+  const ship = couriers.find(c => c.id === courier)?.price || 0;
+  const finalTotal = total + ship;
+
+  const handleOrder = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      let userId = user?.id;
+      if (!userId) {
+        const u = await api.createUser(newUser);
+        userId = u.id;
+      }
+
+      const orderItems = items.map(i => ({ productId: i.productId, quantity: i.quantity }));
+      const addr = addresses.find(a => a.id === selectedAddr);
+      const shipping = addr ? `${addr.fullName}, ${addr.street}, ${addr.city}, ${addr.state} ${addr.zipCode}` : undefined;
+
+      const order = await api.createOrder({ userId, items: orderItems, courier, shippingAddress: shipping });
+      clear();
+      onSuccess?.(order.id);
+      navigate('/shop/confirmation');
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="checkout-wrapper">
+      <div className="checkout-container">
+        <div className="checkout-main">
+          <h2>Checkout</h2>
+          {error && <div className="error">{error}</div>}
+
+          <div className="checkout-section">
+            <h3>Items ({items.length})</h3>
+            {items.length === 0 ? (
+              <p className="muted">Cart is empty</p>
+            ) : (
+              items.map(it => (
+                <div key={it.productId} className="checkout-item">
+                  <div className="checkout-item-info">
+                    <strong>{it.name}</strong> x {it.quantity}
+                    <span>${(it.price * it.quantity).toFixed(2)}</span>
+                  </div>
+                  <button className="btn-text" onClick={() => remove(it.productId)}>Remove</button>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="checkout-section">
+            <h3>Delivery</h3>
+            {couriers.map(c => (
+              <label key={c.id} style={{ display: 'flex', gap: '10px', margin: '10px 0', padding: '10px', border: '1px solid var(--border)', borderRadius: '6px' }}>
+                <input type="radio" value={c.id} checked={courier === c.id} onChange={e => setCourier(e.target.value)} />
+                <div style={{ flex: 1 }}>
+                  <div><strong>{c.name}</strong> - ${c.price.toFixed(2)}</div>
+                  <div className="muted" style={{ fontSize: '0.9em' }}>{c.days}</div>
+                </div>
+              </label>
+            ))}
+          </div>
+
+          {user && addresses.length > 0 && (
+            <div className="checkout-section">
+              <h3>Address</h3>
+              {addresses.map(a => (
+                <label key={a.id} style={{ display: 'flex', gap: '10px', margin: '10px 0', padding: '10px', border: '1px solid var(--border)', borderRadius: '6px' }}>
+                  <input type="radio" checked={selectedAddr === a.id} onChange={() => setSelectedAddr(a.id)} />
+                  <div>
+                    <strong>{a.label}</strong><br />
+                    {a.fullName}, {a.street}, {a.city}, {a.state} {a.zipCode}
+                  </div>
+                </label>
+              ))}
+            </div>
+          )}
+
+          {!user && (
+            <div className="checkout-section">
+              <h3>Account Info</h3>
+              <input placeholder="Username" value={newUser.username} onChange={e => setNewUser({...newUser, username: e.target.value})} style={{ width: '100%', marginBottom: '8px', padding: '8px' }} required />
+              <input placeholder="Email" type="email" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} style={{ width: '100%', marginBottom: '8px', padding: '8px' }} required />
+              <input placeholder="Password" type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} style={{ width: '100%', padding: '8px' }} required />
+            </div>
+          )}
+        </div>
+
+        <div className="checkout-sidebar">
+          <h3>Summary</h3>
+          <div style={{ padding: '20px 0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span>Subtotal</span>
+              <span>${total.toFixed(2)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid var(--border)' }}>
+              <span>Shipping</span>
+              <span>${ship.toFixed(2)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2em', fontWeight: 'bold' }}>
+              <span>Total</span>
+              <span>${finalTotal.toFixed(2)}</span>
+            </div>
+          </div>
+          <button className="btn-primary btn-block" onClick={handleOrder} disabled={loading || items.length === 0}>
+            {loading ? 'Processing...' : 'Place Order'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

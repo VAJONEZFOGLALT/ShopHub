@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProductsOrderByRelevanceFieldEnum = exports.NullsOrder = exports.UsersOrderByRelevanceFieldEnum = exports.SortOrder = exports.OrderItemsScalarFieldEnum = exports.OrdersScalarFieldEnum = exports.ProductsScalarFieldEnum = exports.UsersScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
+exports.AddressOrderByRelevanceFieldEnum = exports.OrdersOrderByRelevanceFieldEnum = exports.ReviewsOrderByRelevanceFieldEnum = exports.ProductsOrderByRelevanceFieldEnum = exports.UsersOrderByRelevanceFieldEnum = exports.NullsOrder = exports.SortOrder = exports.AddressScalarFieldEnum = exports.OrderItemsScalarFieldEnum = exports.OrdersScalarFieldEnum = exports.CompareItemsScalarFieldEnum = exports.RecentlyViewedScalarFieldEnum = exports.WishlistScalarFieldEnum = exports.ReviewsScalarFieldEnum = exports.ProductsScalarFieldEnum = exports.UsersScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/index-browser"));
 exports.Decimal = runtime.Decimal;
 exports.NullTypes = {
@@ -47,8 +47,13 @@ exports.AnyNull = runtime.objectEnumValues.instances.AnyNull;
 exports.ModelName = {
     Users: 'Users',
     Products: 'Products',
+    Reviews: 'Reviews',
+    Wishlist: 'Wishlist',
+    RecentlyViewed: 'RecentlyViewed',
+    CompareItems: 'CompareItems',
     Orders: 'Orders',
-    OrderItems: 'OrderItems'
+    OrderItems: 'OrderItems',
+    Address: 'Address'
 };
 exports.TransactionIsolationLevel = runtime.makeStrictEnum({
     ReadUncommitted: 'ReadUncommitted',
@@ -62,6 +67,7 @@ exports.UsersScalarFieldEnum = {
     email: 'email',
     password_hash: 'password_hash',
     name: 'name',
+    avatar: 'avatar',
     role: 'role'
 };
 exports.ProductsScalarFieldEnum = {
@@ -73,12 +79,42 @@ exports.ProductsScalarFieldEnum = {
     stock: 'stock',
     image: 'image'
 };
+exports.ReviewsScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    productId: 'productId',
+    rating: 'rating',
+    title: 'title',
+    comment: 'comment',
+    createdAt: 'createdAt'
+};
+exports.WishlistScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    productId: 'productId',
+    createdAt: 'createdAt'
+};
+exports.RecentlyViewedScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    productId: 'productId',
+    viewedAt: 'viewedAt'
+};
+exports.CompareItemsScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    productId: 'productId',
+    createdAt: 'createdAt'
+};
 exports.OrdersScalarFieldEnum = {
     id: 'id',
     userId: 'userId',
     totalPrice: 'totalPrice',
     createdAt: 'createdAt',
-    status: 'status'
+    status: 'status',
+    courier: 'courier',
+    shippingAddress: 'shippingAddress',
+    trackingNumber: 'trackingNumber'
 };
 exports.OrderItemsScalarFieldEnum = {
     id: 'id',
@@ -87,25 +123,56 @@ exports.OrderItemsScalarFieldEnum = {
     quantity: 'quantity',
     price: 'price'
 };
+exports.AddressScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    label: 'label',
+    fullName: 'fullName',
+    street: 'street',
+    city: 'city',
+    state: 'state',
+    zipCode: 'zipCode',
+    country: 'country',
+    isDefault: 'isDefault',
+    createdAt: 'createdAt'
+};
 exports.SortOrder = {
     asc: 'asc',
     desc: 'desc'
+};
+exports.NullsOrder = {
+    first: 'first',
+    last: 'last'
 };
 exports.UsersOrderByRelevanceFieldEnum = {
     username: 'username',
     email: 'email',
     password_hash: 'password_hash',
     name: 'name',
+    avatar: 'avatar',
     role: 'role'
-};
-exports.NullsOrder = {
-    first: 'first',
-    last: 'last'
 };
 exports.ProductsOrderByRelevanceFieldEnum = {
     name: 'name',
     description: 'description',
     category: 'category',
     image: 'image'
+};
+exports.ReviewsOrderByRelevanceFieldEnum = {
+    title: 'title',
+    comment: 'comment'
+};
+exports.OrdersOrderByRelevanceFieldEnum = {
+    shippingAddress: 'shippingAddress',
+    trackingNumber: 'trackingNumber'
+};
+exports.AddressOrderByRelevanceFieldEnum = {
+    label: 'label',
+    fullName: 'fullName',
+    street: 'street',
+    city: 'city',
+    state: 'state',
+    zipCode: 'zipCode',
+    country: 'country'
 };
 //# sourceMappingURL=prismaNamespaceBrowser.js.map

@@ -13,6 +13,9 @@ export class CreateUserDto {
   password: string;
   @IsOptional()
   @IsString()
+  name?: string;
+  @IsOptional()
+  @IsString()
   @IsIn(['ADMIN', 'USER'])
   role?: string;
 }

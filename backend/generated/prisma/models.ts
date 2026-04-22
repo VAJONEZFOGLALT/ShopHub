@@ -10,6 +10,11 @@
  */
 export type * from './models/Users.js'
 export type * from './models/Products.js'
+export type * from './models/Reviews.js'
+export type * from './models/Wishlist.js'
+export type * from './models/RecentlyViewed.js'
+export type * from './models/CompareItems.js'
 export type * from './models/Orders.js'
 export type * from './models/OrderItems.js'
+export type * from './models/Address.js'
 export type * from './commonInputTypes.js'
