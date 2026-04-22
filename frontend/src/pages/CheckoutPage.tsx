@@ -35,8 +35,10 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
     setLoading(true);
     setError('');
     try {
-      let userId = user?.id;
-      if (!userId) {
+      let userId: number;
+      if (user?.id) {
+        userId = user.id;
+      } else {
         const u = await api.createUser(newUser);
         userId = u.id;
       }
