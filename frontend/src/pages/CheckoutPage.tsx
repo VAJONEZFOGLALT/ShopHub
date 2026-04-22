@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { api } from '../services/api';
 import { COUNTRY_ADDRESS_CONFIGS, DEFAULT_COUNTRY_CODE, formatAddressSingleLine, getCountryAddressConfig } from '../utils/addressing';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 declare global {
   interface Window {
@@ -69,6 +70,13 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [packetaSelecting, setPacketaSelecting] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
+
+  const isDarkThemeActive = () => {
+    const attrTheme = document.documentElement.getAttribute('data-theme');
+    if (attrTheme) return attrTheme !== 'light';
+    return localStorage.getItem('theme') !== 'light';
+  };
 
   const selectedCourier = couriers.find((c) => c.id === courier) || couriers[0];
   const hasItems = items.length > 0;
@@ -77,35 +85,95 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
   const guestCountryConfig = getCountryAddressConfig(guestAddress.country);
 
   useEffect(() => {
-    if (user) {
-      api.getAddresses(user.id).then((data) => {
-        setAddresses(data);
-        const preferred = data.find((a: any) => a.isDefault) || data[0];
-        setSelectedAddr(preferred?.id ?? null);
-      }).catch(() => {});
-    }
-  }, [user]);
-
-  useEffect(() => {
     setPickupPointLabel('');
     setPickupPointCode('');
   }, [courier]);
 
   useEffect(() => {
-    const existing = document.querySelector('script[data-packeta-widget="1"]') as HTMLScriptElement | null;
-    if (existing) {
-      setPacketaReady(true);
-      return;
-    }
+    let active = true;
 
-    const script = document.createElement('script');
-    script.src = 'https://widget.packeta.com/v6/www/js/library.js';
-    script.async = true;
-    script.setAttribute('data-packeta-widget', '1');
-    script.onload = () => setPacketaReady(true);
-    script.onerror = () => setPacketaReady(false);
-    document.body.appendChild(script);
-  }, []);
+    const ensurePacketaScript = () => {
+      return new Promise<void>((resolve) => {
+        const existing = document.querySelector('script[data-packeta-widget="1"]') as HTMLScriptElement | null;
+        if (existing) {
+          if (window.Packeta?.Widget?.pick) {
+            if (active) {
+              setPacketaReady(true);
+            }
+            resolve();
+            return;
+          }
+
+          existing.addEventListener('load', () => {
+            if (active) {
+              setPacketaReady(true);
+            }
+            resolve();
+          }, { once: true });
+          existing.addEventListener('error', () => {
+            if (active) {
+              setPacketaReady(false);
+            }
+            resolve();
+          }, { once: true });
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://widget.packeta.com/v6/www/js/library.js';
+        script.async = true;
+        script.setAttribute('data-packeta-widget', '1');
+        script.onload = () => {
+          if (active) {
+            setPacketaReady(true);
+          }
+          resolve();
+        };
+        script.onerror = () => {
+          if (active) {
+            setPacketaReady(false);
+          }
+          resolve();
+        };
+        document.body.appendChild(script);
+      });
+    };
+
+    const bootstrapPage = async () => {
+      setPageLoading(true);
+
+      const addressTask = user
+        ? api.getAddresses(user.id)
+            .then((data) => {
+              if (!active) {
+                return;
+              }
+              setAddresses(data);
+              const preferred = data.find((a: any) => a.isDefault) || data[0];
+              setSelectedAddr(preferred?.id ?? null);
+            })
+            .catch(() => {
+              if (!active) {
+                return;
+              }
+              setAddresses([]);
+              setSelectedAddr(null);
+            })
+        : Promise.resolve();
+
+      await Promise.all([ensurePacketaScript(), addressTask]);
+
+      if (active) {
+        setPageLoading(false);
+      }
+    };
+
+    bootstrapPage();
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
 
   useEffect(() => {
     if (!hasItems) {
@@ -118,8 +186,11 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
   useEffect(() => {
     if (!packetaSelecting) {
       document.body.classList.remove('packeta-modal-open');
+      document.body.classList.remove('packeta-widget-dark');
       return;
     }
+
+    const darkTheme = isDarkThemeActive();
 
     const forcePacketaDialogLayout = () => {
       const iframe = document.querySelector('iframe[src*="widget.packeta.com"]') as HTMLIFrameElement | null;
@@ -148,8 +219,9 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
       iframe.style.width = '100%';
       iframe.style.height = '100%';
       iframe.style.border = '0';
-      const isDarkTheme = document.documentElement.getAttribute('data-theme') !== 'light';
-      iframe.style.filter = isDarkTheme ? 'brightness(0.88) contrast(1.05)' : 'none';
+      iframe.style.filter = darkTheme
+        ? 'invert(0.9) hue-rotate(180deg) saturate(0.85) brightness(0.92)'
+        : 'none';
 
       const overlay = dialog.parentElement as HTMLElement | null;
       if (overlay && overlay !== document.body) {
@@ -163,6 +235,11 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
     };
 
     document.body.classList.add('packeta-modal-open');
+    if (darkTheme) {
+      document.body.classList.add('packeta-widget-dark');
+    } else {
+      document.body.classList.remove('packeta-widget-dark');
+    }
     forcePacketaDialogLayout();
 
     const observer = new MutationObserver(() => {
@@ -174,6 +251,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
 
     return () => {
       document.body.classList.remove('packeta-modal-open');
+      document.body.classList.remove('packeta-widget-dark');
       observer.disconnect();
       window.clearInterval(intervalId);
     };
@@ -182,7 +260,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
   const handlePickPacketaPoint = () => {
     const apiKey = import.meta.env.VITE_PACKETA_API_KEY || '';
     const widgetLanguage = import.meta.env.VITE_PACKETA_API_LOCALE || 'en_GB';
-    const isDarkTheme = document.documentElement.getAttribute('data-theme') !== 'light';
+    const isDarkTheme = isDarkThemeActive();
 
     if (!apiKey) {
       setError('Hianyzik a VITE_PACKETA_API_KEY, add meg .env-ben.');
@@ -282,11 +360,17 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
     return null;
   }
 
+  if (pageLoading) {
+    return <LoadingSpinner fullScreen={true} />;
+  }
+
   return (
     <div className="checkout-wrapper">
       <div className={`checkout-container ${hasItems ? '' : 'checkout-container-empty'}`.trim()}>
-        <div className="checkout-main">
+        <div className="checkout-title-row">
           <h2>{t('checkout.title')}</h2>
+        </div>
+        <div className="checkout-main">
           {error && (
             <div className="error">
               <span>{error}</span>

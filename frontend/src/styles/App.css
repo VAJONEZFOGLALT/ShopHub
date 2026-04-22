@@ -4809,6 +4809,10 @@ body.packeta-modal-open iframe[src*="widget.packeta.com"] {
   z-index: 10003;
 }
 
+body.packeta-modal-open.packeta-widget-dark iframe[src*="widget.packeta.com"] {
+  filter: invert(0.9) hue-rotate(180deg) saturate(0.85) brightness(0.92) !important;
+}
+
 @media (max-width: 900px) {
   .checkout-grid-two {
     grid-template-columns: 1fr;
@@ -4823,5 +4827,34 @@ body.packeta-modal-open iframe[src*="widget.packeta.com"] {
 
   .checkout-input {
     padding: 9px 10px;
+  }
+}
+
+.checkout-title-row {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.checkout-title-row h2 {
+  margin: 0;
+  font-size: 1.8em;
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.checkout-main {
+  margin-top: 0;
+}
+
+.checkout-sidebar {
+  align-self: start;
+}
+
+@media (max-width: 768px) {
+  .checkout-title-row h2 {
+    font-size: 1.45em;
   }
 }
