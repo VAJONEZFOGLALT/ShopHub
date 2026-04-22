@@ -4,19 +4,19 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 export declare class ReviewsService {
     private readonly prisma;
     constructor(prisma: PrismaService);
-    findAll(): import("../../generated/prisma/internal/prismaNamespace").PrismaPromise<({
+    findAll(): import("@prisma/client").Prisma.PrismaPromise<({
         user: {
-            id: number;
             username: string;
             email: string;
-            password_hash: string;
             name: string;
-            avatar: string | null;
             role: string;
+            avatar: string | null;
+            password_hash: string;
+            id: number;
         };
         product: {
-            id: number;
             name: string;
+            id: number;
             description: string | null;
             category: string;
             price: number;
@@ -25,28 +25,28 @@ export declare class ReviewsService {
         };
     } & {
         id: number;
-        createdAt: Date;
         userId: number;
         productId: number;
+        createdAt: Date;
         rating: number;
         title: string;
         comment: string;
     })[]>;
-    findByProduct(productId: number): import("../../generated/prisma/internal/prismaNamespace").PrismaPromise<({
+    findByProduct(productId: number): import("@prisma/client").Prisma.PrismaPromise<({
         user: {
-            id: number;
             username: string;
             email: string;
-            password_hash: string;
             name: string;
-            avatar: string | null;
             role: string;
+            avatar: string | null;
+            password_hash: string;
+            id: number;
         };
     } & {
         id: number;
-        createdAt: Date;
         userId: number;
         productId: number;
+        createdAt: Date;
         rating: number;
         title: string;
         comment: string;
@@ -55,37 +55,31 @@ export declare class ReviewsService {
         average: number;
         count: number;
     }>;
-    create(data: CreateReviewDto): import("../../generated/prisma/models").Prisma__ReviewsClient<{
+    create(data: CreateReviewDto): import("@prisma/client").Prisma.Prisma__ReviewsClient<{
         id: number;
-        createdAt: Date;
         userId: number;
         productId: number;
+        createdAt: Date;
         rating: number;
         title: string;
         comment: string;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
-    }>;
-    update(id: number, data: UpdateReviewDto): import("../../generated/prisma/models").Prisma__ReviewsClient<{
+    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
+    update(id: number, data: UpdateReviewDto): import("@prisma/client").Prisma.Prisma__ReviewsClient<{
         id: number;
-        createdAt: Date;
         userId: number;
         productId: number;
+        createdAt: Date;
         rating: number;
         title: string;
         comment: string;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
-    }>;
-    remove(id: number): import("../../generated/prisma/models").Prisma__ReviewsClient<{
+    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
+    remove(id: number): import("@prisma/client").Prisma.Prisma__ReviewsClient<{
         id: number;
-        createdAt: Date;
         userId: number;
         productId: number;
+        createdAt: Date;
         rating: number;
         title: string;
         comment: string;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
-    }>;
+    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
 }

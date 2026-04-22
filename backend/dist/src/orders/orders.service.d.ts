@@ -8,88 +8,82 @@ export declare class OrdersService {
         orderItems: {
             id: number;
             price: number;
-            quantity: number;
             productId: number;
+            quantity: number;
             orderId: number;
         }[];
     } & {
         id: number;
+        userId: number;
+        courier: import("@prisma/client").$Enums.CourierService;
+        shippingAddress: string | null;
+        status: import("@prisma/client").$Enums.OrderStatus;
+        trackingNumber: string | null;
         totalPrice: number;
         createdAt: Date;
-        status: import("../../generated/prisma/enums").OrderStatus;
-        courier: import("../../generated/prisma/enums").CourierService;
-        shippingAddress: string | null;
-        trackingNumber: string | null;
-        userId: number;
     }>;
-    findAll(): import("../../generated/prisma/internal/prismaNamespace").PrismaPromise<({
+    findAll(): import("@prisma/client").Prisma.PrismaPromise<({
         orderItems: {
             id: number;
             price: number;
-            quantity: number;
             productId: number;
+            quantity: number;
             orderId: number;
         }[];
     } & {
         id: number;
+        userId: number;
+        courier: import("@prisma/client").$Enums.CourierService;
+        shippingAddress: string | null;
+        status: import("@prisma/client").$Enums.OrderStatus;
+        trackingNumber: string | null;
         totalPrice: number;
         createdAt: Date;
-        status: import("../../generated/prisma/enums").OrderStatus;
-        courier: import("../../generated/prisma/enums").CourierService;
-        shippingAddress: string | null;
-        trackingNumber: string | null;
-        userId: number;
     })[]>;
-    findOne(id: number): import("../../generated/prisma/models").Prisma__OrdersClient<({
+    findOne(id: number): import("@prisma/client").Prisma.Prisma__OrdersClient<({
         orderItems: {
             id: number;
             price: number;
-            quantity: number;
             productId: number;
+            quantity: number;
             orderId: number;
         }[];
     } & {
         id: number;
+        userId: number;
+        courier: import("@prisma/client").$Enums.CourierService;
+        shippingAddress: string | null;
+        status: import("@prisma/client").$Enums.OrderStatus;
+        trackingNumber: string | null;
         totalPrice: number;
         createdAt: Date;
-        status: import("../../generated/prisma/enums").OrderStatus;
-        courier: import("../../generated/prisma/enums").CourierService;
-        shippingAddress: string | null;
-        trackingNumber: string | null;
-        userId: number;
-    }) | null, null, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
-    }>;
-    update(id: number, updateOrderDto: UpdateOrderDto): import("../../generated/prisma/models").Prisma__OrdersClient<{
+    }) | null, null, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
+    update(id: number, updateOrderDto: UpdateOrderDto): import("@prisma/client").Prisma.Prisma__OrdersClient<{
         orderItems: {
             id: number;
             price: number;
-            quantity: number;
             productId: number;
+            quantity: number;
             orderId: number;
         }[];
     } & {
         id: number;
+        userId: number;
+        courier: import("@prisma/client").$Enums.CourierService;
+        shippingAddress: string | null;
+        status: import("@prisma/client").$Enums.OrderStatus;
+        trackingNumber: string | null;
         totalPrice: number;
         createdAt: Date;
-        status: import("../../generated/prisma/enums").OrderStatus;
-        courier: import("../../generated/prisma/enums").CourierService;
-        shippingAddress: string | null;
-        trackingNumber: string | null;
-        userId: number;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
-    }>;
-    remove(id: number): import("../../generated/prisma/models").Prisma__OrdersClient<{
+    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
+    remove(id: number): import("@prisma/client").Prisma.Prisma__OrdersClient<{
         id: number;
+        userId: number;
+        courier: import("@prisma/client").$Enums.CourierService;
+        shippingAddress: string | null;
+        status: import("@prisma/client").$Enums.OrderStatus;
+        trackingNumber: string | null;
         totalPrice: number;
         createdAt: Date;
-        status: import("../../generated/prisma/enums").OrderStatus;
-        courier: import("../../generated/prisma/enums").CourierService;
-        shippingAddress: string | null;
-        trackingNumber: string | null;
-        userId: number;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
-    }>;
+    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
 }

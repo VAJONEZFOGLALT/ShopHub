@@ -35,6 +35,7 @@ export declare const ModelName: {
     readonly Orders: "Orders";
     readonly OrderItems: "OrderItems";
     readonly Address: "Address";
+    readonly Translation: "Translation";
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 export declare const TransactionIsolationLevel: {
@@ -128,6 +129,15 @@ export declare const AddressScalarFieldEnum: {
     readonly createdAt: "createdAt";
 };
 export type AddressScalarFieldEnum = (typeof AddressScalarFieldEnum)[keyof typeof AddressScalarFieldEnum];
+export declare const TranslationScalarFieldEnum: {
+    readonly id: "id";
+    readonly key: "key";
+    readonly language: "language";
+    readonly value: "value";
+    readonly createdAt: "createdAt";
+    readonly updatedAt: "updatedAt";
+};
+export type TranslationScalarFieldEnum = (typeof TranslationScalarFieldEnum)[keyof typeof TranslationScalarFieldEnum];
 export declare const SortOrder: {
     readonly asc: "asc";
     readonly desc: "desc";
@@ -174,3 +184,8 @@ export declare const AddressOrderByRelevanceFieldEnum: {
     readonly country: "country";
 };
 export type AddressOrderByRelevanceFieldEnum = (typeof AddressOrderByRelevanceFieldEnum)[keyof typeof AddressOrderByRelevanceFieldEnum];
+export declare const TranslationOrderByRelevanceFieldEnum: {
+    readonly key: "key";
+    readonly value: "value";
+};
+export type TranslationOrderByRelevanceFieldEnum = (typeof TranslationOrderByRelevanceFieldEnum)[keyof typeof TranslationOrderByRelevanceFieldEnum];

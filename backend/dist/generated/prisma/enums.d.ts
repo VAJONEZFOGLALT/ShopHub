@@ -13,3 +13,14 @@ export declare const CourierService: {
     readonly INPOST: "INPOST";
 };
 export type CourierService = (typeof CourierService)[keyof typeof CourierService];
+export declare const SupportedLanguage: {
+    readonly HU: "HU";
+    readonly EN: "EN";
+    readonly DE: "DE";
+    readonly FR: "FR";
+    readonly ES: "ES";
+    readonly PL: "PL";
+    readonly CZ: "CZ";
+    readonly IT: "IT";
+};
+export type SupportedLanguage = (typeof SupportedLanguage)[keyof typeof SupportedLanguage];

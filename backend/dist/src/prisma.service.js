@@ -8,10 +8,28 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrismaService = void 0;
 const common_1 = require("@nestjs/common");
-const client_1 = require("../generated/prisma/client");
+const client_1 = require("@prisma/client");
 let PrismaService = class PrismaService extends client_1.PrismaClient {
+    isConnected = false;
     async onModuleInit() {
-        await this.$connect();
+        try {
+            if (!process.env.DATABASE_URL) {
+                console.warn('DATABASE_URL not set - Prisma will not connect');
+                return;
+            }
+            await this.$connect();
+            this.isConnected = true;
+            console.log('Prisma connected successfully');
+        }
+        catch (error) {
+            console.error('Failed to connect to database:', error);
+            this.isConnected = false;
+        }
+    }
+    async onModuleDestroy() {
+        if (this.isConnected) {
+            await this.$disconnect();
+        }
     }
 };
 exports.PrismaService = PrismaService;

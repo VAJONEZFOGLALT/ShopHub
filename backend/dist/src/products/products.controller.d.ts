@@ -6,66 +6,58 @@ export declare class ProductsController {
     private readonly productsService;
     private readonly cloudinaryService;
     constructor(productsService: ProductsService, cloudinaryService: CloudinaryService);
-    create(createProductDto: CreateProductDto): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        id: number;
+    create(createProductDto: CreateProductDto): Promise<{
         name: string;
+        id: number;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
-    findAll(): import("../../generated/prisma/internal/prismaNamespace").PrismaPromise<{
-        id: number;
+    findAll(): Promise<{
         name: string;
+        id: number;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
     }[]>;
-    findOne(id: string): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        id: number;
+    findOne(id: string): Promise<{
         name: string;
+        id: number;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
-    } | null, null, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
-    }>;
-    update(id: string, updateProductDto: UpdateProductDto): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        id: number;
+    } | null>;
+    update(id: string, updateProductDto: UpdateProductDto): Promise<{
         name: string;
+        id: number;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
     uploadImage(id: string, file: Express.Multer.File): Promise<{
-        id: number;
         name: string;
+        id: number;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
     }>;
-    remove(id: string): import("../../generated/prisma/models").Prisma__ProductsClient<{
-        id: number;
+    remove(id: string): Promise<{
         name: string;
+        id: number;
         description: string | null;
         category: string;
         price: number;
         stock: number;
         image: string | null;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
 }

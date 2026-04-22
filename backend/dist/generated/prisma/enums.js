@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CourierService = exports.OrderStatus = void 0;
+exports.SupportedLanguage = exports.CourierService = exports.OrderStatus = void 0;
 exports.OrderStatus = {
     PENDING: 'PENDING',
     PROCESSING: 'PROCESSING',
@@ -13,5 +13,15 @@ exports.CourierService = {
     PACKETA: 'PACKETA',
     DPD: 'DPD',
     INPOST: 'INPOST'
+};
+exports.SupportedLanguage = {
+    HU: 'HU',
+    EN: 'EN',
+    DE: 'DE',
+    FR: 'FR',
+    ES: 'ES',
+    PL: 'PL',
+    CZ: 'CZ',
+    IT: 'IT'
 };
 //# sourceMappingURL=enums.js.map

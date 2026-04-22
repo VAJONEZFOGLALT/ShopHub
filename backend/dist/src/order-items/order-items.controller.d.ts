@@ -4,47 +4,39 @@ import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 export declare class OrderItemsController {
     private readonly orderItemsService;
     constructor(orderItemsService: OrderItemsService);
-    create(createOrderItemDto: CreateOrderItemDto): import("../../generated/prisma/models").Prisma__OrderItemsClient<{
+    create(createOrderItemDto: CreateOrderItemDto): import("@prisma/client").Prisma.Prisma__OrderItemsClient<{
         id: number;
         price: number;
-        quantity: number;
         productId: number;
+        quantity: number;
         orderId: number;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
-    }>;
-    findAll(): import("../../generated/prisma/internal/prismaNamespace").PrismaPromise<{
+    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
+    findAll(): import("@prisma/client").Prisma.PrismaPromise<{
         id: number;
         price: number;
-        quantity: number;
         productId: number;
+        quantity: number;
         orderId: number;
     }[]>;
-    findOne(id: string): import("../../generated/prisma/models").Prisma__OrderItemsClient<{
+    findOne(id: string): import("@prisma/client").Prisma.Prisma__OrderItemsClient<{
         id: number;
         price: number;
-        quantity: number;
         productId: number;
+        quantity: number;
         orderId: number;
-    } | null, null, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
-    }>;
-    update(id: string, updateOrderItemDto: UpdateOrderItemDto): import("../../generated/prisma/models").Prisma__OrderItemsClient<{
+    } | null, null, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
+    update(id: string, updateOrderItemDto: UpdateOrderItemDto): import("@prisma/client").Prisma.Prisma__OrderItemsClient<{
         id: number;
         price: number;
-        quantity: number;
         productId: number;
+        quantity: number;
         orderId: number;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
-    }>;
-    remove(id: string): import("../../generated/prisma/models").Prisma__OrderItemsClient<{
+    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
+    remove(id: string): import("@prisma/client").Prisma.Prisma__OrderItemsClient<{
         id: number;
         price: number;
-        quantity: number;
         productId: number;
+        quantity: number;
         orderId: number;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, {
-        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
-    }>;
+    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
 }

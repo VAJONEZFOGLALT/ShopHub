@@ -15,3 +15,4 @@ export type CompareItems = Prisma.CompareItemsModel;
 export type Orders = Prisma.OrdersModel;
 export type OrderItems = Prisma.OrderItemsModel;
 export type Address = Prisma.AddressModel;
+export type Translation = Prisma.TranslationModel;

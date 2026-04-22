@@ -17,20 +17,50 @@ let ProductsService = class ProductsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    create(createProductDto) {
-        return this.prisma.products.create({ data: createProductDto });
+    async findAll() {
+        try {
+            return await this.prisma.products.findMany();
+        }
+        catch (error) {
+            console.error('Products findAll error:', error);
+            throw new common_1.BadRequestException(`Failed to fetch products: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
     }
-    findAll() {
-        return this.prisma.products.findMany();
+    async create(createProductDto) {
+        try {
+            return await this.prisma.products.create({ data: createProductDto });
+        }
+        catch (error) {
+            console.error('Products create error:', error);
+            throw new common_1.BadRequestException(`Failed to create product: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
     }
-    findOne(id) {
-        return this.prisma.products.findUnique({ where: { id } });
+    async findOne(id) {
+        try {
+            return await this.prisma.products.findUnique({ where: { id } });
+        }
+        catch (error) {
+            console.error('Products findOne error:', error);
+            throw new common_1.BadRequestException(`Failed to fetch product: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
     }
-    update(id, updateProductDto) {
-        return this.prisma.products.update({ where: { id }, data: updateProductDto });
+    async update(id, updateProductDto) {
+        try {
+            return await this.prisma.products.update({ where: { id }, data: updateProductDto });
+        }
+        catch (error) {
+            console.error('Products update error:', error);
+            throw new common_1.BadRequestException(`Failed to update product: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
     }
-    remove(id) {
-        return this.prisma.products.delete({ where: { id } });
+    async remove(id) {
+        try {
+            return await this.prisma.products.delete({ where: { id } });
+        }
+        catch (error) {
+            console.error('Products remove error:', error);
+            throw new common_1.BadRequestException(`Failed to delete product: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
     }
 };
 exports.ProductsService = ProductsService;
