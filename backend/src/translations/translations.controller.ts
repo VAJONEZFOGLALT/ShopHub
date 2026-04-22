@@ -5,7 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { LibreTranslateService } from './libretranslate.service';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('translations')
 @Controller('translations')
@@ -14,6 +14,16 @@ export class TranslationsController {
 
   @Post('translate')
   @ApiOperation({ summary: 'Translate text using LibreTranslate' })
+  @ApiBody({
+    schema: {
+      example: {
+        text: 'Kategoria: Elektronika',
+        sourceLang: 'hu',
+        targetLang: 'en',
+      },
+    },
+  })
+  @ApiOkResponse({ description: 'Translated text.' })
   async translate(
     @Body()
     body: {
@@ -35,6 +45,16 @@ export class TranslationsController {
 
   @Post('translate-batch')
   @ApiOperation({ summary: 'Translate multiple texts using LibreTranslate' })
+  @ApiBody({
+    schema: {
+      example: {
+        texts: ['Kategoria: Elektronika', 'Kategoria: Otthon'],
+        sourceLang: 'hu',
+        targetLang: 'en',
+      },
+    },
+  })
+  @ApiOkResponse({ description: 'Translated texts array.' })
   async translateBatch(
     @Body()
     body: {

@@ -1,9 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, Req, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AddressesService } from './addresses.service';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { AuthGuard } from '@nestjs/passport';
 
+@ApiTags('addresses')
 @Controller('addresses')
 export class AddressesController {
   constructor(private readonly addressesService: AddressesService) {}
@@ -23,6 +25,10 @@ export class AddressesController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('bearer-auth')
+  @ApiOperation({ summary: 'Create an address' })
+  @ApiBody({ type: CreateAddressDto })
+  @ApiOkResponse({ description: 'Address created successfully.' })
   create(@Body() createAddressDto: CreateAddressDto, @Req() req: any) {
     this.assertSelfOrAdmin(req, Number(createAddressDto.userId), 'You can only create addresses for your own account');
     return this.addressesService.create({
@@ -33,6 +39,10 @@ export class AddressesController {
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('bearer-auth')
+  @ApiOperation({ summary: 'List addresses by user' })
+  @ApiQuery({ name: 'userId', example: 240027 })
+  @ApiOkResponse({ description: 'Address list.' })
   findByUser(@Query('userId') userId: string, @Req() req: any) {
     const targetUserId = Number(userId);
     this.assertSelfOrAdmin(req, targetUserId, 'You are not allowed to access these addresses');
@@ -41,6 +51,10 @@ export class AddressesController {
 
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('bearer-auth')
+  @ApiOperation({ summary: 'Get an address by ID' })
+  @ApiParam({ name: 'id', example: 300001 })
+  @ApiOkResponse({ description: 'Address details.' })
   async findOne(@Param('id') id: string, @Req() req: any) {
     const address = await this.addressesService.findOne(+id);
     if (!address) {
@@ -52,6 +66,11 @@ export class AddressesController {
 
   @Patch(':id')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('bearer-auth')
+  @ApiOperation({ summary: 'Update an address' })
+  @ApiParam({ name: 'id', example: 300001 })
+  @ApiBody({ type: UpdateAddressDto })
+  @ApiOkResponse({ description: 'Address updated successfully.' })
   async update(@Param('id') id: string, @Body() updateAddressDto: UpdateAddressDto, @Req() req: any) {
     const existing = await this.addressesService.findOne(+id);
     if (!existing) {
@@ -63,6 +82,10 @@ export class AddressesController {
 
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('bearer-auth')
+  @ApiOperation({ summary: 'Delete an address' })
+  @ApiParam({ name: 'id', example: 300001 })
+  @ApiOkResponse({ description: 'Address deleted successfully.' })
   async remove(@Param('id') id: string, @Req() req: any) {
     const existing = await this.addressesService.findOne(+id);
     if (!existing) {
