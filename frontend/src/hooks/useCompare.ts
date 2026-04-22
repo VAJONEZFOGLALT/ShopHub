@@ -47,6 +47,10 @@ const persistCompareCache = (userId: number, ids: number[]) => {
   }
 };
 
+const emitCompareUpdated = (count: number) => {
+  window.dispatchEvent(new CustomEvent('compare-updated', { detail: { count } }));
+};
+
 export function useCompare() {
   const { user, isAuthenticated } = useAuth();
   const { showToast } = useToast();
@@ -76,6 +80,7 @@ export function useCompare() {
       const cached = readCachedCompare(user.id);
       if (!cancelled) {
         setCompareIds(cached);
+        emitCompareUpdated(cached.length);
       }
 
       try {
@@ -87,6 +92,7 @@ export function useCompare() {
         persistCompareCache(user.id, ids);
         compareIdsRef.current = ids;
         compareItemsRef.current = compare.map((item: CompareItem) => item.product).filter(Boolean);
+        emitCompareUpdated(ids.length);
         if (!cancelled) {
           setCompareIds(ids);
           setCompareItems(compareItemsRef.current);
@@ -95,6 +101,7 @@ export function useCompare() {
         if (!cancelled && cached.length === 0 && loadVersion === mutationVersionRef.current) {
           compareIdsRef.current = [];
           compareItemsRef.current = [];
+          emitCompareUpdated(0);
           setCompareIds([]);
           setCompareItems([]);
         }
@@ -154,6 +161,7 @@ export function useCompare() {
     setCompareIds(nextIds);
     setCompareItems(nextItems);
     persistCompareCache(user.id, nextIds);
+    emitCompareUpdated(nextIds.length);
 
     try {
       if (exists) {
@@ -167,6 +175,7 @@ export function useCompare() {
       setCompareIds(previousIds);
       setCompareItems(previousItems);
       persistCompareCache(user.id, previousIds);
+      emitCompareUpdated(previousIds.length);
       showToast(err?.message || 'Failed to update compare list', 'error');
     } finally {
       pendingIdsRef.current = pendingIdsRef.current.filter((id) => id !== productId);
@@ -190,6 +199,7 @@ export function useCompare() {
     setCompareIds([]);
     setCompareItems([]);
     persistCompareCache(user.id, []);
+    emitCompareUpdated(0);
 
     try {
       await api.clearCompare(user.id);
@@ -197,6 +207,7 @@ export function useCompare() {
       setCompareIds(previousIds);
       setCompareItems(previousItems);
       persistCompareCache(user.id, previousIds);
+      emitCompareUpdated(previousIds.length);
       showToast('Failed to clear compare list', 'error');
     }
   };

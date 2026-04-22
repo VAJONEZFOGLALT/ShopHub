@@ -5,6 +5,24 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { api } from '../../services/api';
 import { getThumbnailUrl } from '../../utils/imageOptimization';
+import { InlineLanguageSwitcher } from '../LanguageSwitcher';
+
+const readCompareCount = (userId?: number): number => {
+  if (!userId) {
+    return 0;
+  }
+
+  try {
+    const raw = localStorage.getItem(`shophub_compare_user_${userId}`);
+    if (!raw) {
+      return 0;
+    }
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.length : 0;
+  } catch {
+    return 0;
+  }
+};
 
 export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart?: () => void }) {
   const { t, i18n } = useTranslation();
@@ -14,6 +32,7 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
   const [showSearch, setShowSearch] = useState(false);
   const [showUser, setShowUser] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
+  const [compareCount, setCompareCount] = useState(0);
   const [theme, setTheme] = useState<'light' | 'dark'>(() => localStorage.getItem('theme') === 'light' ? 'light' : 'dark');
   const { user, logout } = useAuth();
   const { items } = useCart();
@@ -52,6 +71,30 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  useEffect(() => {
+    setCompareCount(readCompareCount(user?.id));
+
+    const onCompareUpdated = (event: Event) => {
+      const custom = event as CustomEvent<{ count?: number }>;
+      if (typeof custom.detail?.count === 'number') {
+        setCompareCount(custom.detail.count);
+        return;
+      }
+      setCompareCount(readCompareCount(user?.id));
+    };
+
+    const onStorage = () => {
+      setCompareCount(readCompareCount(user?.id));
+    };
+
+    window.addEventListener('compare-updated', onCompareUpdated as EventListener);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('compare-updated', onCompareUpdated as EventListener);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, [user?.id]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -76,6 +119,13 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
       setSearchResults([]);
       setShowSearch(false);
     }
+  };
+
+  const handleOpenCompare = () => {
+    if (compareCount === 0) {
+      return;
+    }
+    window.dispatchEvent(new Event('open-compare-drawer'));
   };
 
   return (
@@ -145,11 +195,28 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
 
       <div className="categories-bar">
         <div className="categories-bar-container">
-          <Link to="/shop/all" style={{ fontWeight: 600 }}>{t('common.all')}</Link>
-          {categories.map(cat => {
-            const categoryLabel = products.find((product) => product.category === cat)?.categoryLabel || cat;
-            return <Link key={cat} to={`/shop/category/${encodeURIComponent(cat)}`}>{categoryLabel}</Link>;
-          })}
+          <div className="categories-bar-left">
+            <InlineLanguageSwitcher />
+          </div>
+
+          <div className="categories-bar-links">
+            <Link to="/shop/all" className="categories-item" style={{ fontWeight: 600 }}>{t('common.all')}</Link>
+            {categories.map(cat => {
+              const categoryLabel = products.find((product) => product.category === cat)?.categoryLabel || cat;
+              return <Link key={cat} className="categories-item" to={`/shop/category/${encodeURIComponent(cat)}`}>{categoryLabel}</Link>;
+            })}
+          </div>
+
+          <div className="categories-bar-right">
+            <button
+              type="button"
+              className={`compare-nav-btn ${compareCount > 0 ? 'has-items' : ''}`.trim()}
+              onClick={handleOpenCompare}
+              disabled={compareCount === 0}
+            >
+              Compare {compareCount > 0 ? `(${compareCount})` : ''}
+            </button>
+          </div>
         </div>
       </div>
     </nav>

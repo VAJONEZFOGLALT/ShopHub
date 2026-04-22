@@ -13,6 +13,27 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
+.inline {
+  position: static;
+  right: auto;
+  bottom: auto;
+  z-index: auto;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.inline .label {
+  font-size: 0.85em;
+}
+
+.inline .select {
+  min-width: 92px;
+  padding: 6px 10px;
+  font-size: 0.85em;
+}
+
 .label {
   font-weight: 600;
   font-size: 0.9em;
@@ -61,6 +82,11 @@
     min-width: 80px;
     padding: 6px 10px;
     font-size: 0.85em;
+  }
+
+  .inline {
+    right: auto;
+    bottom: auto;
   }
 }
 
