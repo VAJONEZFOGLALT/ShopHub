@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface LoginModalProps {
@@ -9,6 +10,7 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalProps) {
+  const { t } = useTranslation();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -28,7 +30,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalPr
       onClose();
       navigate('/shop');
     } catch (err) {
-      let message = 'Login failed';
+      let message = t('auth.loginFailed');
       if (err instanceof Error) {
         message = err.message;
       }
@@ -46,7 +48,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalPr
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Login</h2>
+          <h2>{t('auth.loginTitle')}</h2>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
 
@@ -55,19 +57,19 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalPr
 
           <form onSubmit={handleSubmit} className="modal-form">
             <div className="modal-form-group">
-              <label htmlFor="identifier">Email or username:</label>
+              <label htmlFor="identifier">{t('auth.emailOrUsername')}:</label>
               <input
                 id="identifier"
                 type="text"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 required
-                placeholder="email or username"
+                placeholder={t('auth.emailOrUsername')}
               />
             </div>
 
             <div className="modal-form-group">
-              <label htmlFor="password">Password:</label>
+              <label htmlFor="password">{t('auth.password')}:</label>
               <input
                 id="password"
                 type="password"
@@ -79,13 +81,13 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalPr
             </div>
 
             <button type="submit" disabled={isLoading} className="modal-form-button">
-              {isLoading ? 'Logging in...' : 'Login'}
+              {isLoading ? t('auth.loggingIn') : t('auth.loginButton')}
             </button>
           </form>
         </div>
 
         <div className="modal-footer">
-          Don't have an account? <button type="button" onClick={onSwitchToRegister}>Register here</button>
+          {t('auth.noAccount')} <button type="button" onClick={onSwitchToRegister}>{t('auth.registerHere')}</button>
         </div>
       </div>
     </div>

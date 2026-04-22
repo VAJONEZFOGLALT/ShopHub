@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { useWishlist } from '../hooks/useWishlist';
@@ -8,6 +9,7 @@ import { getAvatarUrl, getProductImageUrl } from '../utils/imageOptimization';
 import { useToast } from '../contexts/ToastContext';
 
 export default function ProfilePage() {
+  const { t } = useTranslation();
   const { user, updateProfile, setUserData } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -27,8 +29,8 @@ export default function ProfilePage() {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState<any>(null);
 
-  const roleLabel = user?.role === 'ADMIN' ? '⚡ Admin Account' : '👤 Customer';
-  const accountTypeLabel = user?.role === 'ADMIN' ? 'Administrator' : 'Customer';
+  const roleLabel = user?.role === 'ADMIN' ? t('profile.adminAccount') : `👤 ${t('profile.customer')}`;
+  const accountTypeLabel = user?.role === 'ADMIN' ? t('profile.administrator') : t('profile.customer');
   const displayName = user?.name || user?.username || '';
 
   useEffect(() => {
@@ -158,7 +160,7 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="view">
-        <div className="error">Please log in to view your profile</div>
+        <div className="error">{t('profile.loginRequired')}</div>
       </div>
     );
   }
@@ -193,47 +195,47 @@ export default function ProfilePage() {
           <div className="profile-main">
           <div className="profile-card">
             <div className="profile-card-header">
-              <h2>Account Information</h2>
+              <h2>{t('profile.accountInfo')}</h2>
               {!isEditing && (
-                <button className="btn-secondary" onClick={handleStartEdit}>Edit</button>
+                <button className="btn-secondary" onClick={handleStartEdit}>{t('common.edit')}</button>
               )}
             </div>
-            {saveMessage && <div className="success">{saveMessage}</div>}
+            {saveMessage && <div className="success">{t('profile.profileUpdatedSuccessfully')}</div>}
             {isEditing ? (
               <form className="profile-edit-form" onSubmit={handleSaveProfile}>
                 <label>
-                  Email
+                  {t('profile.email')}
                   <input type="email" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} />
                 </label>
                 <label>
-                  Full Name
+                  {t('profile.fullName')}
                   <input value={nameInput} onChange={(e) => setNameInput(e.target.value)} />
                 </label>
                 <label>
-                  New Password
-                  <input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} placeholder="Leave blank to keep" />
+                  {t('profile.newPassword')}
+                  <input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} placeholder={t('profile.leaveBlank')} />
                 </label>
                 <div className="profile-edit-actions">
-                  <button type="button" className="btn-secondary" onClick={handleCancelEdit}>Cancel</button>
-                  <button type="submit" className="btn-primary">Save</button>
+                  <button type="button" className="btn-secondary" onClick={handleCancelEdit}>{t('common.cancel')}</button>
+                  <button type="submit" className="btn-primary">{t('common.save')}</button>
                 </div>
               </form>
             ) : (
               <>
             <div className="profile-field">
-              <label>Username</label>
+              <label>{t('profile.username')}</label>
               <div className="profile-value">{user.username}</div>
             </div>
             <div className="profile-field">
-              <label>Email</label>
+              <label>{t('profile.email')}</label>
               <div className="profile-value">{user.email}</div>
             </div>
             <div className="profile-field">
-              <label>Full Name</label>
+              <label>{t('profile.fullName')}</label>
               <div className="profile-value">{user.name || '—'}</div>
             </div>
             <div className="profile-field">
-              <label>Account Type</label>
+              <label>{t('profile.accountType')}</label>
               <div className="profile-value">{accountTypeLabel}</div>
             </div>
               </>
@@ -241,11 +243,11 @@ export default function ProfilePage() {
           </div>
 
           <div className="profile-card">
-            <h2>Wishlist</h2>
+            <h2>{t('profile.wishlist')}</h2>
             {loadingProducts ? (
-              <p className="muted">Loading wishlist…</p>
+              <p className="muted">{t('profile.loadingWishlist')}</p>
             ) : wishlistItems.length === 0 ? (
-              <p className="muted">Your wishlist is empty.</p>
+              <p className="muted">{t('profile.emptyWishlist')}</p>
             ) : (
               <div className="profile-grid">
                 {wishlistItems.map((item) => (
@@ -261,7 +263,7 @@ export default function ProfilePage() {
                         <div className="muted">${Number(item.price).toFixed(2)}</div>
                       </div>
                     </div>
-                    <button className="btn-secondary" onClick={() => handleRemoveWishlist(item.id, item.name)}>Remove</button>
+                    <button className="btn-secondary" onClick={() => handleRemoveWishlist(item.id, item.name)}>{t('common.delete')}</button>
                   </div>
                 ))}
               </div>
@@ -269,9 +271,9 @@ export default function ProfilePage() {
           </div>
 
           <div className="profile-card">
-            <h2>Recently Viewed</h2>
+            <h2>{t('profile.recentlyViewed')}</h2>
             {recentlyViewed.length === 0 ? (
-              <p className="muted">No recently viewed products yet.</p>
+              <p className="muted">{t('profile.noRecentlyViewed')}</p>
             ) : (
               <div className="profile-grid">
                 {recentlyViewed.map((item: any) => (
@@ -295,9 +297,9 @@ export default function ProfilePage() {
 
           <div className="profile-card">
             <div className="profile-card-header">
-              <h2>Saved Addresses</h2>
+              <h2>{t('profile.savedAddresses')}</h2>
               <button className="btn-secondary" onClick={() => { setEditingAddress(null); setShowAddressForm(!showAddressForm); }}>
-                {showAddressForm ? 'Cancel' : '+ Add Address'}
+                {showAddressForm ? t('common.cancel') : `+ ${t('profile.addAddress')}`}
               </button>
             </div>
             {showAddressForm && (
@@ -326,29 +328,29 @@ export default function ProfilePage() {
                   setShowAddressForm(false);
                   setEditingAddress(null);
                 } catch (err) {
-                  showToast('Failed to save address', 'error');
+                  showToast(t('profile.failedToSaveAddress'), 'error');
                 }
               }}>
-                <input name="label" placeholder="Label (e.g., Home, Work)" defaultValue={editingAddress?.label} required />
-                <input name="fullName" placeholder="Full Name" defaultValue={editingAddress?.fullName} required />
-                <input name="street" placeholder="Street Address" defaultValue={editingAddress?.street} required />
+                <input name="label" placeholder={t('profile.labelPlaceholder')} defaultValue={editingAddress?.label} required />
+                <input name="fullName" placeholder={t('profile.fullName')} defaultValue={editingAddress?.fullName} required />
+                <input name="street" placeholder={t('profile.streetAddress')} defaultValue={editingAddress?.street} required />
                 <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px'}}>
-                  <input name="city" placeholder="City" defaultValue={editingAddress?.city} required />
-                  <input name="state" placeholder="State" defaultValue={editingAddress?.state} required />
+                  <input name="city" placeholder={t('profile.city')} defaultValue={editingAddress?.city} required />
+                  <input name="state" placeholder={t('profile.state')} defaultValue={editingAddress?.state} required />
                 </div>
                 <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px'}}>
-                  <input name="zipCode" placeholder="ZIP Code" defaultValue={editingAddress?.zipCode} required />
-                  <input name="country" placeholder="Country" defaultValue={editingAddress?.country || 'USA'} />
+                  <input name="zipCode" placeholder={t('profile.zipCode')} defaultValue={editingAddress?.zipCode} required />
+                  <input name="country" placeholder={t('profile.country')} defaultValue={editingAddress?.country || 'USA'} />
                 </div>
                 <label style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                   <input type="checkbox" name="isDefault" defaultChecked={editingAddress?.isDefault} />
-                  Set as default address
+                  {t('profile.setAsDefault')}
                 </label>
-                <button type="submit" className="btn-primary">{editingAddress ? 'Update' : 'Save'} Address</button>
+                <button type="submit" className="btn-primary">{editingAddress ? t('profile.updateAddress') : t('profile.saveAddress')}</button>
               </form>
             )}
             {addresses.length === 0 ? (
-              <p className="muted">No saved addresses yet.</p>
+              <p className="muted">{t('profile.noAddresses')}</p>
             ) : (
               <div className="addresses-list">
                 {addresses.map((addr) => (
@@ -356,7 +358,7 @@ export default function ProfilePage() {
                     <div className="address-content">
                       <div className="address-header">
                         <strong>{addr.label}</strong>
-                        {addr.isDefault && <span className="default-badge">Default</span>}
+                        {addr.isDefault && <span className="default-badge">{t('profile.defaultAddress')}</span>}
                       </div>
                       <div>{addr.fullName}</div>
                       <div>{addr.street}</div>
@@ -364,12 +366,12 @@ export default function ProfilePage() {
                       <div>{addr.country}</div>
                     </div>
                     <div className="address-actions">
-                      <button onClick={() => { setEditingAddress(addr); setShowAddressForm(true); }}>Edit</button>
+                      <button onClick={() => { setEditingAddress(addr); setShowAddressForm(true); }}>{t('common.edit')}</button>
                       <button onClick={async () => {
                         await api.deleteAddress(addr.id);
                         const updated = await api.getAddresses(user!.id);
                         setAddresses(updated);
-                      }}>Delete</button>
+                      }}>{t('common.delete')}</button>
                     </div>
                   </div>
                 ))}
@@ -378,68 +380,68 @@ export default function ProfilePage() {
           </div>
 
           <div className="profile-actions">
-            <Link to="/shop/orders" className="btn-primary">View My Orders</Link>
-            <Link to="/shop/all" className="btn-secondary">Continue Shopping</Link>
+            <Link to="/shop/orders" className="btn-primary">{t('profile.viewMyOrders')}</Link>
+            <Link to="/shop/all" className="btn-secondary">{t('profile.continueShopping')}</Link>
           </div>
         </div>
 
           <div className="profile-sidebar">
             <div className="profile-card">
-              <h2>Quick Stats</h2>
+              <h2>{t('profile.quickStats')}</h2>
               <div className="stats-grid">
                 <div className="stat-item">
                   <div className="stat-icon">📦</div>
                   <div className="stat-info">
                     <div className="stat-value">{orderCount}</div>
-                    <div className="stat-label">Total Orders</div>
+                    <div className="stat-label">{t('profile.totalOrders')}</div>
                   </div>
                 </div>
                 <div className="stat-item">
                   <div className="stat-icon">💰</div>
                   <div className="stat-info">
                     <div className="stat-value">${totalSpent.toFixed(2)}</div>
-                    <div className="stat-label">Total Spent</div>
+                    <div className="stat-label">{t('profile.totalSpent')}</div>
                   </div>
                 </div>
                 <div className="stat-item">
                   <div className="stat-icon">❤️</div>
                   <div className="stat-info">
                     <div className="stat-value">{wishlistItems.length}</div>
-                    <div className="stat-label">Wishlist Items</div>
+                    <div className="stat-label">{t('profile.wishlistItems')}</div>
                   </div>
                 </div>
                 <div className="stat-item">
                   <div className="stat-icon">👁️</div>
                   <div className="stat-info">
                     <div className="stat-value">{recentlyViewed.length}</div>
-                    <div className="stat-label">Recently Viewed</div>
+                    <div className="stat-label">{t('profile.recentlyViewedCount')}</div>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="profile-card">
-              <h2>Quick Links</h2>
+              <h2>{t('profile.quickLinks')}</h2>
               <div className="quick-links">
                 <Link to="/shop/orders" className="quick-link">
                   <span className="quick-link-icon">📋</span>
                   <div>
-                    <div className="quick-link-title">My Orders</div>
-                    <div className="quick-link-desc">Track your purchases</div>
+                    <div className="quick-link-title">{t('profile.myOrders')}</div>
+                    <div className="quick-link-desc">{t('profile.trackPurchases')}</div>
                   </div>
                 </Link>
                 <Link to="/shop/all" className="quick-link">
                   <span className="quick-link-icon">🛍️</span>
                   <div>
-                    <div className="quick-link-title">Shop</div>
-                    <div className="quick-link-desc">Browse products</div>
+                    <div className="quick-link-title">{t('profile.shop')}</div>
+                    <div className="quick-link-desc">{t('profile.browseProducts')}</div>
                   </div>
                 </Link>
                 <Link to="/shop/checkout" className="quick-link">
                   <span className="quick-link-icon">🛒</span>
                   <div>
-                    <div className="quick-link-title">Cart</div>
-                    <div className="quick-link-desc">View your cart</div>
+                    <div className="quick-link-title">{t('profile.cart')}</div>
+                    <div className="quick-link-desc">{t('profile.viewCart')}</div>
                   </div>
                 </Link>
               </div>
