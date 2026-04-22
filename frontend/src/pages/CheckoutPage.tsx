@@ -353,7 +353,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
       const selectedAddress = addresses.find(a => a.id === selectedAddr);
       const shipping = needsPickup
         ? `PICKUP | ${courier} | ${pickupPointCode || 'N/A'} | ${pickupPointLabel}`
-        : `ADDRESS | ${courier} | ${formatAddressSingleLine(user ? selectedAddress || {} : guestAddress, { includeFullName: true })}`;
+        : `ADDRESS | ${courier} | ${formatAddressSingleLine(user ? selectedAddress || {} : guestAddress)}`;
 
       const selectedLanguage = i18n.resolvedLanguage?.toLowerCase().startsWith('en') ? 'en' : 'hu';
       const order = await api.createOrder({ userId, items: orderItems, courier, shippingAddress: shipping, language: selectedLanguage });
