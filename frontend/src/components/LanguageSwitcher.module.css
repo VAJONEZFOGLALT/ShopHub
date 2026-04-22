@@ -1,7 +1,16 @@
 .languageSwitcher {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 1100;
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
 .label {
@@ -39,6 +48,9 @@
 @media (max-width: 768px) {
   .languageSwitcher {
     gap: 6px;
+    left: 10px;
+    bottom: 10px;
+    padding: 6px 8px;
   }
 
   .label {
@@ -57,5 +69,10 @@
     min-width: 70px;
     padding: 6px 8px;
     font-size: 0.8em;
+  }
+
+  .languageSwitcher {
+    left: 8px;
+    bottom: 8px;
   }
 }
