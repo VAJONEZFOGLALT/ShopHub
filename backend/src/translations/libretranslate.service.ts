@@ -24,13 +24,11 @@ export class LibreTranslateService {
   private readonly languageMap: Record<string, string> = {
     hu: 'hu',
     en: 'en',
-    es: 'es',
   };
 
   private readonly deepLLanguageMap: Record<string, string> = {
     hu: 'HU',
     en: 'EN',
-    es: 'ES',
   };
 
   async translate(
@@ -54,16 +52,22 @@ export class LibreTranslateService {
       const translatedText = await this.openaiService.translate(text, source, target);
       return { translatedText };
     } catch (openaiError) {
+      console.warn('⚠ OpenAI unavailable, trying DeepL...');
       try {
         const translatedText = await this.translateWithDeepL(text, source, target);
+        console.log('✓ DeepL succeeded (OpenAI fallback)');
         return { translatedText };
       } catch (deepLError) {
+        console.warn('⚠ DeepL unavailable, trying LibreTranslate...');
         try {
           const translatedText = await this.translateWithLibreTranslate(text, source, target);
+          console.log('✓ LibreTranslate succeeded (DeepL fallback)');
           return { translatedText };
         } catch (libError) {
+          console.warn('⚠ LibreTranslate unavailable, trying MyMemory...');
           try {
             const translatedText = await this.translateWithMyMemory(text, source, target);
+            console.log('✓ MyMemory succeeded (LibreTranslate fallback)');
             return { translatedText };
           } catch (memoryError) {
             console.error('All translation services failed:', { openaiError, deepLError, libError, memoryError });
@@ -155,10 +159,12 @@ export class LibreTranslateService {
 
     // Try OpenAI first for better batch handling
     try {
-      return await this.openaiService.translateBatch(texts, source, target);
+      const results = await this.openaiService.translateBatch(texts, source, target);
+      console.log(`✓ OpenAI batch-translated ${texts.length} items`);
+      return results;
     } catch (openaiError) {
-      console.warn('OpenAI batch translation failed, falling back to individual translations');
-      // Fallback to individual translations
+      console.warn(`⚠ OpenAI batch failed, falling back to individual translations (${texts.length} items)`);
+      // Fallback to individual translations via regular translate (which has its own fallback chain)
       const results = await Promise.all(
         texts.map((text) => this.translate(text, source, target)),
       );
