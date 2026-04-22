@@ -15,7 +15,8 @@ export declare class ProductsController {
         stock: number;
         image: string | null;
     }>;
-    findAll(): Promise<{
+    findAll(lang?: string): Promise<{
+        categoryLabel: string;
         name: string;
         id: number;
         description: string | null;
@@ -24,7 +25,8 @@ export declare class ProductsController {
         stock: number;
         image: string | null;
     }[]>;
-    findOne(id: string): Promise<{
+    findOne(id: string, lang?: string): Promise<{
+        categoryLabel: string;
         name: string;
         id: number;
         description: string | null;

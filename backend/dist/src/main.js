@@ -19,6 +19,7 @@ async function bootstrap() {
         allowedHeaders: ['Content-Type', 'Authorization'],
         optionsSuccessStatus: 200,
     });
+    app.setGlobalPrefix('api');
     const config = new swagger_1.DocumentBuilder()
         .setTitle('WebShop API')
         .setDescription('Complete API documentation for the WebShop e-commerce platform')
@@ -41,6 +42,7 @@ async function bootstrap() {
     });
     app.useGlobalPipes(new common_1.ValidationPipe());
     await app.listen(process.env.PORT ?? 3000);
+    console.log(`Backend running on port ${process.env.PORT ?? 3000}`);
 }
 void bootstrap();
 //# sourceMappingURL=main.js.map
