@@ -36,7 +36,7 @@ export class OrdersService {
         id: { in: productIds },
         deletedAt: null,
       },
-      select: { id: true, price: true },
+      select: { id: true, price: true, name: true },
     });
 
     const foundIds = new Set(products.map((p) => p.id));
@@ -46,6 +46,7 @@ export class OrdersService {
     }
 
     const priceMap = new Map(products.map((p) => [p.id, p.price]));
+    const nameMap = new Map(products.map((p) => [p.id, p.name]));
 
     const orderItemsData = items.map((item) => {
       const price = priceMap.get(item.productId) ?? 0;
@@ -55,6 +56,12 @@ export class OrdersService {
         price,
       };
     });
+
+    const emailItems = items.map((item) => ({
+      name: nameMap.get(item.productId) || `#${item.productId}`,
+      quantity: item.quantity,
+      price: priceMap.get(item.productId) ?? 0,
+    }));
 
     const totalPrice = orderItemsData.reduce(
       (sum, i) => sum + i.price * i.quantity,
@@ -94,6 +101,9 @@ export class OrdersService {
           lineCount: orderItemsData.length,
           courier: createdOrder.courier,
           createdAt: (createdOrder as any).createdAt,
+          trackingNumber: createdOrder.trackingNumber || undefined,
+          shippingAddress: createdOrder.shippingAddress || undefined,
+          items: emailItems,
         });
       } catch (error) {
         emailStatus = {
@@ -123,7 +133,18 @@ export class OrdersService {
   }
 
   findOne(id: number) {
-    return this.prisma.orders.findUnique({ where: { id }, include: { orderItems: true } });
+    return this.prisma.orders.findUnique({
+      where: { id },
+      include: {
+        orderItems: {
+          include: {
+            product: {
+              select: { id: true, name: true, price: true, image: true, category: true },
+            },
+          },
+        },
+      },
+    });
   }
 
   update(id: number, updateOrderDto: UpdateOrderDto) {

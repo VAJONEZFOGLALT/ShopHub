@@ -342,6 +342,11 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
         : `ADDRESS | ${courier} | ${formatAddressSingleLine(user ? selectedAddress || {} : guestAddress)}`;
 
       const order = await api.createOrder({ userId, items: orderItems, courier, shippingAddress: shipping });
+      try {
+        localStorage.setItem('lastConfirmedOrderId', String(order.id));
+      } catch {
+        // Ignore storage failures.
+      }
       if (order.emailStatus && !order.emailStatus.emailSent) {
         const reason = order.emailStatus.reason || 'Unknown email delivery issue';
         showToast(`Az email nem ment ki: ${reason}`, 'warning');

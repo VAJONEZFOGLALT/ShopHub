@@ -322,6 +322,10 @@ export const api = {
     const data = await request<any[]>(`/orders/user/${userId}`);
     return data;
   },
+  getOrder: async (id: number) => {
+    const data = await request<any>(`/orders/${id}`);
+    return data;
+  },
   createOrder: async (data: { 
     userId: number; 
     items: { productId: number; quantity: number }[];

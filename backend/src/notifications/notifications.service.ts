@@ -36,6 +36,9 @@ export class NotificationsService {
     lineCount?: number;
     courier?: string | null;
     createdAt?: Date;
+    trackingNumber?: string | null;
+    shippingAddress?: string | null;
+    items?: Array<{ name: string; quantity: number; price: number }>;
   }): Promise<{ emailSent: boolean; reason?: string }> {
     const to = this.notifyOverrideTo || params.recipientEmail;
     if (!to) {
@@ -57,6 +60,15 @@ export class NotificationsService {
     });
     const totalPrice = `$${params.totalPrice.toFixed(2)}`;
     const lineCount = params.lineCount ?? params.itemCount;
+    const itemRows = params.items && params.items.length > 0
+      ? params.items.map((item) => `
+        <tr>
+          <td style="padding:10px 14px;border-top:1px solid #e7edf7;">${item.name}</td>
+          <td style="padding:10px 14px;border-top:1px solid #e7edf7;text-align:center;">x${item.quantity}</td>
+          <td style="padding:10px 14px;border-top:1px solid #e7edf7;text-align:right;">$${(item.price * item.quantity).toFixed(2)}</td>
+        </tr>
+      `).join('')
+      : '';
 
     const text = [
       `Hi ${displayName},`,
@@ -66,10 +78,12 @@ export class NotificationsService {
       `Product lines: ${lineCount}`,
       `Total: ${totalPrice}`,
       `Courier: ${params.courier || 'UPS'}`,
+      params.trackingNumber ? `Tracking: ${params.trackingNumber}` : '',
+      params.shippingAddress ? `Shipping: ${params.shippingAddress}` : '',
       `Order date: ${orderDate}`,
       '',
       'This is a demo notification email from PannonBolt.',
-    ].join('\n');
+    ].filter(Boolean).join('\n');
 
     const html = `
       <div style="margin:0;padding:24px;background:#f4f7fb;font-family:Segoe UI,Arial,sans-serif;color:#10243f;">
@@ -104,6 +118,18 @@ export class NotificationsService {
                   <td style="padding:12px 14px;color:#4b647f;font-size:13px;border-top:1px solid #e7edf7;">Courier</td>
                   <td style="padding:12px 14px;text-align:right;font-weight:600;border-top:1px solid #e7edf7;">${params.courier || 'UPS'}</td>
                 </tr>
+                ${params.trackingNumber ? `
+                <tr>
+                  <td style="padding:12px 14px;color:#4b647f;font-size:13px;border-top:1px solid #e7edf7;">Tracking</td>
+                  <td style="padding:12px 14px;text-align:right;font-weight:600;border-top:1px solid #e7edf7;">${params.trackingNumber}</td>
+                </tr>
+                ` : ''}
+                ${params.shippingAddress ? `
+                <tr>
+                  <td style="padding:12px 14px;color:#4b647f;font-size:13px;border-top:1px solid #e7edf7;">Shipping</td>
+                  <td style="padding:12px 14px;text-align:right;font-weight:600;border-top:1px solid #e7edf7;">${params.shippingAddress}</td>
+                </tr>
+                ` : ''}
                 <tr>
                   <td style="padding:14px;color:#0f172a;font-size:14px;font-weight:700;border-top:1px solid #e7edf7;">Total</td>
                   <td style="padding:14px;text-align:right;color:#0f172a;font-size:18px;font-weight:800;border-top:1px solid #e7edf7;">${totalPrice}</td>
@@ -111,6 +137,21 @@ export class NotificationsService {
               </table>
             </td>
           </tr>
+          ${itemRows ? `
+          <tr>
+            <td style="padding:0 28px 20px 28px;">
+              <h2 style="margin:0 0 10px 0;font-size:18px;color:#10243f;">Order Items</h2>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #d9e3f0;border-radius:12px;overflow:hidden;">
+                <tr>
+                  <th align="left" style="padding:10px 14px;background:#f8fbff;color:#4b647f;font-size:12px;font-weight:700;">Item</th>
+                  <th align="center" style="padding:10px 14px;background:#f8fbff;color:#4b647f;font-size:12px;font-weight:700;">Qty</th>
+                  <th align="right" style="padding:10px 14px;background:#f8fbff;color:#4b647f;font-size:12px;font-weight:700;">Subtotal</th>
+                </tr>
+                ${itemRows}
+              </table>
+            </td>
+          </tr>
+          ` : ''}
           <tr>
             <td style="padding:0 28px 28px 28px;font-size:13px;color:#5f738c;line-height:1.6;">
               This is a demo notification email from PannonBolt. No real payment was processed.
