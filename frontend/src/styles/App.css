@@ -2395,13 +2395,40 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 
 .profile-header-stats.two-rows {
   display: grid;
-  grid-template-columns: repeat(2, minmax(170px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  width: min(100%, 380px);
+  width: min(100%, 420px);
 }
 
 .profile-header-stats.two-rows .header-stat {
   width: 100%;
+  align-items: flex-start;
+  padding: 10px 12px;
+  min-width: 0;
+}
+
+.profile-header-stats.two-rows .header-stat-icon {
+  width: 24px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.profile-header-stats.two-rows .header-stat > div {
+  min-width: 0;
+}
+
+.profile-header-stats.two-rows .header-stat-value {
+  font-size: 1.05em;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.profile-header-stats.two-rows .header-stat-label {
+  white-space: normal;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .header-stat {
@@ -2413,6 +2440,7 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
+  min-width: 0;
 }
 
 .header-stat-icon {
@@ -3104,7 +3132,7 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 @media (max-width: 768px) {
   .profile-header { flex-direction: column; text-align: center; }
   .profile-header-stats { justify-content: center; flex-wrap: wrap; }
-  .profile-header-stats.two-rows { width: 100%; max-width: 420px; }
+  .profile-header-stats.two-rows { width: 100%; max-width: 420px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .profile-avatar { margin: 0 auto; }
   .profile-info h1 { font-size: 1.5em; }
   .profile-content { grid-template-columns: 1fr; }
