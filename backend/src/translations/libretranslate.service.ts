@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import axios from 'axios';
+import { OpenaiService } from './openai.service';
 
 export interface TranslateRequest {
   text: string;
@@ -13,6 +14,8 @@ export interface TranslateResponse {
 
 @Injectable()
 export class LibreTranslateService {
+  constructor(private readonly openaiService: OpenaiService) {}
+
   private readonly libApiUrl = process.env.LIBRETRANSLATE_API_URL || 'https://api.libretranslate.de';
   private readonly libApiKey = process.env.LIBRETRANSLATE_API_KEY;
   private readonly deepLApiUrl = 'https://api-free.deepl.com/v1/translate';
@@ -46,21 +49,26 @@ export class LibreTranslateService {
       throw new BadRequestException(`Unsupported target language: ${targetLang}`);
     }
 
-    // Try services in order of quality: DeepL > LibreTranslate > MyMemory
+    // Try services in order of quality: OpenAI > DeepL > LibreTranslate > MyMemory
     try {
-      const translatedText = await this.translateWithDeepL(text, source, target);
+      const translatedText = await this.openaiService.translate(text, source, target);
       return { translatedText };
-    } catch (deepLError) {
+    } catch (openaiError) {
       try {
-        const translatedText = await this.translateWithLibreTranslate(text, source, target);
+        const translatedText = await this.translateWithDeepL(text, source, target);
         return { translatedText };
-      } catch (libError) {
+      } catch (deepLError) {
         try {
-          const translatedText = await this.translateWithMyMemory(text, source, target);
+          const translatedText = await this.translateWithLibreTranslate(text, source, target);
           return { translatedText };
-        } catch (memoryError) {
-          console.error('All translation services failed:', { deepLError, libError, memoryError });
-          throw new BadRequestException('All translation services unavailable');
+        } catch (libError) {
+          try {
+            const translatedText = await this.translateWithMyMemory(text, source, target);
+            return { translatedText };
+          } catch (memoryError) {
+            console.error('All translation services failed:', { openaiError, deepLError, libError, memoryError });
+            throw new BadRequestException('All translation services unavailable');
+          }
         }
       }
     }
@@ -138,9 +146,23 @@ export class LibreTranslateService {
     sourceLang: string,
     targetLang: string,
   ): Promise<string[]> {
-    const results = await Promise.all(
-      texts.map((text) => this.translate(text, sourceLang, targetLang)),
-    );
-    return results.map((r) => r.translatedText);
+    if (texts.length === 0) {
+      return [];
+    }
+
+    const source = this.languageMap[sourceLang] || sourceLang;
+    const target = this.languageMap[targetLang] || targetLang;
+
+    // Try OpenAI first for better batch handling
+    try {
+      return await this.openaiService.translateBatch(texts, source, target);
+    } catch (openaiError) {
+      console.warn('OpenAI batch translation failed, falling back to individual translations');
+      // Fallback to individual translations
+      const results = await Promise.all(
+        texts.map((text) => this.translate(text, source, target)),
+      );
+      return results.map((r) => r.translatedText);
+    }
   }
 }
