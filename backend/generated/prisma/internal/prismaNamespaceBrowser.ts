@@ -57,7 +57,8 @@ export const ModelName = {
   CompareItems: 'CompareItems',
   Orders: 'Orders',
   OrderItems: 'OrderItems',
-  Address: 'Address'
+  Address: 'Address',
+  Translation: 'Translation'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -187,6 +188,18 @@ export const AddressScalarFieldEnum = {
 export type AddressScalarFieldEnum = (typeof AddressScalarFieldEnum)[keyof typeof AddressScalarFieldEnum]
 
 
+export const TranslationScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  language: 'language',
+  value: 'value',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TranslationScalarFieldEnum = (typeof TranslationScalarFieldEnum)[keyof typeof TranslationScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -252,4 +265,12 @@ export const AddressOrderByRelevanceFieldEnum = {
 } as const
 
 export type AddressOrderByRelevanceFieldEnum = (typeof AddressOrderByRelevanceFieldEnum)[keyof typeof AddressOrderByRelevanceFieldEnum]
+
+
+export const TranslationOrderByRelevanceFieldEnum = {
+  key: 'key',
+  value: 'value'
+} as const
+
+export type TranslationOrderByRelevanceFieldEnum = (typeof TranslationOrderByRelevanceFieldEnum)[keyof typeof TranslationOrderByRelevanceFieldEnum]
 

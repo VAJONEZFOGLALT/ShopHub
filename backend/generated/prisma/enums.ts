@@ -28,3 +28,17 @@ export const CourierService = {
 } as const
 
 export type CourierService = (typeof CourierService)[keyof typeof CourierService]
+
+
+export const SupportedLanguage = {
+  HU: 'HU',
+  EN: 'EN',
+  DE: 'DE',
+  FR: 'FR',
+  ES: 'ES',
+  PL: 'PL',
+  CZ: 'CZ',
+  IT: 'IT'
+} as const
+
+export type SupportedLanguage = (typeof SupportedLanguage)[keyof typeof SupportedLanguage]

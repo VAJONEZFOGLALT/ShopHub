@@ -15,6 +15,7 @@ import { WishlistModule } from './wishlist/wishlist.module';
 import { RecentlyViewedModule } from './recently-viewed/recently-viewed.module';
 import { CompareModule } from './compare/compare.module';
 import { AddressesModule } from './addresses/addresses.module';
+import { TranslationsModule } from './translations/translations.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { AddressesModule } from './addresses/addresses.module';
     RecentlyViewedModule,
     CompareModule,
     AddressesModule,
+    TranslationsModule,
   ],
   controllers: [AppController],
   providers: [

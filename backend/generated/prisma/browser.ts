@@ -62,3 +62,8 @@ export type OrderItems = Prisma.OrderItemsModel
  * 
  */
 export type Address = Prisma.AddressModel
+/**
+ * Model Translation
+ * 
+ */
+export type Translation = Prisma.TranslationModel
