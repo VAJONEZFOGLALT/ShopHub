@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { api } from '../services/api';
@@ -46,6 +47,7 @@ const persistWishlistCache = (userId: number, ids: number[]) => {
 export function useWishlist() {
   const { user, isAuthenticated } = useAuth();
   const { showToast } = useToast();
+  const { t } = useTranslation();
   const [wishlistIds, setWishlistIds] = useState<number[]>([]);
   const [pendingIds, setPendingIds] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -105,7 +107,7 @@ export function useWishlist() {
 
   const handleToggleWishlist = async (productId: number, productName?: string) => {
     if (!isAuthenticated || !user) {
-      showToast('Please log in to use the wishlist feature', 'warning');
+      showToast(t('toasts.wishlistLogin'), 'warning');
       return;
     }
 
@@ -132,16 +134,16 @@ export function useWishlist() {
     try {
       if (isCurrentlyWishlisted) {
         await api.removeFromWishlistByProduct(user.id, productId);
-        showToast(`💔 ${productName ? `"${productName}"` : 'Item'} removed from wishlist`, 'info');
+        showToast(t('toasts.wishlistRemoved', { item: productName || t('products.product') }), 'info');
       } else {
         await api.addToWishlist({ userId: user.id, productId });
-        showToast(`❤️ ${productName ? `"${productName}"` : 'Item'} added to wishlist!`, 'success');
+        showToast(t('toasts.wishlistAdded', { item: productName || t('products.product') }), 'success');
       }
     } catch {
       wishlistIdsRef.current = previousIds;
       setWishlistIds(previousIds);
       persistWishlistCache(user.id, previousIds);
-      showToast('Failed to update wishlist', 'error');
+      showToast(t('toasts.wishlistUpdateFailed'), 'error');
     } finally {
       pendingIdsRef.current = pendingIdsRef.current.filter((id) => id !== productId);
       setPendingIds(pendingIdsRef.current);
@@ -150,7 +152,7 @@ export function useWishlist() {
 
   const handleRemoveWishlist = async (productId: number, productName?: string) => {
     if (!isAuthenticated || !user) {
-      showToast('Please log in to use the wishlist feature', 'warning');
+      showToast(t('toasts.wishlistLogin'), 'warning');
       return;
     }
 
@@ -160,9 +162,9 @@ export function useWishlist() {
       wishlistIdsRef.current = nextIds;
       setWishlistIds(nextIds);
       persistWishlistCache(user.id, nextIds);
-      showToast(`💔 ${productName ? `"${productName}"` : 'Item'} removed from wishlist`, 'info');
+      showToast(t('toasts.wishlistRemoved', { item: productName || t('products.product') }), 'info');
     } catch {
-      showToast('Failed to remove from wishlist', 'error');
+      showToast(t('toasts.wishlistRemoveFailed'), 'error');
     }
   };
 

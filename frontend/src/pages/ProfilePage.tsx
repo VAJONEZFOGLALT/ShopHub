@@ -79,7 +79,7 @@ export default function ProfilePage() {
         setWishlistIds(wishlistData.map((item: any) => item.productId));
       } catch (err) {
         if (!cancelled) {
-          showToast('Failed to load profile data', 'error');
+          showToast(t('toasts.profileLoadFailed'), 'error');
         }
       } finally {
         if (!cancelled) {
@@ -115,9 +115,9 @@ export default function ProfilePage() {
       await api.removeFromWishlistByProduct(user.id, productId);
       const nextIds = wishlistIds.filter((id) => id !== productId);
       setWishlistIds(nextIds);
-      showToast(`💔 ${productName ? `"${productName}"` : 'Item'} removed from wishlist`, 'info');
+      showToast(t('toasts.wishlistRemoved', { item: productName || t('products.product') }), 'info');
     } catch {
-      showToast('Failed to remove from wishlist', 'error');
+      showToast(t('toasts.wishlistRemoveFailed'), 'error');
     }
   };
 
@@ -202,7 +202,8 @@ export default function ProfilePage() {
       setIsEditing(false);
       setSaveMessage(t('profile.profileUpdatedSuccessfully'));
     } catch (err: any) {
-      showToast(err?.message || t('profile.profileUpdateFailed'), 'error');
+      console.error('Profile update failed:', err);
+      showToast(t('profile.profileUpdateFailed'), 'error');
     }
   };
 
