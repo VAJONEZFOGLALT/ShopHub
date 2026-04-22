@@ -36,11 +36,7 @@ export default function ProfilePage() {
   const displayName = user?.name || user?.username || '';
   const usernameLength = user?.username?.length ?? 0;
   const shouldWrapHeaderStats = usernameLength > 8;
-  const headerStatsClasses = [
-    'profile-header-stats',
-    shouldWrapHeaderStats ? 'two-rows' : 'one-row',
-    usernameLength > 12 ? 'username-xl' : usernameLength > 8 ? 'username-l' : 'username-s',
-  ].join(' ');
+  const headerStatsClasses = `profile-header-stats ${shouldWrapHeaderStats ? 'two-rows' : 'one-row'}`;
   const addressButtonText = addresses.length === 0 ? t('profile.addAddress') : t('profile.updateAddress');
   const isCollectionsLoading = pageLoading;
   const preferredAddress = useMemo(() => {
