@@ -3,14 +3,17 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from '../src/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import express from 'express';
+import * as express from 'express';
+import { Request, Response } from 'express';
 
-const server = express();
-let app: any;
+let cachedServer: express.Express;
 
-async function bootstrap() {
-  if (!app) {
-    app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+async function bootstrapServer(): Promise<express.Express> {
+  if (!cachedServer) {
+    const expressApp = express();
+    const adapter = new ExpressAdapter(expressApp);
+    
+    const app = await NestFactory.create(AppModule, adapter);
 
     const origins = [
       process.env.FRONTEND_URL,
@@ -51,12 +54,14 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe());
     
     await app.init();
+    
+    cachedServer = expressApp;
   }
   
-  return server;
+  return cachedServer;
 }
 
-export default async (req: any, res: any) => {
-  await bootstrap();
-  server(req, res);
-};
+export default async function handler(req: Request, res: Response) {
+  const server = await bootstrapServer();
+  return server(req, res);
+}
