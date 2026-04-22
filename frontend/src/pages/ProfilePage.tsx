@@ -7,7 +7,7 @@ import { useWishlist } from '../hooks/useWishlist';
 import { getRecentlyViewed } from '../services/storage';
 import { getAvatarUrl, getProductImageUrl } from '../utils/imageOptimization';
 import { useToast } from '../contexts/ToastContext';
-import { COUNTRY_ADDRESS_GROUPS, COUNTRY_ADDRESS_CONFIGS, DEFAULT_COUNTRY_CODE, getCountryAddressConfig } from '../utils/addressing';
+import { COUNTRY_ADDRESS_GROUPS, DEFAULT_COUNTRY_CODE, getCountryAddressConfig } from '../utils/addressing';
 
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
@@ -404,9 +404,8 @@ export default function ProfilePage() {
                   <strong>{preferredAddress.label}</strong>
                   {preferredAddress.isDefault && <span className="default-badge">{t('profile.defaultAddress')}</span>}
                 </div>
-                <div className="profile-address-line">{preferredAddress.fullName}</div>
                 <div className="profile-address-line">{preferredAddress.street}</div>
-                <div className="profile-address-line">{preferredAddress.city}, {preferredAddress.state} {preferredAddress.zipCode}</div>
+                <div className="profile-address-line">{preferredAddress.city} {preferredAddress.state ? `, ${preferredAddress.state}` : ''} {preferredAddress.zipCode}</div>
                 <div className="profile-address-line">{preferredAddress.country}</div>
                 <div className="address-modal-current-actions">
                   <button className="btn-sm" onClick={() => {
@@ -438,7 +437,7 @@ export default function ProfilePage() {
                 const data = {
                   userId: user!.id,
                   label: formData.get('label') as string,
-                  fullName: formData.get('fullName') as string,
+                  fullName: user!.name || user!.username,
                   street: formData.get('street') as string,
                   city: formData.get('city') as string,
                   state: formData.get('state') as string,
@@ -460,7 +459,6 @@ export default function ProfilePage() {
                 }
               }}>
                 <input name="label" placeholder={t('profile.labelPlaceholder')} defaultValue={editingAddress?.label} required />
-                <input name="fullName" placeholder={t('profile.fullName')} defaultValue={editingAddress?.fullName} required />
                 <input name="street" placeholder={t('profile.streetAddress')} defaultValue={editingAddress?.street} required />
                 <select name="country" value={addressCountry} onChange={(e) => setAddressCountry(e.target.value)}>
                   {COUNTRY_ADDRESS_GROUPS.map((group) => (
@@ -476,20 +474,17 @@ export default function ProfilePage() {
                 <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px'}}>
                   <input name="city" placeholder={t('profile.city')} defaultValue={editingAddress?.city} required />
                   {activeCountryConfig.regions ? (
-                    <select name="state" defaultValue={editingAddress?.state || ''} required>
-                      <option value="" disabled>{activeCountryConfig.regionLabel}</option>
+                    <select name="state" defaultValue={editingAddress?.state || ''}>
+                      <option value="">{`${activeCountryConfig.regionLabel} (${t('profile.optional')})`}</option>
                       {activeCountryConfig.regions.map((region) => (
                         <option key={region} value={region}>{region}</option>
                       ))}
                     </select>
                   ) : (
-                    <input name="state" placeholder={activeCountryConfig.regionLabel} defaultValue={editingAddress?.state} required />
+                    <input name="state" placeholder={`${activeCountryConfig.regionLabel} (${t('profile.optional')})`} defaultValue={editingAddress?.state} />
                   )}
                 </div>
-                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px'}}>
-                  <input name="zipCode" placeholder={activeCountryConfig.postalLabel} defaultValue={editingAddress?.zipCode} required />
-                  <input value={activeCountryConfig.regionLabel} disabled />
-                </div>
+                <input name="zipCode" placeholder={activeCountryConfig.postalLabel} defaultValue={editingAddress?.zipCode} required />
                 <label style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                   <input type="checkbox" name="isDefault" defaultChecked={editingAddress?.isDefault} />
                   {t('profile.setAsDefault')}
