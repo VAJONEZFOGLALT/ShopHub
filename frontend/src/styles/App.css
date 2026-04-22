@@ -2393,6 +2393,17 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   align-items: center;
 }
 
+.profile-header-stats.two-rows {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(170px, 1fr));
+  gap: 12px;
+  width: min(100%, 380px);
+}
+
+.profile-header-stats.two-rows .header-stat {
+  width: 100%;
+}
+
 .header-stat {
   display: flex;
   align-items: center;
@@ -3076,10 +3087,6 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 .order-total { display: flex; flex-direction: column; text-align: right; padding: 14px; background: var(--surface-hover); border: 1px solid var(--border); border-radius: 10px; }
 .total-label { color: var(--muted); font-size: 0.85em; font-weight: 600; margin-bottom: 4px; }
 .total-amount { font-weight: 700; font-size: 1.6em; color: var(--success); }
-.order-summary-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.summary-pill { padding: 12px; border-radius: 10px; background: var(--surface-hover); border: 1px solid var(--border); display: grid; gap: 6px; }
-.summary-pill span { color: var(--muted); font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2px; }
-.summary-pill strong { color: var(--text); font-size: 1em; }
 .order-side-panel { padding: 12px; border-radius: 10px; background: var(--surface-hover); border: 1px solid var(--border); display: grid; gap: 4px; }
 .side-panel-title { color: var(--muted); font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2px; }
 .side-panel-value { color: var(--text); font-weight: 600; font-size: 0.95em; word-break: break-word; }
@@ -3097,6 +3104,7 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 @media (max-width: 768px) {
   .profile-header { flex-direction: column; text-align: center; }
   .profile-header-stats { justify-content: center; flex-wrap: wrap; }
+  .profile-header-stats.two-rows { width: 100%; max-width: 420px; }
   .profile-avatar { margin: 0 auto; }
   .profile-info h1 { font-size: 1.5em; }
   .profile-content { grid-template-columns: 1fr; }
