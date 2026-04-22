@@ -40,33 +40,33 @@ export class LibreTranslateService {
     }
 
     try {
-      const payload: Record<string, any> = {
-        q: text,
-        source,
-        target,
-      };
-
-      if (this.apiKey) {
-        payload.api_key = this.apiKey;
-      }
-
-      const response = await axios.post(`${this.apiUrl}/translate`, payload, {
-        timeout: 10000,
-      });
-
+      const translatedText = await this.translateWithMyMemory(text, source, target);
       return {
-        translatedText: response.data.translatedText,
+        translatedText,
       };
-    } catch (error) {
+    } catch (primaryError) {
       try {
-        const fallback = await this.translateWithMyMemory(text, source, target);
+        const payload: Record<string, any> = {
+          q: text,
+          source,
+          target,
+        };
+
+        if (this.apiKey) {
+          payload.api_key = this.apiKey;
+        }
+
+        const response = await axios.post(`${this.apiUrl}/translate`, payload, {
+          timeout: 10000,
+        });
+
         return {
-          translatedText: fallback,
+          translatedText: response.data.translatedText,
         };
       } catch (fallbackError) {
-        if (axios.isAxiosError(error)) {
+        if (axios.isAxiosError(primaryError)) {
           throw new BadRequestException(
-            `Translation failed: ${error.response?.data?.message || error.message}`,
+            `Translation failed: ${primaryError.response?.data?.message || primaryError.message}`,
           );
         }
         if (axios.isAxiosError(fallbackError)) {
