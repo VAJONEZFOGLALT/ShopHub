@@ -20,6 +20,17 @@ const getProductCategory = (product: any) => {
 
 const normalizeCategory = (value: string) => value.trim().toLowerCase();
 
+const parseOptionalQueryNumber = (value: string | null): number | null => {
+  if (value === null || value.trim() === '') {
+    return null;
+  }
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return null;
+  }
+  return parsed;
+};
+
 const getSliderCeiling = (maxProductPrice: number) => {
   if (!Number.isFinite(maxProductPrice) || maxProductPrice <= 0) {
     return 1000;
@@ -158,13 +169,13 @@ export default function CategoryPage() {
   }, [products, decodedCategoryName]);
 
   useEffect(() => {
-    const minParam = Number(searchParams.get('min'));
-    const maxParam = Number(searchParams.get('max'));
+    const minParam = parseOptionalQueryNumber(searchParams.get('min'));
+    const maxParam = parseOptionalQueryNumber(searchParams.get('max'));
 
-    const nextMin = Number.isFinite(minParam) && minParam >= 0
+    const nextMin = minParam !== null && minParam >= 0
       ? Math.min(minParam, maxPrice)
       : 0;
-    const rawMax = Number.isFinite(maxParam) && maxParam >= 0
+    const rawMax = maxParam !== null && maxParam >= 0
       ? Math.min(maxParam, maxPrice)
       : maxPrice;
     const nextMax = rawMax < nextMin ? nextMin : rawMax;
