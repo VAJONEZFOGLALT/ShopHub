@@ -142,12 +142,27 @@ export default function ProfilePage() {
     }
   };
 
+  const validatePasswordStrength = (pwd: string): string | null => {
+    if (pwd.length < 8) return 'Jelszó minimum 8 karakter hosszú kell legyen';
+    if (!/[A-Z]/.test(pwd)) return 'Jelszóban kell lennie nagy betűnek';
+    if (!/[a-z]/.test(pwd)) return 'Jelszóban kell lennie kis betűnek';
+    if (!/[0-9]/.test(pwd)) return 'Jelszóban kell lennie számnak';
+    return null;
+  };
+
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaveMessage(null);
     if (passwordInput.trim() && !oldPasswordInput.trim()) {
       showToast('Az uj jelszohoz meg kell adni a regi jelszot is.', 'error');
       return;
+    }
+    if (passwordInput.trim()) {
+      const error = validatePasswordStrength(passwordInput.trim());
+      if (error) {
+        showToast(error, 'error');
+        return;
+      }
     }
 
     try {
@@ -225,7 +240,7 @@ export default function ProfilePage() {
             </button>
           </div>
           <div className="profile-info">
-            <h1>{displayName}</h1>
+            <h1>{user.username || displayName}</h1>
             <p className="profile-role">{roleLabel}</p>
           </div>
           
@@ -305,11 +320,11 @@ export default function ProfilePage() {
               </div>
               <div className="profile-field">
                 <label>{t('profile.email')}</label>
-                <div className="profile-value">{user.email}</div>
+                <div className="profile-value profile-email">{user.email}</div>
               </div>
               <div className="profile-field">
                 <label>{t('profile.fullName')}</label>
-                <div className="profile-value">{user.name || '—'}</div>
+                <div className="profile-value profile-fullname">{user.name || '—'}</div>
               </div>
               <div className="profile-field">
                 <label>{t('profile.accountType')}</label>
@@ -543,7 +558,7 @@ export default function ProfilePage() {
             <form className="profile-edit-form modal-body" onSubmit={handleSaveProfile}>
               <label>
                 {t('profile.username')}
-                <input value={usernameInput} onChange={(e) => setUsernameInput(e.target.value)} required />
+                <input value={usernameInput} onChange={(e) => setUsernameInput(e.target.value)} maxLength={16} required />
               </label>
               <label>
                 {t('profile.email')}
@@ -553,6 +568,7 @@ export default function ProfilePage() {
                 {t('profile.fullName')}
                 <input value={nameInput} onChange={(e) => setNameInput(e.target.value)} />
               </label>
+              <div className="profile-edit-password-section"></div>
               <label>
                 {t('profile.oldPassword')}
                 <input type="password" value={oldPasswordInput} onChange={(e) => setOldPasswordInput(e.target.value)} placeholder={t('profile.oldPasswordPlaceholder')} />

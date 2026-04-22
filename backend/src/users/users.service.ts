@@ -22,6 +22,21 @@ export class UsersService {
     return this.prisma.users.findUnique({ where: { id } });
   }
 
+  private validatePasswordStrength(password: string): void {
+    if (password.length < 8) {
+      throw new BadRequestException('Password must be at least 8 characters long');
+    }
+    if (!/[A-Z]/.test(password)) {
+      throw new BadRequestException('Password must contain at least one uppercase letter');
+    }
+    if (!/[a-z]/.test(password)) {
+      throw new BadRequestException('Password must contain at least one lowercase letter');
+    }
+    if (!/[0-9]/.test(password)) {
+      throw new BadRequestException('Password must contain at least one number');
+    }
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto) {
     const { password, oldPassword, ...rest } = updateUserDto;
     const existing = await this.prisma.users.findUnique({
@@ -42,6 +57,8 @@ export class UsersService {
       if (!matches) {
         throw new BadRequestException('Old password is incorrect');
       }
+
+      this.validatePasswordStrength(password);
 
       const hashedPassword = await bcrypt.hash(password, 10);
       return this.prisma.users.update({ where: { id }, data: { ...rest, password_hash: hashedPassword } });
