@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { api } from '../../services/api';
 import { getThumbnailUrl } from '../../utils/imageOptimization';
+import { LanguageSwitcher } from '../LanguageSwitcher';
 
 export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart?: () => void }) {
   const [categories, setCategories] = useState<string[]>([]);
@@ -102,6 +103,8 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
           <button className="theme-toggle" onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}>
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
+
+          <LanguageSwitcher />
 
           <button className="navbar-cart" onClick={onCart}>
             🛒 {items.length > 0 && <span className="cart-badge">{items.length}</span>}

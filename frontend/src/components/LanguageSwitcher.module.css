@@ -5,26 +5,57 @@
 }
 
 .label {
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  font-size: 0.9em;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  margin: 0;
 }
 
 .select {
-  padding: 6px 12px;
-  border: 1px solid #ddd;
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 0.9em;
+  font-weight: 500;
   cursor: pointer;
-  background-color: white;
   transition: border-color 0.2s;
+  min-width: 100px;
 }
 
 .select:hover {
-  border-color: #999;
+  border-color: var(--primary);
+  background: var(--surface);
 }
 
 .select:focus {
   outline: none;
-  border-color: #0066cc;
-  box-shadow: 0 0 4px rgba(0, 102, 204, 0.25);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+@media (max-width: 768px) {
+  .languageSwitcher {
+    gap: 6px;
+  }
+
+  .label {
+    display: none;
+  }
+
+  .select {
+    min-width: 80px;
+    padding: 6px 10px;
+    font-size: 0.85em;
+  }
+}
+
+@media (max-width: 480px) {
+  .select {
+    min-width: 70px;
+    padding: 6px 8px;
+    font-size: 0.8em;
+  }
 }
