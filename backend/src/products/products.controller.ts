@@ -37,6 +37,14 @@ export class ProductsController {
     return this.productsService.findAll(lang);
   }
 
+  @Get('featured')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  @Header('Pragma', 'no-cache')
+  @Header('Expires', '0')
+  getFeatured(@Query('lang') lang?: string) {
+    return this.productsService.getFeaturedShowcase(lang);
+  }
+
   @Get(':id')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   @Header('Pragma', 'no-cache')

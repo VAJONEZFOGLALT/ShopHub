@@ -115,6 +115,82 @@ export class ProductsService {
     }
   }
 
+  async getFeaturedShowcase(language?: string) {
+    const products = await this.findAll(language);
+    const recentViews = await this.prisma.recentlyViewed.findMany({
+      where: {
+        product: {
+          deletedAt: null,
+        },
+      },
+      select: {
+        productId: true,
+      },
+    });
+
+    const viewCounts = new Map<number, number>();
+    for (const row of recentViews) {
+      viewCounts.set(row.productId, (viewCounts.get(row.productId) || 0) + 1);
+    }
+
+    const enrichedProducts = products.map((product) => ({
+      ...product,
+      viewsCount: viewCounts.get(product.id) || 0,
+    }));
+
+    const categories = new Map<string, { key: string; label: string; viewsCount: number; productCount: number }>();
+    for (const product of enrichedProducts) {
+      const key = (product.category || '').trim();
+      if (!key) {
+        continue;
+      }
+
+      const label = (product.categoryLabel || product.category || key).trim();
+      const existing = categories.get(key);
+      if (existing) {
+        existing.viewsCount += product.viewsCount || 0;
+        existing.productCount += 1;
+        continue;
+      }
+
+      categories.set(key, {
+        key,
+        label,
+        viewsCount: product.viewsCount || 0,
+        productCount: 1,
+      });
+    }
+
+    const featuredProducts = [...enrichedProducts]
+      .sort((a, b) => {
+        const viewDelta = (b.viewsCount || 0) - (a.viewsCount || 0);
+        if (viewDelta !== 0) {
+          return viewDelta;
+        }
+        return b.id - a.id;
+      })
+      .slice(0, 12);
+
+    const featuredCategories = [...categories.values()]
+      .sort((a, b) => {
+        const viewDelta = b.viewsCount - a.viewsCount;
+        if (viewDelta !== 0) {
+          return viewDelta;
+        }
+        const labelDelta = a.label.localeCompare(b.label);
+        if (labelDelta !== 0) {
+          return labelDelta;
+        }
+        return b.productCount - a.productCount;
+      })
+      .slice(0, 6);
+
+    return {
+      categories: featuredCategories,
+      products: featuredProducts,
+    };
+  }
+
   async create(createProductDto: CreateProductDto) {
     try {
       const created = await this.prisma.products.create({ data: createProductDto });
