@@ -11,7 +11,14 @@ export class ProductsService {
   private readonly cacheTtlMs = 60 * 1000;
   private readonly categoryTranslationOverrides: Record<string, Record<string, string>> = {
     en: {
+      elektronika: 'Electronics',
+      kiegeszitok: 'Accessories',
+      iroda: 'Office',
       otthon: 'Home',
+      divat: 'Fashion',
+      sport: 'Sports',
+      gaming: 'Gaming',
+      audio: 'Audio',
     },
   };
   private readonly productNameTranslationContext =
