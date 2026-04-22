@@ -77,6 +77,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
   const [error, setError] = useState('');
 
   const selectedCourier = couriers.find((c) => c.id === courier) || couriers[0];
+  const hasItems = items.length > 0;
   const needsPickup = selectedCourier.type === 'pickup' || (selectedCourier.type === 'both' && deliveryMode === 'pickup');
   const needsAddress = selectedCourier.type === 'address' || (selectedCourier.type === 'both' && deliveryMode === 'address');
   const guestCountryConfig = getCountryAddressConfig(guestAddress.country);
@@ -112,6 +113,14 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
     script.onerror = () => setPacketaReady(false);
     document.body.appendChild(script);
   }, []);
+
+  useEffect(() => {
+    if (!hasItems) {
+      setError(t('cart.empty'));
+      return;
+    }
+    setError('');
+  }, [hasItems, t]);
 
   const handlePickPacketaPoint = () => {
     const apiKey = import.meta.env.VITE_PACKETA_API_KEY || '';
@@ -163,6 +172,11 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
     setLoading(true);
     setError('');
     try {
+      if (!hasItems) {
+        setError(t('cart.empty'));
+        return;
+      }
+
       if (needsPickup && !pickupPointLabel.trim()) {
         setError('Valassz atvevo pontot/boxot a kivalasztott futarhoz.');
         return;
@@ -205,24 +219,33 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
 
   return (
     <div className="checkout-wrapper">
-      <div className="checkout-container">
+      <div className={`checkout-container ${hasItems ? '' : 'checkout-container-empty'}`.trim()}>
         <div className="checkout-main">
           <h2>{t('checkout.title')}</h2>
           {error && <div className="error">{error}</div>}
 
-          {items.length === 0 ? (
+          {!hasItems ? (
             <div className="empty-checkout">
               <div className="empty-state">
                 <p style={{ fontSize: '4em', margin: '0 0 16px 0' }}>🛒</p>
                 <h3>{t('cart.empty')}</h3>
-                <p className="muted">{t('checkout.addItemsFirst')}</p>
-                <button 
-                  className="btn-primary" 
-                  onClick={() => navigate('/shop/all')}
-                  style={{ marginTop: '20px' }}
-                >
-                  Continue Shopping
-                </button>
+                <p className="muted">Tegyél legalább egy terméket a kosárba a rendelés folytatásához.</p>
+                <div className="empty-checkout-actions">
+                  <button
+                    className="btn-primary"
+                    onClick={() => navigate('/shop/all')}
+                    style={{ marginTop: '20px' }}
+                  >
+                    {t('profile.continueShopping')}
+                  </button>
+                  <button
+                    className="btn-secondary"
+                    onClick={() => navigate('/shop')}
+                    style={{ marginTop: '20px' }}
+                  >
+                    {t('common.home')}
+                  </button>
+                </div>
               </div>
             </div>
           ) : (
@@ -433,26 +456,28 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
           )}
         </div>
 
-        <div className="checkout-sidebar">
-          <h3>{t('checkout.summary')}</h3>
-          <div style={{ padding: '20px 0' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span>{t('checkout.subtotal')}</span>
-              <span>${total.toFixed(2)}</span>
+        {hasItems && (
+          <div className="checkout-sidebar">
+            <h3>{t('checkout.summary')}</h3>
+            <div style={{ padding: '20px 0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span>{t('checkout.subtotal')}</span>
+                <span>${total.toFixed(2)}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid var(--border)' }}>
+                <span>{t('checkout.shipping')}</span>
+                <span>${ship.toFixed(2)}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2em', fontWeight: 'bold' }}>
+                <span>{t('checkout.total')}</span>
+                <span>${finalTotal.toFixed(2)}</span>
+              </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid var(--border)' }}>
-              <span>{t('checkout.shipping')}</span>
-              <span>${ship.toFixed(2)}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2em', fontWeight: 'bold' }}>
-              <span>{t('checkout.total')}</span>
-              <span>${finalTotal.toFixed(2)}</span>
-            </div>
+            <button className="btn-primary btn-block" onClick={handleOrder} disabled={loading || !hasItems}>
+              {loading ? t('checkout.processing') : t('checkout.placeOrder')}
+            </button>
           </div>
-          <button className="btn-primary btn-block" onClick={handleOrder} disabled={loading || items.length === 0}>
-            {loading ? t('checkout.processing') : t('checkout.placeOrder')}
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );
