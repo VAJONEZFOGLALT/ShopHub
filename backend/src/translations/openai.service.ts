@@ -16,6 +16,7 @@ export class OpenaiService {
     texts: string[],
     sourceLanguage: string,
     targetLanguage: string,
+    context?: string,
   ): Promise<string[]> {
     if (!this.apiKey) {
       throw new BadRequestException('OpenAI API key not configured');
@@ -27,32 +28,36 @@ export class OpenaiService {
 
     const sourceLang = this.languageNames[sourceLanguage] || sourceLanguage;
     const targetLang = this.languageNames[targetLanguage] || targetLanguage;
+    const contextInstructions = context?.trim()
+      ? `\n\nCONTEXT:\n${context.trim()}\n`
+      : '\n';
 
     try {
       const response = await axios.post(
         this.apiUrl,
         {
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-4o-mini',
           temperature: 0,
           messages: [
             {
               role: 'system',
-            content: `You are a professional e-commerce translator. Translate from ${sourceLang} to ${targetLang}.
+              content: `You are a professional e-commerce translator. Translate from ${sourceLang} to ${targetLang}.
 
 CRITICAL RULES:
-- Return ONLY the translations, one per line, in exact same order as input
-- No numbering, quotes, formatting, or explanations
+- Return ONLY valid JSON in the form of an array of strings.
+- The array must contain exactly one translation per input item and preserve order.
+- Do not wrap the JSON in markdown or extra text.
 - Be concise and natural - use terms a native ${targetLang} speaker would use in e-commerce
 - Preserve the meaning exactly
 
 Guidelines:
-- For product names/descriptions: be technical but accessible
-- For categories: use common e-commerce terminology (typically short, 1-2 words)
+${contextInstructions}- For product names/descriptions: be technical but accessible
+- For categories: use common e-commerce category terminology, usually short noun phrases
 - Never be overly literal - prioritize what makes sense in context`,
             },
             {
               role: 'user',
-              content: `Translate these ${texts.length} items from ${sourceLang} to ${targetLang}:\n\n${texts.join('\n')}`,
+              content: `Translate these ${texts.length} items from ${sourceLang} to ${targetLang}:\n\n${JSON.stringify(texts)}`,
             },
           ],
         },
@@ -65,10 +70,20 @@ Guidelines:
       );
 
       const content = response.data.choices?.[0]?.message?.content || '';
-      const translations = content
-        .split('\n')
-        .map((line: string) => line.trim())
-        .filter((line: string) => line.length > 0);
+      let translations: string[] = [];
+
+      try {
+        const parsed = JSON.parse(content);
+        if (Array.isArray(parsed)) {
+          translations = parsed.map((item) => String(item).trim()).filter((line) => line.length > 0);
+        }
+      } catch {
+        translations = content
+          .split('\n')
+          .map((line: string) => line.trim())
+          .filter((line: string) => line.length > 0)
+          .map((line: string) => line.replace(/^[-*\d.\s]+/, '').trim());
+      }
 
       // Ensure we return same number of translations as inputs
       if (translations.length !== texts.length) {
@@ -94,8 +109,9 @@ Guidelines:
     text: string,
     sourceLanguage: string,
     targetLanguage: string,
+    context?: string,
   ): Promise<string> {
-    const results = await this.translateBatch([text], sourceLanguage, targetLanguage);
+    const results = await this.translateBatch([text], sourceLanguage, targetLanguage, context);
     return results[0] || text;
   }
 }

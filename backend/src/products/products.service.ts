@@ -14,6 +14,8 @@ export class ProductsService {
       otthon: 'Home',
     },
   };
+  private readonly categoryTranslationContext =
+    'These are website product category labels for an e-commerce store. Translate them as short category names, not verbs or sentences. Prefer common storefront category terms such as Home, Electronics, Clothing, Accessories, Shoes, Beauty, Toys, Furniture, Sports, Garden, Books, or Pet Supplies when appropriate.';
 
   constructor(
     private readonly prisma: PrismaService,
@@ -91,7 +93,7 @@ export class ProductsService {
       const [translatedNames, translatedDescriptions, translatedCategories] = await Promise.all([
         this.translateService.translateBatch(names, 'hu', normalizedLang),
         this.translateService.translateBatch(descriptions, 'hu', normalizedLang),
-        this.translateService.translateBatch(categories, 'hu', normalizedLang),
+        this.translateService.translateBatch(categories, 'hu', normalizedLang, this.categoryTranslationContext),
       ]);
 
       const translatedProducts = products.map((product, index) => ({
@@ -236,7 +238,7 @@ export class ProductsService {
       const [translatedName, translatedDescription, translatedCategory] = await Promise.all([
         this.translateService.translate(product.name || '', 'hu', normalizedLang),
         this.translateService.translate(product.description || '', 'hu', normalizedLang),
-        this.translateService.translate(product.category || '', 'hu', normalizedLang),
+        this.translateService.translate(product.category || '', 'hu', normalizedLang, this.categoryTranslationContext),
       ]);
 
       const translatedProduct = {
