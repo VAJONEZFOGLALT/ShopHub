@@ -4,12 +4,17 @@
     "products": "Produkte",
     "cart": "Warenkorb",
     "account": "Mein Konto",
+    "myProfile": "Mein Profil",
+    "myOrders": "Meine Bestellungen",
+    "admin": "Admin",
+    "all": "Alle",
     "logout": "Abmelden",
     "login": "Anmelden",
     "register": "Registrieren",
     "search": "Suchen",
     "language": "Sprache",
-    "currency": "Währung"
+    "currency": "Währung",
+    "footerRights": "Professional Shop. Alle Rechte vorbehalten."
   },
   "products": {
     "title": "Produkte",

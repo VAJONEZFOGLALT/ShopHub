@@ -4,12 +4,17 @@
     "products": "Termékek",
     "cart": "Kosár",
     "account": "Fiókom",
+    "myProfile": "Profilom",
+    "myOrders": "Rendeléseim",
+    "admin": "Admin",
+    "all": "Összes",
     "logout": "Kijelentkezés",
     "login": "Bejelentkezés",
     "register": "Regisztráció",
     "search": "Keresés",
     "language": "Nyelv",
-    "currency": "Pénznem"
+    "currency": "Pénznem",
+    "footerRights": "Professional Shop. Minden jog fenntartva."
   },
   "products": {
     "title": "Termékek",

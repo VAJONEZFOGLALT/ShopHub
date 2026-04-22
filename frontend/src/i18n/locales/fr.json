@@ -4,12 +4,17 @@
     "products": "Produits",
     "cart": "Panier",
     "account": "Mon Compte",
+    "myProfile": "Mon Profil",
+    "myOrders": "Mes Commandes",
+    "admin": "Admin",
+    "all": "Tous",
     "logout": "Déconnexion",
     "login": "Connexion",
     "register": "S'inscrire",
     "search": "Recherche",
     "language": "Langue",
-    "currency": "Devise"
+    "currency": "Devise",
+    "footerRights": "Professional Shop. Tous droits réservés."
   },
   "products": {
     "title": "Produits",

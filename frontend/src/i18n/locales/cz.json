@@ -4,12 +4,17 @@
     "products": "Produkty",
     "cart": "Nákupní Košík",
     "account": "Můj Účet",
+    "myProfile": "Můj Profil",
+    "myOrders": "Moje Objednávky",
+    "admin": "Admin",
+    "all": "Vše",
     "logout": "Odhlásit se",
     "login": "Přihlášení",
     "register": "Registrace",
     "search": "Hledat",
     "language": "Jazyk",
-    "currency": "Měna"
+    "currency": "Měna",
+    "footerRights": "Professional Shop. Všechna práva vyhrazena."
   },
   "products": {
     "title": "Produkty",
