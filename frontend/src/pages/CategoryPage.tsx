@@ -294,19 +294,17 @@ export default function CategoryPage() {
           ) : (
             <div className="grid-products">
               {filtered.map((p: any) => (
-                <div key={p.id} onClick={() => navigate(`/shop/product/${p.id}`)} style={{ cursor: 'pointer' }}>
-                  <ProductCard
-                    product={p}
-                    disableNav={true}
-                    showWishlist={true}
-                    isWishlisted={wishlistIds.includes(p.id)}
-                    onToggleWishlist={(id) => handleToggleWishlist(id, p.name)}
-                    showCompare={true}
-                    isCompared={compareIds.includes(p.id)}
-                    onToggleCompare={handleToggleCompare}
-                    showStockBadge={true}
-                  />
-                </div>
+                <ProductCard
+                  key={p.id}
+                  product={p}
+                  showWishlist={true}
+                  isWishlisted={wishlistIds.includes(p.id)}
+                  onToggleWishlist={handleToggleWishlist}
+                  showCompare={true}
+                  isCompared={compareIds.includes(p.id)}
+                  onToggleCompare={handleToggleCompare}
+                  showStockBadge={true}
+                />
               ))}
             </div>
           )}

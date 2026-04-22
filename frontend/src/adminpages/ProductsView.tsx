@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../services/api';
 
 export default function ProductsView() {
@@ -92,6 +92,38 @@ export default function ProductsView() {
   const start = (currentPage - 1) * pageSize;
   const pagedProducts = filtered.slice(start, start + pageSize);
 
+  const stats = useMemo(() => {
+    let lowStock = 0;
+    let outOfStock = 0;
+    let inventoryValue = 0;
+    const categories = new Set<string>();
+
+    for (let i = 0; i < products.length; i += 1) {
+      const product = products[i];
+      const stock = Number(product.stock) || 0;
+      const price = Number(product.price) || 0;
+
+      if (product.category) {
+        categories.add(String(product.category));
+      }
+      if (stock <= 0) {
+        outOfStock += 1;
+      } else if (stock <= 5) {
+        lowStock += 1;
+      }
+      inventoryValue += stock * price;
+    }
+
+    return {
+      total: products.length,
+      filtered: filtered.length,
+      categories: categories.size,
+      lowStock,
+      outOfStock,
+      inventoryValue,
+    };
+  }, [products, filtered.length]);
+
   async function onUploadImage(id: number) {
     const file = selectedFiles[id];
     if (!file) {
@@ -114,6 +146,36 @@ export default function ProductsView() {
   return (
     <div className="view">
       <h2>Products</h2>
+      <div className="stats-grid products-stats">
+        <div className="stat-item">
+          <div className="stat-icon">📦</div>
+          <div className="stat-info">
+            <div className="stat-value">{stats.total}</div>
+            <div className="stat-label">Total products</div>
+          </div>
+        </div>
+        <div className="stat-item">
+          <div className="stat-icon">🔎</div>
+          <div className="stat-info">
+            <div className="stat-value">{stats.filtered}</div>
+            <div className="stat-label">Matching current filter</div>
+          </div>
+        </div>
+        <div className="stat-item">
+          <div className="stat-icon">⚠️</div>
+          <div className="stat-info">
+            <div className="stat-value">{stats.lowStock + stats.outOfStock}</div>
+            <div className="stat-label">Need attention (low/out)</div>
+          </div>
+        </div>
+        <div className="stat-item">
+          <div className="stat-icon">💰</div>
+          <div className="stat-info">
+            <div className="stat-value">${stats.inventoryValue.toFixed(0)}</div>
+            <div className="stat-label">Inventory value</div>
+          </div>
+        </div>
+      </div>
       {error && <div className="error">{error}</div>}
       <form className="form" onSubmit={onCreate}>
         <div className="grid">
@@ -148,6 +210,9 @@ export default function ProductsView() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
+        <div className="products-search-meta">
+          Showing {pagedProducts.length} of {filtered.length} items • {stats.categories} categories • {stats.outOfStock} out of stock
+        </div>
       </div>
 
       <div className="list">

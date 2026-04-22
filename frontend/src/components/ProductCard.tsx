@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { getProductImageUrl } from '../utils/imageOptimization';
@@ -7,14 +8,14 @@ type ProductCardProps = {
   disableNav?: boolean;
   showWishlist?: boolean;
   isWishlisted?: boolean;
-  onToggleWishlist?: (productId: number) => void;
+  onToggleWishlist?: (productId: number, productName?: string) => void;
   showCompare?: boolean;
   isCompared?: boolean;
   onToggleCompare?: (productId: number) => void;
   showStockBadge?: boolean;
 };
 
-export default function ProductCard({
+function ProductCard({
   product,
   disableNav,
   showWishlist,
@@ -68,7 +69,7 @@ export default function ProductCard({
           <button
             type="button"
             className={`wishlist-btn ${isWishlisted ? 'active' : ''}`}
-            onClick={(e) => { e.stopPropagation(); onToggleWishlist?.(product.id); }}
+            onClick={(e) => { e.stopPropagation(); onToggleWishlist?.(product.id, product.name); }}
             title={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
           >
             ♥
@@ -102,3 +103,20 @@ export default function ProductCard({
     </div>
   );
 }
+
+export default memo(ProductCard, (prev, next) => {
+  return (
+    prev.product?.id === next.product?.id &&
+    prev.product?.name === next.product?.name &&
+    prev.product?.price === next.product?.price &&
+    prev.product?.stock === next.product?.stock &&
+    prev.product?.category === next.product?.category &&
+    prev.product?.image === next.product?.image &&
+    prev.disableNav === next.disableNav &&
+    prev.showWishlist === next.showWishlist &&
+    prev.isWishlisted === next.isWishlisted &&
+    prev.showCompare === next.showCompare &&
+    prev.isCompared === next.isCompared &&
+    prev.showStockBadge === next.showStockBadge
+  );
+});
