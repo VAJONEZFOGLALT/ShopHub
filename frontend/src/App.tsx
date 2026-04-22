@@ -10,6 +10,7 @@ import OrderItemsView from './admin/OrderItemsView'
 import { CartProvider } from './user/CartContext'
 import { AuthProvider } from './auth/AuthContext'
 import { ProtectedRoute } from './auth/ProtectedRoute'
+import { ProtectedAdminRoute } from './auth/ProtectedAdminRoute'
 import { LoginModal } from './auth/LoginModal'
 import { RegisterModal } from './auth/RegisterModal'
 import { CartModal } from './user/components/CartModal'
@@ -147,7 +148,7 @@ function App() {
         <div className="app-root">
           <Routes>
             <Route path="/shop/*" element={<ShopApp onOpenAuth={handleOpenAuth} />} />
-            <Route path="/admin/*" element={<AdminApp />} />
+            <Route path="/admin/*" element={<ProtectedAdminRoute><AdminApp /></ProtectedAdminRoute>} />
             <Route path="/" element={<ShopApp onOpenAuth={handleOpenAuth} />} />
           </Routes>
 

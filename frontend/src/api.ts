@@ -12,7 +12,10 @@ if (storedToken) {
 
 async function request<T>(path: string, init?: RequestInit) {
   const headers: Record<string, string> = {};
-  headers['Content-Type'] = 'application/json';
+  const isFormData = init?.body instanceof FormData;
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   if (authToken) {
     headers['Authorization'] = `Bearer ${authToken}`;
@@ -89,6 +92,10 @@ export const api = {
     const created = await request<any>('/users', { method: 'POST', body: JSON.stringify(data) });
     return created;
   },
+  updateUser: async (id: number, data: { username?: string; email?: string; password?: string; role?: string }) => {
+    const updated = await request<any>(`/users/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+    return updated;
+  },
   deleteUser: async (id: number) => {
     const res = await request<void>(`/users/${id}`, { method: 'DELETE' });
     return res;
@@ -102,6 +109,12 @@ export const api = {
   createProduct: async (data: { name: string; description?: string; category: string; price: number; stock: number }) => {
     const created = await request<any>('/products', { method: 'POST', body: JSON.stringify(data) });
     return created;
+  },
+  uploadProductImage: async (id: number, file: File) => {
+    const body = new FormData();
+    body.append('file', file);
+    const updated = await request<any>(`/products/${id}/image`, { method: 'POST', body });
+    return updated;
   },
   deleteProduct: async (id: number) => {
     const res = await request<void>(`/products/${id}`, { method: 'DELETE' });

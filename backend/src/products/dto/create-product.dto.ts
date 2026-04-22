@@ -21,4 +21,8 @@ export class CreateProductDto {
   @IsInt()
   @Min(0)
   stock: number;
+
+  @IsOptional()
+  @IsString()
+  image?: string;
 }

@@ -38,8 +38,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var client_1 = require("../generated/prisma/client");
 var faker_1 = require("@faker-js/faker");
-var dotenv_1 = require("dotenv");
-dotenv_1.default.config();
+var dotenv = require("dotenv");
+dotenv.config();
 var prisma = new client_1.PrismaClient();
 function main() {
     return __awaiter(this, void 0, void 0, function () {

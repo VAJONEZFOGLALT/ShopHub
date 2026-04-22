@@ -11,16 +11,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductsController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
 const products_service_1 = require("./products.service");
 const create_product_dto_1 = require("./dto/create-product.dto");
 const update_product_dto_1 = require("./dto/update-product.dto");
+const cloudinary_service_1 = require("../cloudinary/cloudinary.service");
 let ProductsController = class ProductsController {
     productsService;
-    constructor(productsService) {
+    cloudinaryService;
+    constructor(productsService, cloudinaryService) {
         this.productsService = productsService;
+        this.cloudinaryService = cloudinaryService;
     }
     create(createProductDto) {
         return this.productsService.create(createProductDto);
@@ -33,6 +38,10 @@ let ProductsController = class ProductsController {
     }
     update(id, updateProductDto) {
         return this.productsService.update(+id, updateProductDto);
+    }
+    async uploadImage(id, file) {
+        const upload = await this.cloudinaryService.uploadImage(file, 'products');
+        return this.productsService.update(+id, { image: upload.url });
     }
     remove(id) {
         return this.productsService.remove(+id);
@@ -68,6 +77,15 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "update", null);
 __decorate([
+    (0, common_1.Post)(':id/image'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', { limits: { fileSize: 5 * 1024 * 1024 } })),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, typeof (_b = typeof Express !== "undefined" && (_a = Express.Multer) !== void 0 && _a.File) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], ProductsController.prototype, "uploadImage", null);
+__decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
@@ -76,6 +94,7 @@ __decorate([
 ], ProductsController.prototype, "remove", null);
 exports.ProductsController = ProductsController = __decorate([
     (0, common_1.Controller)('products'),
-    __metadata("design:paramtypes", [products_service_1.ProductsService])
+    __metadata("design:paramtypes", [products_service_1.ProductsService,
+        cloudinary_service_1.CloudinaryService])
 ], ProductsController);
 //# sourceMappingURL=products.controller.js.map
