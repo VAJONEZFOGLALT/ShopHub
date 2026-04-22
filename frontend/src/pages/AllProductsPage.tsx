@@ -36,9 +36,10 @@ export default function AllProductsPage() {
     setError(null);
     try {
       const data = await api.getProducts();
-      setProducts(data);
+      setProducts(Array.isArray(data) ? data : []);
     } catch (e: any) {
       setError(e.message);
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -52,8 +53,10 @@ export default function AllProductsPage() {
         return;
       }
       const compare = await api.getCompare(user.id);
-      setCompareIds(compare.map((item: any) => item.productId));
-      setCompareItems(compare.map((item: any) => item.product));
+      if (Array.isArray(compare)) {
+        setCompareIds(compare.map((item: any) => item.productId));
+        setCompareItems(compare.map((item: any) => item.product));
+      }
     };
     loadLists();
   }, [user]);
