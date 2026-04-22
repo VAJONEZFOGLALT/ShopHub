@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
@@ -8,6 +8,14 @@ export class AddressesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createAddressDto: CreateAddressDto) {
+    const user = await this.prisma.users.findUnique({
+      where: { id: createAddressDto.userId },
+      select: { id: true },
+    });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
     // If this is set as default, unset other defaults for this user
     if (createAddressDto.isDefault) {
       await this.prisma.address.updateMany({
