@@ -58,6 +58,14 @@ export class OrdersService {
     return this.prisma.orders.findMany({ include: { orderItems: true } });
   }
 
+  findByUser(userId: number) {
+    return this.prisma.orders.findMany({
+      where: { userId },
+      include: { orderItems: true },
+      orderBy: { id: 'desc' },
+    });
+  }
+
   findOne(id: number) {
     return this.prisma.orders.findUnique({ where: { id }, include: { orderItems: true } });
   }

@@ -10,11 +10,24 @@ const resources = {
 
 const SUPPORTED_LANGUAGES = ['hu', 'en'] as const;
 
+const normalizeLanguage = (value: string) => value.toLowerCase().split('-')[0];
+
 const getInitialLanguage = () => {
   if (typeof window !== 'undefined') {
     const urlLang = new URLSearchParams(window.location.search).get('lang');
-    if (urlLang && SUPPORTED_LANGUAGES.includes(urlLang as (typeof SUPPORTED_LANGUAGES)[number])) {
-      return urlLang;
+    if (urlLang) {
+      const normalizedUrlLang = normalizeLanguage(urlLang);
+      if (SUPPORTED_LANGUAGES.includes(normalizedUrlLang as (typeof SUPPORTED_LANGUAGES)[number])) {
+        return normalizedUrlLang;
+      }
+    }
+
+    const storedLang = localStorage.getItem('language');
+    if (storedLang) {
+      const normalizedStoredLang = normalizeLanguage(storedLang);
+      if (SUPPORTED_LANGUAGES.includes(normalizedStoredLang as (typeof SUPPORTED_LANGUAGES)[number])) {
+        return normalizedStoredLang;
+      }
     }
   }
 

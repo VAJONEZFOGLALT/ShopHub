@@ -153,6 +153,8 @@
     "accountInfo": "Account Information",
     "email": "Email",
     "fullName": "Full Name",
+    "oldPassword": "Current Password",
+    "oldPasswordPlaceholder": "Enter your current password",
     "newPassword": "New Password",
     "leaveBlank": "Leave blank to keep current",
     "username": "Username",

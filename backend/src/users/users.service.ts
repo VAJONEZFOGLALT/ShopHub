@@ -23,8 +23,26 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    const { password, ...rest } = updateUserDto;
+    const { password, oldPassword, ...rest } = updateUserDto;
+    const existing = await this.prisma.users.findUnique({
+      where: { id },
+      select: { password_hash: true },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
     if (password) {
+      if (!oldPassword) {
+        throw new BadRequestException('Old password is required to set a new password');
+      }
+
+      const matches = await bcrypt.compare(oldPassword, existing.password_hash);
+      if (!matches) {
+        throw new BadRequestException('Old password is incorrect');
+      }
+
       const hashedPassword = await bcrypt.hash(password, 10);
       return this.prisma.users.update({ where: { id }, data: { ...rest, password_hash: hashedPassword } });
     }

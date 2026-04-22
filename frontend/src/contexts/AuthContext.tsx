@@ -17,7 +17,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (identifier: string, password: string) => Promise<void>;
   register: (email: string, password: string, username: string, name?: string) => Promise<void>;
-  updateProfile: (data: { name?: string; email?: string; username?: string; password?: string }) => Promise<void>;
+  updateProfile: (data: { name?: string; email?: string; username?: string; password?: string; oldPassword?: string }) => Promise<void>;
   setUserData: (data: User | null) => void;
   logout: () => void;
 }
@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const updateProfile = async (data: { name?: string; email?: string; username?: string; password?: string }) => {
+  const updateProfile = async (data: { name?: string; email?: string; username?: string; password?: string; oldPassword?: string }) => {
     if (!user) {
       return;
     }

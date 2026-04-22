@@ -7,7 +7,7 @@ import { useWishlist } from '../hooks/useWishlist';
 import { getRecentlyViewed } from '../services/storage';
 import { getAvatarUrl, getProductImageUrl } from '../utils/imageOptimization';
 import { useToast } from '../contexts/ToastContext';
-import { COUNTRY_ADDRESS_CONFIGS, DEFAULT_COUNTRY_CODE, getCountryAddressConfig } from '../utils/addressing';
+import { COUNTRY_ADDRESS_GROUPS, COUNTRY_ADDRESS_CONFIGS, DEFAULT_COUNTRY_CODE, getCountryAddressConfig } from '../utils/addressing';
 
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
@@ -15,13 +15,15 @@ export default function ProfilePage() {
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
-  const { wishlistIds, handleRemoveWishlist } = useWishlist();
-  const [recentlyViewed, setRecentlyViewed] = useState<any[]>(() => getRecentlyViewed());
+  const { wishlistIds, handleRemoveWishlist, isWishlistLoading } = useWishlist();
+  const [recentlyViewed, setRecentlyViewed] = useState<any[]>([]);
+  const [recentlyViewedLoading, setRecentlyViewedLoading] = useState(true);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [nameInput, setNameInput] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [usernameInput, setUsernameInput] = useState('');
+  const [oldPasswordInput, setOldPasswordInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [orderCount, setOrderCount] = useState(0);
@@ -35,7 +37,8 @@ export default function ProfilePage() {
   const roleLabel = user?.role === 'ADMIN' ? t('profile.adminAccount') : `👤 ${t('profile.customer')}`;
   const accountTypeLabel = user?.role === 'ADMIN' ? t('profile.administrator') : t('profile.customer');
   const displayName = user?.name || user?.username || '';
-  const addressButtonText = addresses.length === 0 ? 'Cim megadasa' : 'Cim modositasa';
+  const addressButtonText = addresses.length === 0 ? t('profile.addAddress') : t('profile.updateAddress');
+  const isCollectionsLoading = loadingProducts || isWishlistLoading || recentlyViewedLoading;
   const preferredAddress = useMemo(() => {
     if (addresses.length === 0) return null;
     return addresses.find((addr) => addr.isDefault) || addresses[0];
@@ -62,9 +65,12 @@ export default function ProfilePage() {
     const loadOrders = async () => {
       if (!user) return;
       try {
-        const orders = await api.getUserOrders(user.id);
+        const orders = await api.getUserOrders(user.id).catch(async () => {
+          const allOrders = await api.getOrders();
+          return allOrders.filter((order: any) => Number(order.userId) === user.id);
+        });
         setOrderCount(orders.length);
-        const total = orders.reduce((sum: number, order: any) => sum + Number(order.total), 0);
+        const total = orders.reduce((sum: number, order: any) => sum + Number(order.totalPrice ?? order.total ?? 0), 0);
         setTotalSpent(total);
       } catch {
         // Ignore errors
@@ -90,12 +96,20 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const load = async () => {
+      setRecentlyViewedLoading(true);
       if (!user) {
         setRecentlyViewed(getRecentlyViewed());
+        setRecentlyViewedLoading(false);
         return;
       }
-      const items = await api.getRecentlyViewed(user.id);
-      setRecentlyViewed(items.map((entry: any) => entry.product));
+      try {
+        const items = await api.getRecentlyViewed(user.id);
+        setRecentlyViewed(items.map((entry: any) => entry.product));
+      } catch {
+        setRecentlyViewed([]);
+      } finally {
+        setRecentlyViewedLoading(false);
+      }
     };
     load();
   }, [user]);
@@ -114,11 +128,13 @@ export default function ProfilePage() {
   const handleStartEdit = () => {
     setIsEditing(true);
     setSaveMessage(null);
+    setOldPasswordInput('');
   };
 
   const handleCancelEdit = () => {
     setIsEditing(false);
     setPasswordInput('');
+    setOldPasswordInput('');
     if (user) {
       setNameInput(user.name || '');
       setEmailInput(user.email || '');
@@ -129,15 +145,26 @@ export default function ProfilePage() {
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaveMessage(null);
-    await updateProfile({
-      name: nameInput.trim(),
-      email: emailInput.trim(),
-      username: usernameInput.trim(),
-      password: passwordInput.trim() || undefined,
-    });
-    setPasswordInput('');
-    setIsEditing(false);
-    setSaveMessage('Profil frissitve.');
+    if (passwordInput.trim() && !oldPasswordInput.trim()) {
+      showToast('Az uj jelszohoz meg kell adni a regi jelszot is.', 'error');
+      return;
+    }
+
+    try {
+      await updateProfile({
+        name: nameInput.trim(),
+        email: emailInput.trim(),
+        username: usernameInput.trim(),
+        password: passwordInput.trim() || undefined,
+        oldPassword: passwordInput.trim() ? oldPasswordInput.trim() : undefined,
+      });
+      setPasswordInput('');
+      setOldPasswordInput('');
+      setIsEditing(false);
+      setSaveMessage('Profil frissitve.');
+    } catch (err: any) {
+      showToast(err?.message || 'Profile update failed', 'error');
+    }
   };
 
   const handleAvatarUpload = async () => {
@@ -238,8 +265,8 @@ export default function ProfilePage() {
           {/* LEFT: Wishlist */}
           <div className="profile-card profile-left">
             <h2>{t('profile.wishlist')}</h2>
-            {loadingProducts ? (
-              <p className="muted">{t('profile.loadingWishlist')}</p>
+            {isCollectionsLoading ? (
+              <p className="muted">{t('common.loading')}</p>
             ) : wishlistItems.length === 0 ? (
               <p className="muted">{t('profile.emptyWishlist')}</p>
             ) : (
@@ -324,7 +351,9 @@ export default function ProfilePage() {
           {/* RIGHT: Recently Viewed */}
           <div className="profile-card profile-right">
             <h2>{t('profile.recentlyViewed')}</h2>
-            {recentlyViewed.length === 0 ? (
+            {isCollectionsLoading ? (
+              <p className="muted">{t('common.loading')}</p>
+            ) : recentlyViewed.length === 0 ? (
               <p className="muted">{t('profile.noRecentlyViewed')}</p>
             ) : (
               <div className="profile-product-list">
@@ -369,6 +398,30 @@ export default function ProfilePage() {
               }}>✕</button>
             </div>
 
+            {!editingAddress && preferredAddress && (
+              <div className="profile-address-preview-card address-modal-current-card">
+                <div className="profile-address-preview-title">
+                  <strong>{preferredAddress.label}</strong>
+                  {preferredAddress.isDefault && <span className="default-badge">{t('profile.defaultAddress')}</span>}
+                </div>
+                <div className="profile-address-line">{preferredAddress.fullName}</div>
+                <div className="profile-address-line">{preferredAddress.street}</div>
+                <div className="profile-address-line">{preferredAddress.city}, {preferredAddress.state} {preferredAddress.zipCode}</div>
+                <div className="profile-address-line">{preferredAddress.country}</div>
+                <div className="address-modal-current-actions">
+                  <button className="btn-sm" onClick={() => {
+                    setEditingAddress(preferredAddress);
+                    setAddressCountry((preferredAddress.country || DEFAULT_COUNTRY_CODE).toUpperCase());
+                  }}>{t('common.edit')}</button>
+                  <button className="btn-sm danger" onClick={async () => {
+                    await api.deleteAddress(preferredAddress.id);
+                    const updated = await api.getAddresses(user!.id);
+                    setAddresses(updated);
+                  }}>{t('common.delete')}</button>
+                </div>
+              </div>
+            )}
+
             {!editingAddress && (
               <button className="btn-primary" style={{marginBottom: '16px', width: '100%'}} onClick={() => {
                 setEditingAddress({ country: DEFAULT_COUNTRY_CODE });
@@ -390,7 +443,7 @@ export default function ProfilePage() {
                   city: formData.get('city') as string,
                   state: formData.get('state') as string,
                   zipCode: formData.get('zipCode') as string,
-                  country: formData.get('country') as string || 'USA',
+                  country: formData.get('country') as string || DEFAULT_COUNTRY_CODE,
                   isDefault: formData.get('isDefault') === 'on',
                 };
                 try {
@@ -409,15 +462,15 @@ export default function ProfilePage() {
                 <input name="label" placeholder={t('profile.labelPlaceholder')} defaultValue={editingAddress?.label} required />
                 <input name="fullName" placeholder={t('profile.fullName')} defaultValue={editingAddress?.fullName} required />
                 <input name="street" placeholder={t('profile.streetAddress')} defaultValue={editingAddress?.street} required />
-                <select
-                  name="country"
-                  value={addressCountry}
-                  onChange={(e) => setAddressCountry(e.target.value)}
-                >
-                  {COUNTRY_ADDRESS_CONFIGS.map((country) => (
-                    <option key={country.code} value={country.code}>
-                      {country.name}
-                    </option>
+                <select name="country" value={addressCountry} onChange={(e) => setAddressCountry(e.target.value)}>
+                  {COUNTRY_ADDRESS_GROUPS.map((group) => (
+                    <optgroup key={group.label} label={group.label}>
+                      {group.countries.map((country) => (
+                        <option key={country.code} value={country.code}>
+                          {country.name}
+                        </option>
+                      ))}
+                    </optgroup>
                   ))}
                 </select>
                 <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px'}}>
@@ -435,7 +488,7 @@ export default function ProfilePage() {
                 </div>
                 <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px'}}>
                   <input name="zipCode" placeholder={activeCountryConfig.postalLabel} defaultValue={editingAddress?.zipCode} required />
-                  <input value={addressCountry} disabled />
+                  <input value={activeCountryConfig.regionLabel} disabled />
                 </div>
                 <label style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                   <input type="checkbox" name="isDefault" defaultChecked={editingAddress?.isDefault} />
@@ -504,6 +557,10 @@ export default function ProfilePage() {
               <label>
                 {t('profile.fullName')}
                 <input value={nameInput} onChange={(e) => setNameInput(e.target.value)} />
+              </label>
+              <label>
+                {t('profile.oldPassword')}
+                <input type="password" value={oldPasswordInput} onChange={(e) => setOldPasswordInput(e.target.value)} placeholder={t('profile.oldPasswordPlaceholder')} />
               </label>
               <label>
                 {t('profile.newPassword')}

@@ -5,6 +5,10 @@ import { IsOptional, IsString, IsIn } from 'class-validator';
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsOptional()
   @IsString()
+  oldPassword?: string;
+
+  @IsOptional()
+  @IsString()
   @IsIn(['ADMIN', 'USER'])
   role?: string;
 

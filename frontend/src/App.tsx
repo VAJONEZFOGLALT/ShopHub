@@ -50,25 +50,24 @@ function LanguageUrlSync() {
     const urlLang = rawUrlLang ? normalizeLanguage(rawUrlLang) : null;
     const currentI18nLanguage = normalizeLanguage(i18n.language || 'hu');
     const isUrlLangSupported = !!urlLang && SUPPORTED_LANGUAGES.includes(urlLang);
-    const defaultLang = 'hu';
+    const storedLangRaw = localStorage.getItem('language') || '';
+    const storedLang = storedLangRaw ? normalizeLanguage(storedLangRaw) : null;
+    const isStoredLangSupported = !!storedLang && SUPPORTED_LANGUAGES.includes(storedLang);
+    const fallbackLang = 'hu';
+    const targetLang = isUrlLangSupported
+      ? urlLang
+      : isStoredLangSupported
+        ? storedLang
+        : fallbackLang;
 
-    if (isUrlLangSupported && urlLang !== currentI18nLanguage) {
-      void i18n.changeLanguage(urlLang);
-      localStorage.setItem('language', urlLang);
+    if (targetLang !== currentI18nLanguage) {
+      void i18n.changeLanguage(targetLang);
+      localStorage.setItem('language', targetLang);
       return;
     }
 
-    if (isUrlLangSupported) {
-      return;
-    }
-
-    if (currentI18nLanguage !== defaultLang) {
-      void i18n.changeLanguage(defaultLang);
-      localStorage.setItem('language', defaultLang);
-    }
-
-    if (!isUrlLangSupported || urlLang !== defaultLang) {
-      params.set('lang', defaultLang);
+    if (!isUrlLangSupported || urlLang !== targetLang) {
+      params.set('lang', targetLang);
       navigate(`${location.pathname}?${params.toString()}`, { replace: true });
     }
   }, [i18n, i18n.language, location.pathname, location.search, navigate]);

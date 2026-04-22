@@ -9,6 +9,11 @@ export class ProductsService {
   private readonly listCache = new Map<string, { expiresAt: number; data: any[] }>();
   private readonly itemCache = new Map<string, { expiresAt: number; data: any }>();
   private readonly cacheTtlMs = 60 * 1000;
+  private readonly categoryTranslationOverrides: Record<string, Record<string, string>> = {
+    en: {
+      otthon: 'Home',
+    },
+  };
 
   constructor(
     private readonly prisma: PrismaService,
@@ -41,6 +46,20 @@ export class ProductsService {
   private clearProductCaches() {
     this.listCache.clear();
     this.itemCache.clear();
+  }
+
+  private resolveCategoryLabel(
+    originalCategory: string,
+    translatedCategory: string | undefined,
+    normalizedLang: string,
+  ): string {
+    const normalizedCategory = (originalCategory || '').trim().toLowerCase();
+    const langOverrides = this.categoryTranslationOverrides[normalizedLang] || {};
+    const overridden = langOverrides[normalizedCategory];
+    if (overridden) {
+      return overridden;
+    }
+    return translatedCategory || originalCategory;
   }
 
   async findAll(language?: string) {
@@ -80,7 +99,11 @@ export class ProductsService {
         name: translatedNames[index] || product.name,
         description: translatedDescriptions[index] || product.description,
         category: product.category,
-        categoryLabel: translatedCategories[index] || product.category,
+        categoryLabel: this.resolveCategoryLabel(
+          product.category,
+          translatedCategories[index],
+          normalizedLang,
+        ),
       }));
       this.setCache(this.listCache, listCacheKey, translatedProducts);
       return translatedProducts;
@@ -145,7 +168,11 @@ export class ProductsService {
         name: translatedName.translatedText || product.name,
         description: translatedDescription.translatedText || product.description,
         category: product.category,
-        categoryLabel: translatedCategory.translatedText || product.category,
+        categoryLabel: this.resolveCategoryLabel(
+          product.category,
+          translatedCategory.translatedText,
+          normalizedLang,
+        ),
       };
       this.setCache(this.itemCache, itemCacheKey, translatedProduct);
       return translatedProduct;
