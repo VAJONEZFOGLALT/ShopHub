@@ -142,10 +142,18 @@ export default function ProfilePage() {
     }
   };
 
-  const formatEmailForDisplay = (email: string): string => {
+  const formatEmailForDisplay = (email: string): { user: string; domain: string } => {
     const atIndex = email.indexOf('@');
-    if (atIndex === -1) return email;
-    return email.substring(0, atIndex) + '@***';
+    if (atIndex === -1) return { user: email, domain: '' };
+    return { user: email.substring(0, atIndex), domain: email.substring(atIndex) };
+  };
+
+  const validatePasswordStrength = (pwd: string): string | null => {
+    if (pwd.length < 8) return 'Jelszó minimum 8 karakter hosszú kell legyen';
+    if (!/[A-Z]/.test(pwd)) return 'Jelszóban kell lennie nagy betűnek';
+    if (!/[a-z]/.test(pwd)) return 'Jelszóban kell lennie kis betűnek';
+    if (!/[0-9]/.test(pwd)) return 'Jelszóban kell lennie számnak';
+    return null;
   };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
@@ -317,8 +325,8 @@ export default function ProfilePage() {
                 <div className="profile-value">{user.username}</div>
               </div>
               <div className="profile-field">
-                <label>{t('profile.email')}</label>
-                <div className="profile-value profile-email">{formatEmailForDisplay(user.email)}</div>
+                <label>{t('profile.email')} ({formatEmailForDisplay(user.email).domain})</label>
+                <div className="profile-value profile-email">{formatEmailForDisplay(user.email).user}</div>
               </div>
               <div className="profile-field">
                 <label>{t('profile.fullName')}</label>
