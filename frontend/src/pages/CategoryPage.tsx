@@ -8,6 +8,7 @@ import CompareDrawer from '../components/CompareDrawer';
 import { useAuth } from '../contexts/AuthContext';
 import { useWishlist } from '../hooks/useWishlist';
 import { useToast } from '../contexts/ToastContext';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 const getProductCategory = (product: any) => {
   const rawCategory = product?.category ?? product?.categoryName ?? product?.category?.name;
@@ -25,7 +26,7 @@ export default function CategoryPage() {
   const decodedCategoryName = decodeURIComponent(name || '');
   const navigate = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [sortBy, setSortBy] = useState('name');
@@ -217,6 +218,10 @@ export default function CategoryPage() {
 
   return (
     <div className="category-view">
+            {loading && products.length === 0 ? (
+              <LoadingSpinner fullScreen={true} />
+            ) : (
+              <>
       <div className="category-header">
         <button className="back-btn" onClick={() => navigate('/shop')}>{t('common.backToShop')}</button>
         <h1>{categoryDisplayName}</h1>
@@ -332,6 +337,8 @@ export default function CategoryPage() {
         </main>
       </div>
       <CompareDrawer items={resolvedCompareItems} onRemove={handleToggleCompare} onClear={handleClearCompare} />
+            </>
+          )}
     </div>
   );
 }

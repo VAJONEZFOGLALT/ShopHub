@@ -8,13 +8,14 @@ import CompareDrawer from '../components/CompareDrawer';
 import { useAuth } from '../contexts/AuthContext';
 import { useWishlist } from '../hooks/useWishlist';
 import { useToast } from '../contexts/ToastContext';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 export default function AllProductsPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user, isAuthenticated } = useAuth();
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
@@ -182,6 +183,10 @@ export default function AllProductsPage() {
 
   return (
     <div className="view category-view">
+            {loading && products.length === 0 ? (
+              <LoadingSpinner fullScreen={true} />
+            ) : (
+              <>
       <div className="category-header">
         <button className="back-btn" onClick={() => navigate('/shop')}>{t('common.backToShop')}</button>
         <h1>{searchQuery ? t('products.searchResults', { query: searchQuery }) : t('products.allProducts')}</h1>
@@ -297,6 +302,8 @@ export default function AllProductsPage() {
       </div>
 
       <CompareDrawer items={resolvedCompareItems} onRemove={handleToggleCompare} onClear={handleClearCompare} />
+            </>
+          )}
     </div>
   );
 }
