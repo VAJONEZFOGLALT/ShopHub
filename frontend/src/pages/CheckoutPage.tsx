@@ -72,7 +72,6 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
 
   const selectedCourier = couriers.find((c) => c.id === courier) || couriers[0];
   const hasItems = items.length > 0;
-  const emptyCheckout = !hasItems;
   const needsPickup = selectedCourier.type === 'pickup';
   const needsAddress = selectedCourier.type === 'address';
   const guestCountryConfig = getCountryAddressConfig(guestAddress.country);
@@ -110,11 +109,11 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
 
   useEffect(() => {
     if (!hasItems) {
-      setError(t('cart.empty'));
+      navigate('/shop/all', { replace: true });
       return;
     }
     setError('');
-  }, [hasItems, t]);
+  }, [hasItems, navigate]);
 
   useEffect(() => {
     if (!packetaSelecting) {
@@ -149,6 +148,8 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
       iframe.style.width = '100%';
       iframe.style.height = '100%';
       iframe.style.border = '0';
+      const isDarkTheme = document.documentElement.getAttribute('data-theme') !== 'light';
+      iframe.style.filter = isDarkTheme ? 'brightness(0.88) contrast(1.05)' : 'none';
 
       const overlay = dialog.parentElement as HTMLElement | null;
       if (overlay && overlay !== document.body) {
@@ -181,6 +182,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
   const handlePickPacketaPoint = () => {
     const apiKey = import.meta.env.VITE_PACKETA_API_KEY || '';
     const widgetLanguage = import.meta.env.VITE_PACKETA_API_LOCALE || 'en_GB';
+    const isDarkTheme = document.documentElement.getAttribute('data-theme') !== 'light';
 
     if (!apiKey) {
       setError('Hianyzik a VITE_PACKETA_API_KEY, add meg .env-ben.');
@@ -206,6 +208,9 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
       {
         language: widgetLanguage,
         country: 'hu',
+        theme: isDarkTheme ? 'dark' : 'light',
+        colorMode: isDarkTheme ? 'dark' : 'light',
+        appearance: isDarkTheme ? 'dark' : 'light',
       }
     );
   };
@@ -273,43 +278,22 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
     }
   };
 
+  if (!hasItems) {
+    return null;
+  }
+
   return (
     <div className="checkout-wrapper">
       <div className={`checkout-container ${hasItems ? '' : 'checkout-container-empty'}`.trim()}>
         <div className="checkout-main">
           <h2>{t('checkout.title')}</h2>
-          <p className="checkout-lead">Gyors, biztonsagos checkout. Valassz futart, ellenorizd az adatokat, es kuldheted is a rendelest.</p>
           {error && (
-            <div className={emptyCheckout ? 'checkout-empty-banner' : 'error'}>
-              {emptyCheckout && <span className="checkout-empty-banner-icon">!</span>}
+            <div className="error">
               <span>{error}</span>
             </div>
           )}
 
-          {!hasItems ? (
-            <div className="empty-checkout">
-              <div className="empty-state">
-                <p style={{ fontSize: '4em', margin: '0 0 16px 0' }}>🛒</p>
-                <h3>{t('cart.empty')}</h3>
-                <p className="muted">Tegyél legalább egy terméket a kosárba a rendelés folytatásához.</p>
-                <div className="empty-checkout-actions">
-                  <button
-                    className="btn-primary"
-                    onClick={() => navigate('/shop/all')}
-                  >
-                    {t('profile.continueShopping')}
-                  </button>
-                  <button
-                    className="btn-secondary"
-                    onClick={() => navigate('/shop')}
-                  >
-                    {t('common.home')}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <>
+          <>
               <div className="checkout-section">
                 <h3>{t('checkout.items')} ({items.length})</h3>
                 <div className="checkout-items">
@@ -454,32 +438,29 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                   <input className="checkout-input" placeholder={t('auth.password')} type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} required />
                 </div>
               )}
-            </>
-          )}
+          </>
         </div>
 
-        {hasItems && (
-          <div className="checkout-sidebar">
-            <h3>{t('checkout.summary')}</h3>
-            <div className="checkout-summary">
-              <div className="checkout-summary-row">
-                <span>{t('checkout.subtotal')}</span>
-                <span>${total.toFixed(2)}</span>
-              </div>
-              <div className="checkout-summary-row">
-                <span>{t('checkout.shipping')}</span>
-                <span>${ship.toFixed(2)}</span>
-              </div>
-              <div className="checkout-summary-row total">
-                <span>{t('checkout.total')}</span>
-                <span>${finalTotal.toFixed(2)}</span>
-              </div>
+        <div className="checkout-sidebar">
+          <h3>{t('checkout.summary')}</h3>
+          <div className="checkout-summary">
+            <div className="checkout-summary-row">
+              <span>{t('checkout.subtotal')}</span>
+              <span>${total.toFixed(2)}</span>
             </div>
-            <button className="btn-primary btn-block" onClick={handleOrder} disabled={loading || !hasItems}>
-              {loading ? t('checkout.processing') : t('checkout.placeOrder')}
-            </button>
+            <div className="checkout-summary-row">
+              <span>{t('checkout.shipping')}</span>
+              <span>${ship.toFixed(2)}</span>
+            </div>
+            <div className="checkout-summary-row total">
+              <span>{t('checkout.total')}</span>
+              <span>${finalTotal.toFixed(2)}</span>
+            </div>
           </div>
-        )}
+          <button className="btn-primary btn-block" onClick={handleOrder} disabled={loading || !hasItems}>
+            {loading ? t('checkout.processing') : t('checkout.placeOrder')}
+          </button>
+        </div>
       </div>
     </div>
   );
