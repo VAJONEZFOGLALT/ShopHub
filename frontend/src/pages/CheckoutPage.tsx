@@ -23,20 +23,9 @@ declare global {
 
 const couriers: CourierOption[] = [
   { id: 'UPS', name: 'UPS Express (hazhoz)', price: 15.99, days: '1-2 nap', type: 'address' },
+  { id: 'DPD', name: 'DPD Home (hazhoz)', price: 7.99, days: '1-2 nap', type: 'address' },
   { id: 'INPOST', name: 'Magyar Posta (hazhoz)', price: 6.99, days: '2-4 nap', type: 'address' },
   { id: 'PACKETA', name: 'Packeta (atvevo pont / Z-BOX)', price: 4.99, days: '2-3 nap', type: 'pickup' },
-  { id: 'DPD', name: 'DPD Pickup (atvevo pont)', price: 5.99, days: '1-2 nap', type: 'pickup' },
-];
-
-const DPD_PICKUP_POINTS: Array<{ code: string; name: string; city: string; address: string }> = [
-  { code: 'DPD-BUD-001', name: 'DPD Pickup - Corvin', city: 'Budapest', address: 'Futou. 1' },
-  { code: 'DPD-BUD-002', name: 'DPD Pickup - Westend', city: 'Budapest', address: 'Vaci ut 1-3' },
-  { code: 'DPD-BUD-003', name: 'DPD Pickup - Allee', city: 'Budapest', address: 'Oktober 23. ut 8-10' },
-  { code: 'DPD-DEP-001', name: 'DPD Pickup - Debrecen Plaza', city: 'Debrecen', address: 'Pesti ut 2' },
-  { code: 'DPD-GYO-001', name: 'DPD Pickup - Arpad', city: 'Gyor', address: 'Arpad ut 35' },
-  { code: 'DPD-SZE-001', name: 'DPD Pickup - Belvaros', city: 'Szeged', address: 'Kossuth Lajos sgt. 14' },
-  { code: 'DPD-PEC-001', name: 'DPD Pickup - Kiraly', city: 'Pecs', address: 'Kossuth ter 3' },
-  { code: 'DPD-MIS-001', name: 'DPD Pickup - Szinvapark', city: 'Miskolc', address: 'Bajcsy-Zsilinszky ut 2-4' },
 ];
 
 type CourierOption = {
@@ -69,8 +58,6 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
   const [selectedAddr, setSelectedAddr] = useState<number | null>(null);
   const [pickupPointLabel, setPickupPointLabel] = useState('');
   const [pickupPointCode, setPickupPointCode] = useState('');
-  const [dpdPickerOpen, setDpdPickerOpen] = useState(false);
-  const [dpdSearch, setDpdSearch] = useState('');
   const [guestAddress, setGuestAddress] = useState<GuestAddressDraft>({
     fullName: '',
     street: '',
@@ -103,8 +90,6 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
   useEffect(() => {
     setPickupPointLabel('');
     setPickupPointCode('');
-    setDpdPickerOpen(false);
-    setDpdSearch('');
   }, [courier]);
 
   useEffect(() => {
@@ -133,6 +118,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
 
   const handlePickPacketaPoint = () => {
     const apiKey = import.meta.env.VITE_PACKETA_API_KEY || '';
+    const widgetLanguage = import.meta.env.VITE_PACKETA_API_LOCALE || 'en_GB';
 
     if (!apiKey) {
       setError('Hianyzik a VITE_PACKETA_API_KEY, add meg .env-ben.');
@@ -153,27 +139,10 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
         setPickupPointCode(String(point.id || point.code || 'PACKETA-POINT'));
       },
       {
-        language: 'hu',
+        language: widgetLanguage,
         country: 'hu',
       }
     );
-  };
-
-  const filteredDpdPoints = DPD_PICKUP_POINTS.filter((point) => {
-    const q = dpdSearch.trim().toLowerCase();
-    if (!q) return true;
-    return (
-      point.code.toLowerCase().includes(q)
-      || point.name.toLowerCase().includes(q)
-      || point.city.toLowerCase().includes(q)
-      || point.address.toLowerCase().includes(q)
-    );
-  });
-
-  const handleSelectDpdPoint = (point: { code: string; name: string; city: string; address: string }) => {
-    setPickupPointCode(point.code);
-    setPickupPointLabel(`${point.name}, ${point.city}, ${point.address}`);
-    setDpdPickerOpen(false);
   };
 
   const validateGuestAddress = () => {
@@ -315,52 +284,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                     {pickupPointLabel && <p className="muted" style={{ marginTop: '8px' }}>📍 {pickupPointLabel}</p>}
                   </div>
                 )}
-
-                {needsPickup && courier === 'DPD' && (
-                  <div className="courier-picker-box">
-                    <button className="btn-secondary" onClick={() => setDpdPickerOpen(true)}>
-                      DPD atvevo pont valasztasa
-                    </button>
-                    {pickupPointLabel && <p className="muted" style={{ marginTop: '8px' }}>📍 {pickupPointLabel}</p>}
-                  </div>
-                )}
               </div>
-
-              {needsPickup && courier === 'DPD' && dpdPickerOpen && (
-                <div className="modal-overlay" onClick={() => setDpdPickerOpen(false)}>
-                  <div className="modal-content" style={{ maxWidth: '720px' }} onClick={(e) => e.stopPropagation()}>
-                    <div className="modal-header">
-                      <h2>DPD atvevo pont valaszto</h2>
-                      <button className="modal-close" onClick={() => setDpdPickerOpen(false)}>✕</button>
-                    </div>
-                    <div className="modal-body" style={{ display: 'grid', gap: '12px' }}>
-                      <input
-                        value={dpdSearch}
-                        onChange={(e) => setDpdSearch(e.target.value)}
-                        placeholder="Kereses kodra, varosra vagy cimre"
-                        className="filter-search"
-                      />
-                      <div style={{ display: 'grid', gap: '10px', maxHeight: '360px', overflowY: 'auto' }}>
-                        {filteredDpdPoints.map((point) => (
-                          <button
-                            key={point.code}
-                            type="button"
-                            className="btn-secondary"
-                            style={{ textAlign: 'left' }}
-                            onClick={() => handleSelectDpdPoint(point)}
-                          >
-                            <strong>{point.name}</strong><br />
-                            {point.city}, {point.address} ({point.code})
-                          </button>
-                        ))}
-                        {filteredDpdPoints.length === 0 && (
-                          <p className="muted">Nincs talalat a megadott keresessel.</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {needsAddress && user && addresses.length > 0 && (
                 <div className="checkout-section">
