@@ -11,6 +11,7 @@ async function bootstrap() {
 
   const origins = [
     process.env.FRONTEND_URL,
+    'https://webshopfrontend.vercel.app',
     'http://localhost:5173',
     'http://localhost:5174',
   ].filter((origin): origin is string => Boolean(origin));
@@ -18,7 +19,7 @@ async function bootstrap() {
   app.enableCors({
     origin: origins,
     credentials: true,
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     optionsSuccessStatus: 200,
   });
