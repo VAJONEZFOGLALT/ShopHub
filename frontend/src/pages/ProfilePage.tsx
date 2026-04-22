@@ -7,6 +7,7 @@ import { useWishlist } from '../hooks/useWishlist';
 import { getRecentlyViewed } from '../services/storage';
 import { getAvatarUrl, getProductImageUrl } from '../utils/imageOptimization';
 import { useToast } from '../contexts/ToastContext';
+import { COUNTRY_ADDRESS_CONFIGS, DEFAULT_COUNTRY_CODE, getCountryAddressConfig } from '../utils/addressing';
 
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
@@ -29,6 +30,7 @@ export default function ProfilePage() {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [editingAddress, setEditingAddress] = useState<any>(null);
+  const [addressCountry, setAddressCountry] = useState(DEFAULT_COUNTRY_CODE);
 
   const roleLabel = user?.role === 'ADMIN' ? t('profile.adminAccount') : `👤 ${t('profile.customer')}`;
   const accountTypeLabel = user?.role === 'ADMIN' ? t('profile.administrator') : t('profile.customer');
@@ -38,6 +40,10 @@ export default function ProfilePage() {
     if (addresses.length === 0) return null;
     return addresses.find((addr) => addr.isDefault) || addresses[0];
   }, [addresses]);
+  const activeCountryConfig = useMemo(
+    () => getCountryAddressConfig(addressCountry),
+    [addressCountry],
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -291,6 +297,7 @@ export default function ProfilePage() {
               <button className="btn-secondary" onClick={() => {
                 setShowAddressModal(true);
                 setEditingAddress(null);
+                setAddressCountry(DEFAULT_COUNTRY_CODE);
               }}>
                 📍 {addressButtonText}
               </button>
@@ -363,7 +370,10 @@ export default function ProfilePage() {
             </div>
 
             {!editingAddress && (
-              <button className="btn-primary" style={{marginBottom: '16px', width: '100%'}} onClick={() => setEditingAddress({})}>
+              <button className="btn-primary" style={{marginBottom: '16px', width: '100%'}} onClick={() => {
+                setEditingAddress({ country: DEFAULT_COUNTRY_CODE });
+                setAddressCountry(DEFAULT_COUNTRY_CODE);
+              }}>
                 + {t('profile.addAddress')}
               </button>
             )}
@@ -399,13 +409,33 @@ export default function ProfilePage() {
                 <input name="label" placeholder={t('profile.labelPlaceholder')} defaultValue={editingAddress?.label} required />
                 <input name="fullName" placeholder={t('profile.fullName')} defaultValue={editingAddress?.fullName} required />
                 <input name="street" placeholder={t('profile.streetAddress')} defaultValue={editingAddress?.street} required />
+                <select
+                  name="country"
+                  value={addressCountry}
+                  onChange={(e) => setAddressCountry(e.target.value)}
+                >
+                  {COUNTRY_ADDRESS_CONFIGS.map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
                 <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px'}}>
                   <input name="city" placeholder={t('profile.city')} defaultValue={editingAddress?.city} required />
-                  <input name="state" placeholder={t('profile.state')} defaultValue={editingAddress?.state} required />
+                  {activeCountryConfig.regions ? (
+                    <select name="state" defaultValue={editingAddress?.state || ''} required>
+                      <option value="" disabled>{activeCountryConfig.regionLabel}</option>
+                      {activeCountryConfig.regions.map((region) => (
+                        <option key={region} value={region}>{region}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input name="state" placeholder={activeCountryConfig.regionLabel} defaultValue={editingAddress?.state} required />
+                  )}
                 </div>
                 <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px'}}>
-                  <input name="zipCode" placeholder={t('profile.zipCode')} defaultValue={editingAddress?.zipCode} required />
-                  <input name="country" placeholder={t('profile.country')} defaultValue={editingAddress?.country || 'USA'} />
+                  <input name="zipCode" placeholder={activeCountryConfig.postalLabel} defaultValue={editingAddress?.zipCode} required />
+                  <input value={addressCountry} disabled />
                 </div>
                 <label style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                   <input type="checkbox" name="isDefault" defaultChecked={editingAddress?.isDefault} />
@@ -437,7 +467,10 @@ export default function ProfilePage() {
                       </div>
                     </div>
                     <div style={{display: 'flex', gap: '6px'}}>
-                      <button className="btn-sm" onClick={() => setEditingAddress(addr)}>{t('common.edit')}</button>
+                      <button className="btn-sm" onClick={() => {
+                        setEditingAddress(addr);
+                        setAddressCountry((addr.country || DEFAULT_COUNTRY_CODE).toUpperCase());
+                      }}>{t('common.edit')}</button>
                       <button className="btn-sm danger" onClick={async () => {
                         await api.deleteAddress(addr.id);
                         const updated = await api.getAddresses(user!.id);
