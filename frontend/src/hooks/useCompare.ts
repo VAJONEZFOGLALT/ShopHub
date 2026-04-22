@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { api } from '../services/api';
@@ -53,12 +53,20 @@ export function useCompare() {
   const [compareIds, setCompareIds] = useState<number[]>([]);
   const [compareItems, setCompareItems] = useState<any[]>([]);
   const [pendingIds, setPendingIds] = useState<number[]>([]);
+  const compareIdsRef = useRef<number[]>([]);
+  const compareItemsRef = useRef<any[]>([]);
+  const pendingIdsRef = useRef<number[]>([]);
+  const mutationVersionRef = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
+    const loadVersion = ++mutationVersionRef.current;
 
     async function load() {
       if (!user) {
+        compareIdsRef.current = [];
+        compareItemsRef.current = [];
+        pendingIdsRef.current = [];
         setCompareIds([]);
         setCompareItems([]);
         setPendingIds([]);
@@ -73,13 +81,20 @@ export function useCompare() {
       try {
         const compare = await api.getCompare(user.id);
         const ids = compare.map((item: CompareItem) => item.productId);
+        if (cancelled || loadVersion !== mutationVersionRef.current) {
+          return;
+        }
         persistCompareCache(user.id, ids);
+        compareIdsRef.current = ids;
+        compareItemsRef.current = compare.map((item: CompareItem) => item.product).filter(Boolean);
         if (!cancelled) {
           setCompareIds(ids);
-          setCompareItems(compare.map((item: CompareItem) => item.product).filter(Boolean));
+          setCompareItems(compareItemsRef.current);
         }
       } catch {
-        if (!cancelled && cached.length === 0) {
+        if (!cancelled && cached.length === 0 && loadVersion === mutationVersionRef.current) {
+          compareIdsRef.current = [];
+          compareItemsRef.current = [];
           setCompareIds([]);
           setCompareItems([]);
         }
@@ -107,28 +122,35 @@ export function useCompare() {
       return;
     }
 
-    if (pendingIds.includes(productId)) {
+    if (pendingIdsRef.current.includes(productId)) {
       return;
     }
 
-    const exists = compareIdSet.has(productId);
+    mutationVersionRef.current += 1;
 
-    if (!exists && compareIds.length >= COMPARE_LIMIT) {
+    const previousIds = compareIdsRef.current;
+    const previousItems = compareItemsRef.current;
+    const exists = previousIds.includes(productId);
+
+    if (!exists && previousIds.length >= COMPARE_LIMIT) {
       showToast(`You can compare up to ${COMPARE_LIMIT} products`, 'warning');
       return;
     }
 
     const nextIds = exists
-      ? compareIds.filter((id) => id !== productId)
-      : [...compareIds, productId];
+      ? previousIds.filter((id) => id !== productId)
+      : [...previousIds, productId];
 
     const nextItems = exists
-      ? compareItems.filter((item) => item?.id !== productId)
-      : compareItems.some((item) => item?.id === productId)
-        ? compareItems
-        : [product, ...compareItems].slice(0, COMPARE_LIMIT);
+      ? previousItems.filter((item) => item?.id !== productId)
+      : previousItems.some((item) => item?.id === productId)
+        ? previousItems
+        : [product, ...previousItems].slice(0, COMPARE_LIMIT);
 
-    setPendingIds((prev) => [...prev, productId]);
+    pendingIdsRef.current = [...pendingIdsRef.current, productId];
+    setPendingIds(pendingIdsRef.current);
+    compareIdsRef.current = nextIds;
+    compareItemsRef.current = nextItems;
     setCompareIds(nextIds);
     setCompareItems(nextItems);
     persistCompareCache(user.id, nextIds);
@@ -140,12 +162,15 @@ export function useCompare() {
         await api.addCompare({ userId: user.id, productId });
       }
     } catch (err: any) {
-      setCompareIds(compareIds);
-      setCompareItems(compareItems);
-      persistCompareCache(user.id, compareIds);
+      compareIdsRef.current = previousIds;
+      compareItemsRef.current = previousItems;
+      setCompareIds(previousIds);
+      setCompareItems(previousItems);
+      persistCompareCache(user.id, previousIds);
       showToast(err?.message || 'Failed to update compare list', 'error');
     } finally {
-      setPendingIds((prev) => prev.filter((id) => id !== productId));
+      pendingIdsRef.current = pendingIdsRef.current.filter((id) => id !== productId);
+      setPendingIds(pendingIdsRef.current);
     }
   };
 
@@ -155,9 +180,13 @@ export function useCompare() {
       return;
     }
 
-    const previousIds = compareIds;
-    const previousItems = compareItems;
+    mutationVersionRef.current += 1;
 
+    const previousIds = compareIdsRef.current;
+    const previousItems = compareItemsRef.current;
+
+    compareIdsRef.current = [];
+    compareItemsRef.current = [];
     setCompareIds([]);
     setCompareItems([]);
     persistCompareCache(user.id, []);
