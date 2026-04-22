@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { ProductCardSkeleton } from '../components/SkeletonLoader';
@@ -9,6 +10,7 @@ import { useWishlist } from '../hooks/useWishlist';
 import { useToast } from '../contexts/ToastContext';
 
 export default function CategoryPage() {
+  const { t } = useTranslation();
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
@@ -119,7 +121,7 @@ export default function CategoryPage() {
 
   const handleToggleCompare = async (productId: number) => {
     if (!isAuthenticated) {
-      showToast('Please log in to compare products', 'warning');
+      showToast(t('products.logInToCompare'), 'warning');
       return;
     }
 
@@ -139,7 +141,7 @@ export default function CategoryPage() {
 
   const handleClearCompare = async () => {
     if (!isAuthenticated) {
-      showToast('Please log in to use compare feature', 'warning');
+      showToast(t('products.logInToCompare'), 'warning');
       return;
     }
     await api.clearCompare(user!.id);
@@ -197,23 +199,23 @@ export default function CategoryPage() {
   return (
     <div className="category-view">
       <div className="category-header">
-        <button className="back-btn" onClick={() => navigate('/shop')}>← Back to Shop</button>
+        <button className="back-btn" onClick={() => navigate('/shop')}>{t('common.backToShop')}</button>
         <h1>{name}</h1>
-        <p className="category-count">{filtered.length} products</p>
+        <p className="category-count">{filtered.length} {t('products.items')}</p>
       </div>
 
       <div className="category-content">
         {/* Left Sidebar - Filters */}
         <aside className="category-filters">
           <div className="filter-header">
-            <h2>Filters</h2>
-            <span className="filter-count">{filtered.length} items</span>
+            <h2>{t('products.filters')}</h2>
+            <span className="filter-count">{filtered.length} {t('products.items')}</span>
           </div>
           <div className="filter-section">
-            <h3>Search in category</h3>
+            <h3>{t('products.search')}</h3>
             <input
               type="text"
-              placeholder="Name or description"
+              placeholder={t('products.searchInCategory')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="filter-search"
@@ -224,15 +226,15 @@ export default function CategoryPage() {
                 checked={inStockOnly}
                 onChange={(e) => setInStockOnly(e.target.checked)}
               />
-              In stock only
+              {t('products.inStockOnly')}
             </label>
           </div>
           <div className="filter-section">
-            <h3>Price Range</h3>
+            <h3>{t('products.priceRange')}</h3>
             <div className="price-inputs">
               <input 
                 type="number" 
-                placeholder="Min" 
+                placeholder={t('products.min')} 
                 value={priceRange[0]} 
                 onChange={(e) => handleMinPriceChange(e.target.value)}
                 min="0"
@@ -240,7 +242,7 @@ export default function CategoryPage() {
               <span>-</span>
               <input 
                 type="number" 
-                placeholder="Max" 
+                placeholder={t('products.max')} 
                 value={priceRange[1]} 
                 onChange={(e) => handleMaxPriceChange(e.target.value)}
                 max={maxPrice}
@@ -260,12 +262,12 @@ export default function CategoryPage() {
           </div>
 
           <div className="filter-section">
-            <h3>Sort By</h3>
+            <h3>{t('products.sortBy')}</h3>
             <select value={sortBy} onChange={(e) => handleSortChange(e.target.value)} className="sort-select">
-              <option value="name">Name</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="stock">Stock</option>
+              <option value="name">{t('products.name')}</option>
+              <option value="price-low">{t('products.priceLow')}</option>
+              <option value="price-high">{t('products.priceHigh')}</option>
+              <option value="stock">{t('products.stock')}</option>
             </select>
           </div>
 
@@ -273,7 +275,7 @@ export default function CategoryPage() {
             className="filter-reset"
             onClick={handleResetFilters}
           >
-            Reset Filters
+            {t('products.resetFilters')}
           </button>
         </aside>
 
@@ -288,8 +290,8 @@ export default function CategoryPage() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="no-products">
-              <p>No products found in this category.</p>
-              <p className="no-products-hint">Try adjusting your filters</p>
+              <p>{t('products.noProductsInCategory')}</p>
+              <p className="no-products-hint">{t('products.adjustFilters')}</p>
             </div>
           ) : (
             <div className="grid-products">

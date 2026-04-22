@@ -65,7 +65,10 @@
     "category": "Kategória",
     "allCategories": "Összes kategória",
     "searchResults": "Keresési eredmények a(z) \"{query}\" kifejezésre",
-    "logInToCompare": "Kérjük jelentkezzen be az összehasonlításhoz"
+    "logInToCompare": "Kérjük jelentkezzen be az összehasonlításhoz",
+    "resetFilters": "Szűrők törlése",
+    "noProductsInCategory": "Nincs termék ebben a kategóriában.",
+    "adjustFilters": "Próbálja meg a szűrőkat módosítani"
   },
   "cart": {
     "title": "Bevásárlókosár",
