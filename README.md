@@ -36,11 +36,11 @@ ShopHub egy teljes stackes webáruház alkalmazás NestJS backenddel és React/V
 
 ## Indítás előtti beállítások
 
-A repó már tartalmazza a használt backend `.env` példát és a projektben ténylegesen használt Vite környezeti változókat. Ne régi, idegen példák alapján állítsd be, hanem a jelenlegi kódban használt neveket használd.
+A repóban már benne vannak a használt `backend/.env` és `frontend/.env` fájlok. Ezeket nem kell külön legenerálni, csak ellenőrizd és szükség esetén írd felül a saját helyi értékeiddel.
 
 ### Backend környezeti változók
 
-Hozz létre egy `backend/.env` fájlt, és töltsd ki legalább ezeket:
+A backend `.env` legalább ezeket tartalmazza:
 
 - `PORT`
 - `DATABASE_URL`
@@ -64,11 +64,15 @@ A helyi fejlesztéshez a backend az `http://localhost:3000` portot használja, a
 
 ### Frontend környezeti változók
 
-A frontend a következő Vite env változókat használja:
+A frontend `.env` a következő Vite env változókat használja:
 
 - `VITE_API_URL`
 - `VITE_PACKETA_API_KEY`
 - `VITE_PACKETA_API_LOCALE`
+- `VITE_PACKETA_INVOICE_LOCALE`
+- `FRONTEND_URL`
+- `NODE_ENV`
+- `PORT`
 
 Ha ezek nincsenek megadva, a frontend a helyi alapértékekkel próbál működni, de a Packeta widgethez és az API célpontjához érdemes beállítani őket.
 
