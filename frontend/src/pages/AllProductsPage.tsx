@@ -35,11 +35,7 @@ export default function AllProductsPage() {
   const { wishlistIds, handleToggleWishlist, isWishlistPending, isWishlistLoading } = useWishlist();
   const { compareIds, compareItems, toggleCompare, clearCompare, isComparePending, isCompareLoading } = useCompare();
 
-  const rawSearch = searchParams.get('search');
-  let searchQuery = '';
-  if (rawSearch) {
-    searchQuery = rawSearch.toLowerCase();
-  }
+  const searchQuery = (searchParams.get('search') || '').toLowerCase();
 
   async function load() {
     setLoading(true);
@@ -59,9 +55,7 @@ export default function AllProductsPage() {
   const pageLoading = loading || isWishlistLoading || isCompareLoading;
 
   useEffect(() => {
-    if (searchQuery) {
-      setSearchTerm(searchQuery);
-    }
+    setSearchTerm(searchQuery);
   }, [searchQuery]);
 
   const maxPrice = useMemo(() => {
