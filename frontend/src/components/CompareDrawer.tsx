@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getThumbnailUrl } from '../utils/imageOptimization';
+import { formatPriceHUF } from '../utils/currency';
 
 export default function CompareDrawer({
   items,
@@ -61,7 +62,7 @@ export default function CompareDrawer({
               <div className="compare-item-info">
                 <span className="compare-item-name" title={item.name}>{item.name}</span>
                 <div className="compare-item-meta">
-                  <span className="compare-item-price">${Number(item.price).toFixed(2)}</span>
+                  <span className="compare-item-price">{formatPriceHUF(Number(item.price))}</span>
                   <span className="compare-item-category">{item.category || '—'}</span>
                 </div>
               </div>
@@ -98,7 +99,7 @@ export default function CompareDrawer({
                   <div className="compare-row">
                     <div className="compare-cell">{t('products.price')}</div>
                     {items.map((item) => (
-                      <div key={item.id} className="compare-cell">${Number(item.price).toFixed(2)}</div>
+                      <div key={item.id} className="compare-cell">{formatPriceHUF(Number(item.price))}</div>
                     ))}
                   </div>
                   <div className="compare-row">

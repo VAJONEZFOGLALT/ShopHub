@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
+import { formatPriceHUF } from '../utils/currency';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 
 type ConfirmedOrder = {
@@ -172,7 +173,7 @@ export default function OrderConfirmationPage({ orderId, onOrderViewed }: { orde
               <div className="confirmation-order-meta">
                 <div>
                   <span className="confirmation-label">{t('checkout.total')}</span>
-                  <strong>${Number(order?.totalPrice || 0).toFixed(2)}</strong>
+                  <strong>{formatPriceHUF(Number(order?.totalPrice || 0))}</strong>
                 </div>
                 <div>
                   <span className="confirmation-label">{t('orders.courier')}</span>
@@ -203,7 +204,7 @@ export default function OrderConfirmationPage({ orderId, onOrderViewed }: { orde
                       <strong>{item.product?.name || `#${item.product?.id || item.id}`}</strong>
                       <span>x{item.quantity}</span>
                     </div>
-                    <div className="confirmation-item-price">${Number(item.price * item.quantity).toFixed(2)}</div>
+                    <div className="confirmation-item-price">{formatPriceHUF(Number(item.price * item.quantity))}</div>
                   </div>
                 ))}
               </div>

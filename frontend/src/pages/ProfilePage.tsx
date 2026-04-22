@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { getAvatarUrl, getProductImageUrl } from '../utils/imageOptimization';
+import { formatPriceHUF } from '../utils/currency';
 import { useToast } from '../contexts/ToastContext';
 import { COUNTRY_ADDRESS_GROUPS, DEFAULT_COUNTRY_CODE, getCountryAddressConfig } from '../utils/addressing';
 
@@ -294,7 +295,7 @@ export default function ProfilePage() {
             <div className="header-stat">
               <span className="header-stat-icon">💰</span>
               <div>
-                <div className="header-stat-value">${totalSpent.toFixed(2)}</div>
+                <div className="header-stat-value">{formatPriceHUF(totalSpent)}</div>
                 <div className="header-stat-label">{t('profile.totalSpent')}</div>
               </div>
             </div>
@@ -336,7 +337,7 @@ export default function ProfilePage() {
                     </div>
                     <div className="profile-product-mini-info">
                       <strong onClick={() => navigate(`/shop/product/${item.id}`)} style={{cursor: 'pointer'}}>{item.name}</strong>
-                      <div className="muted">${Number(item.price).toFixed(2)}</div>
+                      <div className="muted">{formatPriceHUF(Number(item.price))}</div>
                       <button className="btn-delete" onClick={() => handleRemoveWishlist(item.id, item.name)}>{t('cart.remove')}</button>
                     </div>
                   </div>
@@ -422,7 +423,7 @@ export default function ProfilePage() {
                     </div>
                     <div className="profile-product-mini-info">
                       <strong onClick={() => navigate(`/shop/product/${item.id}`)} style={{cursor: 'pointer'}}>{item.name}</strong>
-                      <div className="muted">${Number(item.price).toFixed(2)}</div>
+                      <div className="muted">{formatPriceHUF(Number(item.price))}</div>
                     </div>
                   </div>
                 ))}
