@@ -1,6 +1,6 @@
 .languageSwitcher {
   position: fixed;
-  left: 16px;
+  right: 16px;
   bottom: 16px;
   z-index: 1100;
   display: flex;
@@ -48,7 +48,7 @@
 @media (max-width: 768px) {
   .languageSwitcher {
     gap: 6px;
-    left: 10px;
+    right: 10px;
     bottom: 10px;
     padding: 6px 8px;
   }
@@ -72,7 +72,7 @@
   }
 
   .languageSwitcher {
-    left: 8px;
+    right: 8px;
     bottom: 8px;
   }
 }

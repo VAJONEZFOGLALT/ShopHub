@@ -33,6 +33,14 @@ async function bootstrapServer(): Promise<express.Express> {
 
       app.setGlobalPrefix('api');
 
+      // Redirect only exact legacy docs paths to avoid redirect loops.
+      expressApp.get(/^\/docs\/?$/, (_req, res) => {
+        res.redirect(308, '/api/docs/');
+      });
+      expressApp.get(/^\/api\/docs$/, (_req, res) => {
+        res.redirect(308, '/api/docs/');
+      });
+
       const config = new DocumentBuilder()
         .setTitle('WebShop API')
         .setDescription('Complete API documentation for the WebShop e-commerce platform')
@@ -50,6 +58,7 @@ async function bootstrapServer(): Promise<express.Express> {
 
       const document = SwaggerModule.createDocument(app, config);
       SwaggerModule.setup('docs', app, document, {
+        useGlobalPrefix: true,
         swaggerOptions: {
           persistAuthorization: true,
         },

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-interface CourierOption {
+export interface CourierOption {
   id: string;
   name: string;
   price: number;
