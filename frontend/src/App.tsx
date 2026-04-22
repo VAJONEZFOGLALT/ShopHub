@@ -5,7 +5,7 @@ import './styles/App.css'
 import UsersView from './adminpages/UsersView'
 import ProductsView from './adminpages/ProductsView'
 import OrdersView from './adminpages/OrdersView'
-import OrderItemsView from './adminpages/OrderItemsView'
+import AdminInfoView from './adminpages/AdminInfoView'
 import CartProvider from './contexts/CartContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { ToastProvider } from './contexts/ToastContext'
@@ -29,6 +29,7 @@ import { ScrollToTop } from './components/ScrollToTop'
 import { useTranslation } from 'react-i18next';
 
 type Modals = 'none' | 'login' | 'register'
+type AdminTab = 'overview' | 'users' | 'products' | 'orders'
 
 const SUPPORTED_LANGUAGES = ['hu', 'en', 'es'];
 const normalizeLanguage = (value: string) => value.toLowerCase().split('-')[0];
@@ -62,14 +63,21 @@ function LanguageUrlSync() {
 }
 
 function AdminPanel() {
-  const [tab, setTab] = useState('users')
+  const [tab, setTab] = useState<AdminTab>('overview')
   const navigate = useNavigate()
   
-  const views: Record<string, React.JSX.Element> = {
+  const views: Record<AdminTab, React.JSX.Element> = {
+    overview: <AdminInfoView onNavigateToTab={setTab} />,
     users: <UsersView />,
     products: <ProductsView />,
-    orders: <OrdersView />,
-    orderItems: <OrderItemsView />
+    orders: <OrdersView />
+  }
+
+  const labels: Record<AdminTab, string> = {
+    overview: 'Overview',
+    users: 'Users',
+    products: 'Products',
+    orders: 'Orders',
   }
 
   return (
@@ -82,13 +90,13 @@ function AdminPanel() {
           </button>
         </div>
         <nav className="nav">
-          {Object.keys(views).map(key => (
+          {(Object.keys(views) as AdminTab[]).map(key => (
             <button 
               key={key}
               className={tab === key ? 'active' : ''}
               onClick={() => setTab(key)}
             >
-              {key.charAt(0).toUpperCase() + key.slice(1)}
+              {labels[key] || key.charAt(0).toUpperCase() + key.slice(1)}
             </button>
           ))}
         </nav>

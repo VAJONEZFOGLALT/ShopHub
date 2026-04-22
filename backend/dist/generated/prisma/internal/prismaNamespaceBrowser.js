@@ -78,7 +78,8 @@ exports.ProductsScalarFieldEnum = {
     category: 'category',
     price: 'price',
     stock: 'stock',
-    image: 'image'
+    image: 'image',
+    deletedAt: 'deletedAt'
 };
 exports.ReviewsScalarFieldEnum = {
     id: 'id',
@@ -115,7 +116,8 @@ exports.OrdersScalarFieldEnum = {
     status: 'status',
     courier: 'courier',
     shippingAddress: 'shippingAddress',
-    trackingNumber: 'trackingNumber'
+    trackingNumber: 'trackingNumber',
+    teljesitve: 'teljesitve'
 };
 exports.OrderItemsScalarFieldEnum = {
     id: 'id',

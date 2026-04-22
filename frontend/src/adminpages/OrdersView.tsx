@@ -202,7 +202,7 @@ export default function OrdersView() {
               {pagedOrders.map((o: any) => {
                 const user = users.find((u: any) => u.id === o.userId);
                 return (
-                  <tr key={o.id}>
+                  <tr key={o.id} className={o.teljesitve ? 'order-row-fulfilled' : ''}>
                     <td>{o.id}</td>
                     <td>{o.userId}</td>
                     <td>{user ? user.name : '-'}</td>
@@ -226,11 +226,13 @@ export default function OrdersView() {
                         className={o.teljesitve ? "fulfilled" : "danger"}
                         style={{
                           marginLeft: 4,
-                          backgroundColor: o.teljesitve ? '#2ecc40' : '#ffeb3b',
-                          color: o.teljesitve ? 'white' : '#333',
-                          border: 'none',
+                          backgroundColor: o.teljesitve ? 'rgba(46, 204, 113, 0.18)' : '#ff2d55',
+                          color: o.teljesitve ? '#d8f3e4' : '#ffffff',
+                          border: o.teljesitve ? '1px solid rgba(46, 204, 113, 0.32)' : '1px solid #ff2d55',
                           padding: '4px 8px',
                           borderRadius: '4px',
+                          fontWeight: o.teljesitve ? 500 : 700,
+                          boxShadow: o.teljesitve ? 'none' : '0 0 0 2px rgba(255, 45, 85, 0.2)',
                         }}
                         onClick={async () => {
                           await api.fulfillOrder(o.id, !o.teljesitve);

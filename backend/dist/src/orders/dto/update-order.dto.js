@@ -24,6 +24,7 @@ var OrderStatus;
 class UpdateOrderDto extends (0, mapped_types_1.PartialType)(create_order_dto_1.CreateOrderDto) {
     status;
     trackingNumber;
+    teljesitve;
 }
 exports.UpdateOrderDto = UpdateOrderDto;
 __decorate([
@@ -36,4 +37,9 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdateOrderDto.prototype, "trackingNumber", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], UpdateOrderDto.prototype, "teljesitve", void 0);
 //# sourceMappingURL=update-order.dto.js.map

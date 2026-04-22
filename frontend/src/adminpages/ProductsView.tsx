@@ -146,36 +146,6 @@ export default function ProductsView() {
   return (
     <div className="view">
       <h2>Products</h2>
-      <div className="stats-grid products-stats">
-        <div className="stat-item">
-          <div className="stat-icon">📦</div>
-          <div className="stat-info">
-            <div className="stat-value">{stats.total}</div>
-            <div className="stat-label">Total products</div>
-          </div>
-        </div>
-        <div className="stat-item">
-          <div className="stat-icon">🔎</div>
-          <div className="stat-info">
-            <div className="stat-value">{stats.filtered}</div>
-            <div className="stat-label">Matching current filter</div>
-          </div>
-        </div>
-        <div className="stat-item">
-          <div className="stat-icon">⚠️</div>
-          <div className="stat-info">
-            <div className="stat-value">{stats.lowStock + stats.outOfStock}</div>
-            <div className="stat-label">Need attention (low/out)</div>
-          </div>
-        </div>
-        <div className="stat-item">
-          <div className="stat-icon">💰</div>
-          <div className="stat-info">
-            <div className="stat-value">${stats.inventoryValue.toFixed(0)}</div>
-            <div className="stat-label">Inventory value</div>
-          </div>
-        </div>
-      </div>
       {error && <div className="error">{error}</div>}
       <form className="form" onSubmit={onCreate}>
         <div className="grid">

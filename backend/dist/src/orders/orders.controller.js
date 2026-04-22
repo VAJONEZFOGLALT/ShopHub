@@ -37,6 +37,9 @@ let OrdersController = class OrdersController {
     updateStatus(id, body) {
         return this.ordersService.update(+id, { status: body.status });
     }
+    fulfillOrder(id, body) {
+        return this.ordersService.update(+id, { teljesitve: typeof body.teljesitve === 'boolean' ? body.teljesitve : true });
+    }
     remove(id) {
         return this.ordersService.remove(+id);
     }
@@ -78,6 +81,14 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], OrdersController.prototype, "updateStatus", null);
+__decorate([
+    (0, common_1.Patch)(':id/fulfill'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], OrdersController.prototype, "fulfillOrder", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),

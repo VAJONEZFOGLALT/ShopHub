@@ -28,6 +28,7 @@ export type OrdersMinAggregateOutputType = {
     courier: $Enums.CourierService | null;
     shippingAddress: string | null;
     trackingNumber: string | null;
+    teljesitve: boolean | null;
 };
 export type OrdersMaxAggregateOutputType = {
     id: number | null;
@@ -38,6 +39,7 @@ export type OrdersMaxAggregateOutputType = {
     courier: $Enums.CourierService | null;
     shippingAddress: string | null;
     trackingNumber: string | null;
+    teljesitve: boolean | null;
 };
 export type OrdersCountAggregateOutputType = {
     id: number;
@@ -48,6 +50,7 @@ export type OrdersCountAggregateOutputType = {
     courier: number;
     shippingAddress: number;
     trackingNumber: number;
+    teljesitve: number;
     _all: number;
 };
 export type OrdersAvgAggregateInputType = {
@@ -69,6 +72,7 @@ export type OrdersMinAggregateInputType = {
     courier?: true;
     shippingAddress?: true;
     trackingNumber?: true;
+    teljesitve?: true;
 };
 export type OrdersMaxAggregateInputType = {
     id?: true;
@@ -79,6 +83,7 @@ export type OrdersMaxAggregateInputType = {
     courier?: true;
     shippingAddress?: true;
     trackingNumber?: true;
+    teljesitve?: true;
 };
 export type OrdersCountAggregateInputType = {
     id?: true;
@@ -89,6 +94,7 @@ export type OrdersCountAggregateInputType = {
     courier?: true;
     shippingAddress?: true;
     trackingNumber?: true;
+    teljesitve?: true;
     _all?: true;
 };
 export type OrdersAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -128,6 +134,7 @@ export type OrdersGroupByOutputType = {
     courier: $Enums.CourierService;
     shippingAddress: string | null;
     trackingNumber: string | null;
+    teljesitve: boolean;
     _count: OrdersCountAggregateOutputType | null;
     _avg: OrdersAvgAggregateOutputType | null;
     _sum: OrdersSumAggregateOutputType | null;
@@ -149,6 +156,7 @@ export type OrdersWhereInput = {
     courier?: Prisma.EnumCourierServiceFilter<"Orders"> | $Enums.CourierService;
     shippingAddress?: Prisma.StringNullableFilter<"Orders"> | string | null;
     trackingNumber?: Prisma.StringNullableFilter<"Orders"> | string | null;
+    teljesitve?: Prisma.BoolFilter<"Orders"> | boolean;
     user?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.UsersWhereInput>;
     orderItems?: Prisma.OrderItemsListRelationFilter;
 };
@@ -161,6 +169,7 @@ export type OrdersOrderByWithRelationInput = {
     courier?: Prisma.SortOrder;
     shippingAddress?: Prisma.SortOrderInput | Prisma.SortOrder;
     trackingNumber?: Prisma.SortOrderInput | Prisma.SortOrder;
+    teljesitve?: Prisma.SortOrder;
     user?: Prisma.UsersOrderByWithRelationInput;
     orderItems?: Prisma.OrderItemsOrderByRelationAggregateInput;
     _relevance?: Prisma.OrdersOrderByRelevanceInput;
@@ -177,6 +186,7 @@ export type OrdersWhereUniqueInput = Prisma.AtLeast<{
     courier?: Prisma.EnumCourierServiceFilter<"Orders"> | $Enums.CourierService;
     shippingAddress?: Prisma.StringNullableFilter<"Orders"> | string | null;
     trackingNumber?: Prisma.StringNullableFilter<"Orders"> | string | null;
+    teljesitve?: Prisma.BoolFilter<"Orders"> | boolean;
     user?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.UsersWhereInput>;
     orderItems?: Prisma.OrderItemsListRelationFilter;
 }, "id">;
@@ -189,6 +199,7 @@ export type OrdersOrderByWithAggregationInput = {
     courier?: Prisma.SortOrder;
     shippingAddress?: Prisma.SortOrderInput | Prisma.SortOrder;
     trackingNumber?: Prisma.SortOrderInput | Prisma.SortOrder;
+    teljesitve?: Prisma.SortOrder;
     _count?: Prisma.OrdersCountOrderByAggregateInput;
     _avg?: Prisma.OrdersAvgOrderByAggregateInput;
     _max?: Prisma.OrdersMaxOrderByAggregateInput;
@@ -207,6 +218,7 @@ export type OrdersScalarWhereWithAggregatesInput = {
     courier?: Prisma.EnumCourierServiceWithAggregatesFilter<"Orders"> | $Enums.CourierService;
     shippingAddress?: Prisma.StringNullableWithAggregatesFilter<"Orders"> | string | null;
     trackingNumber?: Prisma.StringNullableWithAggregatesFilter<"Orders"> | string | null;
+    teljesitve?: Prisma.BoolWithAggregatesFilter<"Orders"> | boolean;
 };
 export type OrdersCreateInput = {
     totalPrice: number;
@@ -215,6 +227,7 @@ export type OrdersCreateInput = {
     courier?: $Enums.CourierService;
     shippingAddress?: string | null;
     trackingNumber?: string | null;
+    teljesitve?: boolean;
     user: Prisma.UsersCreateNestedOneWithoutOrdersInput;
     orderItems?: Prisma.OrderItemsCreateNestedManyWithoutOrderInput;
 };
@@ -227,6 +240,7 @@ export type OrdersUncheckedCreateInput = {
     courier?: $Enums.CourierService;
     shippingAddress?: string | null;
     trackingNumber?: string | null;
+    teljesitve?: boolean;
     orderItems?: Prisma.OrderItemsUncheckedCreateNestedManyWithoutOrderInput;
 };
 export type OrdersUpdateInput = {
@@ -236,6 +250,7 @@ export type OrdersUpdateInput = {
     courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
     shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    teljesitve?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     user?: Prisma.UsersUpdateOneRequiredWithoutOrdersNestedInput;
     orderItems?: Prisma.OrderItemsUpdateManyWithoutOrderNestedInput;
 };
@@ -248,6 +263,7 @@ export type OrdersUncheckedUpdateInput = {
     courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
     shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    teljesitve?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderItems?: Prisma.OrderItemsUncheckedUpdateManyWithoutOrderNestedInput;
 };
 export type OrdersCreateManyInput = {
@@ -259,6 +275,7 @@ export type OrdersCreateManyInput = {
     courier?: $Enums.CourierService;
     shippingAddress?: string | null;
     trackingNumber?: string | null;
+    teljesitve?: boolean;
 };
 export type OrdersUpdateManyMutationInput = {
     totalPrice?: Prisma.FloatFieldUpdateOperationsInput | number;
@@ -267,6 +284,7 @@ export type OrdersUpdateManyMutationInput = {
     courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
     shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    teljesitve?: Prisma.BoolFieldUpdateOperationsInput | boolean;
 };
 export type OrdersUncheckedUpdateManyInput = {
     id?: Prisma.IntFieldUpdateOperationsInput | number;
@@ -277,6 +295,7 @@ export type OrdersUncheckedUpdateManyInput = {
     courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
     shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    teljesitve?: Prisma.BoolFieldUpdateOperationsInput | boolean;
 };
 export type OrdersListRelationFilter = {
     every?: Prisma.OrdersWhereInput;
@@ -300,6 +319,7 @@ export type OrdersCountOrderByAggregateInput = {
     courier?: Prisma.SortOrder;
     shippingAddress?: Prisma.SortOrder;
     trackingNumber?: Prisma.SortOrder;
+    teljesitve?: Prisma.SortOrder;
 };
 export type OrdersAvgOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -315,6 +335,7 @@ export type OrdersMaxOrderByAggregateInput = {
     courier?: Prisma.SortOrder;
     shippingAddress?: Prisma.SortOrder;
     trackingNumber?: Prisma.SortOrder;
+    teljesitve?: Prisma.SortOrder;
 };
 export type OrdersMinOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -325,6 +346,7 @@ export type OrdersMinOrderByAggregateInput = {
     courier?: Prisma.SortOrder;
     shippingAddress?: Prisma.SortOrder;
     trackingNumber?: Prisma.SortOrder;
+    teljesitve?: Prisma.SortOrder;
 };
 export type OrdersSumOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -379,6 +401,9 @@ export type EnumOrderStatusFieldUpdateOperationsInput = {
 export type EnumCourierServiceFieldUpdateOperationsInput = {
     set?: $Enums.CourierService;
 };
+export type BoolFieldUpdateOperationsInput = {
+    set?: boolean;
+};
 export type OrdersCreateNestedOneWithoutOrderItemsInput = {
     create?: Prisma.XOR<Prisma.OrdersCreateWithoutOrderItemsInput, Prisma.OrdersUncheckedCreateWithoutOrderItemsInput>;
     connectOrCreate?: Prisma.OrdersCreateOrConnectWithoutOrderItemsInput;
@@ -398,6 +423,7 @@ export type OrdersCreateWithoutUserInput = {
     courier?: $Enums.CourierService;
     shippingAddress?: string | null;
     trackingNumber?: string | null;
+    teljesitve?: boolean;
     orderItems?: Prisma.OrderItemsCreateNestedManyWithoutOrderInput;
 };
 export type OrdersUncheckedCreateWithoutUserInput = {
@@ -408,6 +434,7 @@ export type OrdersUncheckedCreateWithoutUserInput = {
     courier?: $Enums.CourierService;
     shippingAddress?: string | null;
     trackingNumber?: string | null;
+    teljesitve?: boolean;
     orderItems?: Prisma.OrderItemsUncheckedCreateNestedManyWithoutOrderInput;
 };
 export type OrdersCreateOrConnectWithoutUserInput = {
@@ -443,6 +470,7 @@ export type OrdersScalarWhereInput = {
     courier?: Prisma.EnumCourierServiceFilter<"Orders"> | $Enums.CourierService;
     shippingAddress?: Prisma.StringNullableFilter<"Orders"> | string | null;
     trackingNumber?: Prisma.StringNullableFilter<"Orders"> | string | null;
+    teljesitve?: Prisma.BoolFilter<"Orders"> | boolean;
 };
 export type OrdersCreateWithoutOrderItemsInput = {
     totalPrice: number;
@@ -451,6 +479,7 @@ export type OrdersCreateWithoutOrderItemsInput = {
     courier?: $Enums.CourierService;
     shippingAddress?: string | null;
     trackingNumber?: string | null;
+    teljesitve?: boolean;
     user: Prisma.UsersCreateNestedOneWithoutOrdersInput;
 };
 export type OrdersUncheckedCreateWithoutOrderItemsInput = {
@@ -462,6 +491,7 @@ export type OrdersUncheckedCreateWithoutOrderItemsInput = {
     courier?: $Enums.CourierService;
     shippingAddress?: string | null;
     trackingNumber?: string | null;
+    teljesitve?: boolean;
 };
 export type OrdersCreateOrConnectWithoutOrderItemsInput = {
     where: Prisma.OrdersWhereUniqueInput;
@@ -483,6 +513,7 @@ export type OrdersUpdateWithoutOrderItemsInput = {
     courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
     shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    teljesitve?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     user?: Prisma.UsersUpdateOneRequiredWithoutOrdersNestedInput;
 };
 export type OrdersUncheckedUpdateWithoutOrderItemsInput = {
@@ -494,6 +525,7 @@ export type OrdersUncheckedUpdateWithoutOrderItemsInput = {
     courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
     shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    teljesitve?: Prisma.BoolFieldUpdateOperationsInput | boolean;
 };
 export type OrdersCreateManyUserInput = {
     id?: number;
@@ -503,6 +535,7 @@ export type OrdersCreateManyUserInput = {
     courier?: $Enums.CourierService;
     shippingAddress?: string | null;
     trackingNumber?: string | null;
+    teljesitve?: boolean;
 };
 export type OrdersUpdateWithoutUserInput = {
     totalPrice?: Prisma.FloatFieldUpdateOperationsInput | number;
@@ -511,6 +544,7 @@ export type OrdersUpdateWithoutUserInput = {
     courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
     shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    teljesitve?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderItems?: Prisma.OrderItemsUpdateManyWithoutOrderNestedInput;
 };
 export type OrdersUncheckedUpdateWithoutUserInput = {
@@ -521,6 +555,7 @@ export type OrdersUncheckedUpdateWithoutUserInput = {
     courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
     shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    teljesitve?: Prisma.BoolFieldUpdateOperationsInput | boolean;
     orderItems?: Prisma.OrderItemsUncheckedUpdateManyWithoutOrderNestedInput;
 };
 export type OrdersUncheckedUpdateManyWithoutUserInput = {
@@ -531,6 +566,7 @@ export type OrdersUncheckedUpdateManyWithoutUserInput = {
     courier?: Prisma.EnumCourierServiceFieldUpdateOperationsInput | $Enums.CourierService;
     shippingAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     trackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    teljesitve?: Prisma.BoolFieldUpdateOperationsInput | boolean;
 };
 export type OrdersCountOutputType = {
     orderItems: number;
@@ -553,6 +589,7 @@ export type OrdersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     courier?: boolean;
     shippingAddress?: boolean;
     trackingNumber?: boolean;
+    teljesitve?: boolean;
     user?: boolean | Prisma.UsersDefaultArgs<ExtArgs>;
     orderItems?: boolean | Prisma.Orders$orderItemsArgs<ExtArgs>;
     _count?: boolean | Prisma.OrdersCountOutputTypeDefaultArgs<ExtArgs>;
@@ -566,8 +603,9 @@ export type OrdersSelectScalar = {
     courier?: boolean;
     shippingAddress?: boolean;
     trackingNumber?: boolean;
+    teljesitve?: boolean;
 };
-export type OrdersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "totalPrice" | "createdAt" | "status" | "courier" | "shippingAddress" | "trackingNumber", ExtArgs["result"]["orders"]>;
+export type OrdersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "totalPrice" | "createdAt" | "status" | "courier" | "shippingAddress" | "trackingNumber" | "teljesitve", ExtArgs["result"]["orders"]>;
 export type OrdersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     user?: boolean | Prisma.UsersDefaultArgs<ExtArgs>;
     orderItems?: boolean | Prisma.Orders$orderItemsArgs<ExtArgs>;
@@ -588,6 +626,7 @@ export type $OrdersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
         courier: $Enums.CourierService;
         shippingAddress: string | null;
         trackingNumber: string | null;
+        teljesitve: boolean;
     }, ExtArgs["result"]["orders"]>;
     composites: {};
 };
@@ -653,6 +692,7 @@ export interface OrdersFieldRefs {
     readonly courier: Prisma.FieldRef<"Orders", 'CourierService'>;
     readonly shippingAddress: Prisma.FieldRef<"Orders", 'String'>;
     readonly trackingNumber: Prisma.FieldRef<"Orders", 'String'>;
+    readonly teljesitve: Prisma.FieldRef<"Orders", 'Boolean'>;
 }
 export type OrdersFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.OrdersSelect<ExtArgs> | null;

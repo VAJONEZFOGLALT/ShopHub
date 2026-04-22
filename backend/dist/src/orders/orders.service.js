@@ -21,9 +21,17 @@ let OrdersService = class OrdersService {
         const { userId, items, courier, shippingAddress } = createOrderDto;
         const productIds = Array.from(new Set(items.map((i) => i.productId)));
         const products = await this.prisma.products.findMany({
-            where: { id: { in: productIds } },
+            where: {
+                id: { in: productIds },
+                deletedAt: null,
+            },
             select: { id: true, price: true },
         });
+        const foundIds = new Set(products.map((p) => p.id));
+        const unavailableIds = productIds.filter((id) => !foundIds.has(id));
+        if (unavailableIds.length > 0) {
+            throw new common_1.BadRequestException(`Products unavailable: ${unavailableIds.join(', ')}`);
+        }
         const priceMap = new Map(products.map((p) => [p.id, p.price]));
         const orderItemsData = items.map((item) => {
             const price = priceMap.get(item.productId) ?? 0;
@@ -55,8 +63,15 @@ let OrdersService = class OrdersService {
         const { items, ...rest } = updateOrderDto;
         return this.prisma.orders.update({ where: { id }, data: rest, include: { orderItems: true } });
     }
-    remove(id) {
-        return this.prisma.orders.delete({ where: { id } });
+    async remove(id) {
+        const existing = await this.prisma.orders.findUnique({ where: { id }, select: { id: true } });
+        if (!existing) {
+            throw new common_1.NotFoundException(`Order with id ${id} not found`);
+        }
+        return this.prisma.$transaction(async (tx) => {
+            await tx.orderItems.deleteMany({ where: { orderId: id } });
+            return tx.orders.delete({ where: { id } });
+        });
     }
 };
 exports.OrdersService = OrdersService;

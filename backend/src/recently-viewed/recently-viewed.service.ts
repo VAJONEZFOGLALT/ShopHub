@@ -9,7 +9,12 @@ export class RecentlyViewedService {
 
   findByUser(userId: number) {
     return this.prisma.recentlyViewed.findMany({
-      where: { userId },
+      where: {
+        userId,
+        product: {
+          deletedAt: null,
+        },
+      },
       include: { product: true },
       orderBy: { viewedAt: 'desc' },
       take: 12,
@@ -17,6 +22,17 @@ export class RecentlyViewedService {
   }
 
   async upsert(data: CreateRecentlyViewedDto) {
+    const product = await this.prisma.products.findFirst({
+      where: {
+        id: data.productId,
+        deletedAt: null,
+      },
+      select: { id: true },
+    });
+    if (!product) {
+      return null;
+    }
+
     try {
       return await this.prisma.recentlyViewed.create({
         data: { userId: data.userId, productId: data.productId },

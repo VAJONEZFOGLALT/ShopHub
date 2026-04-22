@@ -911,6 +911,7 @@ export declare const ProductsScalarFieldEnum: {
     readonly price: "price";
     readonly stock: "stock";
     readonly image: "image";
+    readonly deletedAt: "deletedAt";
 };
 export type ProductsScalarFieldEnum = (typeof ProductsScalarFieldEnum)[keyof typeof ProductsScalarFieldEnum];
 export declare const ReviewsScalarFieldEnum: {
@@ -953,6 +954,7 @@ export declare const OrdersScalarFieldEnum: {
     readonly courier: "courier";
     readonly shippingAddress: "shippingAddress";
     readonly trackingNumber: "trackingNumber";
+    readonly teljesitve: "teljesitve";
 };
 export type OrdersScalarFieldEnum = (typeof OrdersScalarFieldEnum)[keyof typeof OrdersScalarFieldEnum];
 export declare const OrderItemsScalarFieldEnum: {

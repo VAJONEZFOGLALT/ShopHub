@@ -8,13 +8,29 @@ export class CompareService {
 
   findByUser(userId: number) {
     return this.prisma.compareItems.findMany({
-      where: { userId },
+      where: {
+        userId,
+        product: {
+          deletedAt: null,
+        },
+      },
       include: { product: true },
       orderBy: { createdAt: 'desc' },
     });
   }
 
   async add(data: CreateCompareDto) {
+    const product = await this.prisma.products.findFirst({
+      where: {
+        id: data.productId,
+        deletedAt: null,
+      },
+      select: { id: true },
+    });
+    if (!product) {
+      throw new BadRequestException('Product not found');
+    }
+
     const existing = await this.prisma.compareItems.findUnique({
       where: { userId_productId: { userId: data.userId, productId: data.productId } },
     });

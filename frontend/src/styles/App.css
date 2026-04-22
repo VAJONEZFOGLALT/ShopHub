@@ -198,6 +198,7 @@ table { width: 100%; border-collapse: collapse; }
 th, td { padding: 14px; border-bottom: 1px solid var(--border); text-align: left; }
 th { color: var(--text-secondary); font-weight: 700; font-size: 0.9em; background: var(--surface-hover); text-transform: uppercase; letter-spacing: 0.5px; }
 td { color: var(--text); }
+.order-row-fulfilled { opacity: 0.5; }
 td input { background: var(--surface-hover); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 6px; width: 100px; transition: all 0.2s; }
 td input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
 tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: var(--surface-hover); }
@@ -2329,6 +2330,13 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 .stats-grid { display: grid; gap: 12px; }
 .stat-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--surface-hover); border-radius: 10px; border: 1px solid var(--border); transition: all 0.2s; }
 .stat-item:hover { border-color: var(--primary); background: var(--primary-light); transform: translateX(4px); }
+.stat-item-action {
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
 .stat-icon { font-size: 2em; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: var(--surface); border-radius: 10px; }
 .stat-info { flex: 1; }
 .stat-value { font-size: 1.8em; font-weight: 700; color: var(--text); line-height: 1; margin-bottom: 4px; }

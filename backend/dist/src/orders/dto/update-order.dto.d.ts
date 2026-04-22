@@ -10,5 +10,6 @@ declare const UpdateOrderDto_base: import("@nestjs/mapped-types").MappedType<Par
 export declare class UpdateOrderDto extends UpdateOrderDto_base {
     status?: OrderStatus;
     trackingNumber?: string;
+    teljesitve?: boolean;
 }
 export {};
