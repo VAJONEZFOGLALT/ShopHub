@@ -68,6 +68,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
   const [newUser, setNewUser] = useState({ username: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [packetaSelecting, setPacketaSelecting] = useState(false);
 
   const selectedCourier = couriers.find((c) => c.id === courier) || couriers[0];
   const hasItems = items.length > 0;
@@ -115,6 +116,68 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
     setError('');
   }, [hasItems, t]);
 
+  useEffect(() => {
+    if (!packetaSelecting) {
+      document.body.classList.remove('packeta-modal-open');
+      return;
+    }
+
+    const forcePacketaDialogLayout = () => {
+      const iframe = document.querySelector('iframe[src*="widget.packeta.com"]') as HTMLIFrameElement | null;
+      if (!iframe) return;
+
+      let dialog = iframe.parentElement as HTMLElement | null;
+      while (dialog && dialog !== document.body) {
+        const computed = window.getComputedStyle(dialog);
+        if (computed.position === 'fixed' || computed.position === 'absolute') break;
+        dialog = dialog.parentElement;
+      }
+
+      if (!dialog) return;
+
+      dialog.style.inset = '50% auto auto 50%';
+      dialog.style.transform = 'translate(-50%, -50%)';
+      dialog.style.width = '75vw';
+      dialog.style.maxWidth = '1120px';
+      dialog.style.height = '78vh';
+      dialog.style.maxHeight = '860px';
+      dialog.style.borderRadius = '16px';
+      dialog.style.overflow = 'hidden';
+      dialog.style.boxShadow = '0 35px 90px rgba(2, 6, 23, 0.52)';
+      dialog.style.zIndex = '10002';
+
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = '0';
+
+      const overlay = dialog.parentElement as HTMLElement | null;
+      if (overlay && overlay !== document.body) {
+        const computed = window.getComputedStyle(overlay);
+        if (computed.position === 'fixed' || computed.position === 'absolute') {
+          overlay.style.background = 'rgba(7, 10, 18, 0.72)';
+          overlay.style.backdropFilter = 'blur(4px)';
+          overlay.style.zIndex = '10001';
+        }
+      }
+    };
+
+    document.body.classList.add('packeta-modal-open');
+    forcePacketaDialogLayout();
+
+    const observer = new MutationObserver(() => {
+      forcePacketaDialogLayout();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    const intervalId = window.setInterval(forcePacketaDialogLayout, 200);
+
+    return () => {
+      document.body.classList.remove('packeta-modal-open');
+      observer.disconnect();
+      window.clearInterval(intervalId);
+    };
+  }, [packetaSelecting]);
+
   const handlePickPacketaPoint = () => {
     const apiKey = import.meta.env.VITE_PACKETA_API_KEY || '';
     const widgetLanguage = import.meta.env.VITE_PACKETA_API_LOCALE || 'en_GB';
@@ -129,9 +192,12 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
       return;
     }
 
+    setPacketaSelecting(true);
+
     window.Packeta.Widget.pick(
       apiKey,
       (point: any) => {
+        setPacketaSelecting(false);
         if (!point) return;
         const label = [point.name, point.city, point.street].filter(Boolean).join(', ');
         setPickupPointLabel(label);
@@ -212,6 +278,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
       <div className={`checkout-container ${hasItems ? '' : 'checkout-container-empty'}`.trim()}>
         <div className="checkout-main">
           <h2>{t('checkout.title')}</h2>
+          <p className="checkout-lead">Gyors, biztonsagos checkout. Valassz futart, ellenorizd az adatokat, es kuldheted is a rendelest.</p>
           {error && (
             <div className={emptyCheckout ? 'checkout-empty-banner' : 'error'}>
               {emptyCheckout && <span className="checkout-empty-banner-icon">!</span>}
@@ -245,21 +312,24 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
             <>
               <div className="checkout-section">
                 <h3>{t('checkout.items')} ({items.length})</h3>
-                {items.map(it => (
-                  <div key={it.productId} className="checkout-item">
-                    <div className="checkout-item-info">
-                      <strong>{it.name}</strong> x {it.quantity}
-                      <span>${(it.price * it.quantity).toFixed(2)}</span>
+                <div className="checkout-items">
+                  {items.map(it => (
+                    <div key={it.productId} className="checkout-item">
+                      <div className="checkout-item-info">
+                        <strong>{it.name}</strong>
+                        <span className="muted">Mennyiseg: {it.quantity}</span>
+                        <span>${(it.price * it.quantity).toFixed(2)}</span>
+                      </div>
+                      <button className="btn-text" onClick={() => remove(it.productId)}>{t('checkout.remove')}</button>
                     </div>
-                    <button className="btn-text" onClick={() => remove(it.productId)}>{t('checkout.remove')}</button>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
 
               <div className="checkout-section">
                 <h3>{t('checkout.delivery')}</h3>
                 {couriers.map(c => (
-                  <label key={c.id} style={{ display: 'flex', gap: '10px', margin: '10px 0', padding: '10px', border: '1px solid var(--border)', borderRadius: '6px' }}>
+                  <label key={c.id} className="checkout-courier-option">
                     <input
                       type="radio"
                       value={c.id}
@@ -268,9 +338,9 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                         setCourier(e.target.value as CourierOption['id']);
                       }}
                     />
-                    <div style={{ flex: 1 }}>
+                    <div className="checkout-courier-content">
                       <div><strong>{c.name}</strong> - ${c.price.toFixed(2)}</div>
-                      <div className="muted" style={{ fontSize: '0.9em' }}>{c.days}</div>
+                      <div className="muted checkout-courier-days">{c.days}</div>
                     </div>
                   </label>
                 ))}
@@ -280,7 +350,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                     <button className="btn-secondary" onClick={handlePickPacketaPoint} disabled={!packetaReady}>
                       {packetaReady ? 'Packeta pont valasztasa' : 'Packeta betoltese...'}
                     </button>
-                    {pickupPointLabel && <p className="muted" style={{ marginTop: '8px' }}>📍 {pickupPointLabel}</p>}
+                    {pickupPointLabel && <p className="muted courier-picked-point">📍 {pickupPointLabel}</p>}
                   </div>
                 )}
               </div>
@@ -289,7 +359,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                 <div className="checkout-section">
                   <h3>{t('checkout.address')}</h3>
                   {addresses.map(a => (
-                    <label key={a.id} style={{ display: 'flex', gap: '10px', margin: '10px 0', padding: '10px', border: '1px solid var(--border)', borderRadius: '6px' }}>
+                    <label key={a.id} className="checkout-address-option">
                       <input type="radio" checked={selectedAddr === a.id} onChange={() => setSelectedAddr(a.id)} />
                       <div>
                         <strong>{a.label}</strong><br />
@@ -312,23 +382,23 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                 <div className="checkout-section">
                   <h3>Szallitasi cim</h3>
                   <input
+                    className="checkout-input"
                     placeholder={t('profile.fullName')}
                     value={guestAddress.fullName}
                     onChange={(e) => setGuestAddress((prev) => ({ ...prev, fullName: e.target.value }))}
-                    style={{ width: '100%', marginBottom: '8px', padding: '8px' }}
                     required
                   />
                   <input
+                    className="checkout-input"
                     placeholder={t('profile.streetAddress')}
                     value={guestAddress.street}
                     onChange={(e) => setGuestAddress((prev) => ({ ...prev, street: e.target.value }))}
-                    style={{ width: '100%', marginBottom: '8px', padding: '8px' }}
                     required
                   />
                   <select
+                    className="checkout-input"
                     value={guestAddress.country}
                     onChange={(e) => setGuestAddress((prev) => ({ ...prev, country: e.target.value, state: '' }))}
-                    style={{ width: '100%', marginBottom: '8px', padding: '8px' }}
                   >
                     {COUNTRY_ADDRESS_CONFIGS.map((country) => (
                       <option key={country.code} value={country.code}>
@@ -336,19 +406,19 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                       </option>
                     ))}
                   </select>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <div className="checkout-grid-two">
                     <input
+                      className="checkout-input"
                       placeholder={t('profile.city')}
                       value={guestAddress.city}
                       onChange={(e) => setGuestAddress((prev) => ({ ...prev, city: e.target.value }))}
-                      style={{ width: '100%', marginBottom: '8px', padding: '8px' }}
                       required
                     />
                     {guestCountryConfig.regions ? (
                       <select
+                        className="checkout-input"
                         value={guestAddress.state}
                         onChange={(e) => setGuestAddress((prev) => ({ ...prev, state: e.target.value }))}
-                        style={{ width: '100%', marginBottom: '8px', padding: '8px' }}
                         required
                       >
                         <option value="" disabled>{guestCountryConfig.regionLabel}</option>
@@ -358,19 +428,19 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                       </select>
                     ) : (
                       <input
+                        className="checkout-input"
                         placeholder={guestCountryConfig.regionLabel}
                         value={guestAddress.state}
                         onChange={(e) => setGuestAddress((prev) => ({ ...prev, state: e.target.value }))}
-                        style={{ width: '100%', marginBottom: '8px', padding: '8px' }}
                         required
                       />
                     )}
                   </div>
                   <input
+                    className="checkout-input"
                     placeholder={guestCountryConfig.postalLabel}
                     value={guestAddress.zipCode}
                     onChange={(e) => setGuestAddress((prev) => ({ ...prev, zipCode: e.target.value }))}
-                    style={{ width: '100%', marginBottom: '8px', padding: '8px' }}
                     required
                   />
                 </div>
@@ -379,9 +449,9 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
               {!user && (
                 <div className="checkout-section">
                   <h3>{t('checkout.accountInfo')}</h3>
-                  <input placeholder={t('common.username')} value={newUser.username} onChange={e => setNewUser({...newUser, username: e.target.value})} style={{ width: '100%', marginBottom: '8px', padding: '8px' }} required />
-                  <input placeholder={t('auth.email')} type="email" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} style={{ width: '100%', marginBottom: '8px', padding: '8px' }} required />
-                  <input placeholder={t('auth.password')} type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} style={{ width: '100%', padding: '8px' }} required />
+                  <input className="checkout-input" placeholder={t('common.username')} value={newUser.username} onChange={e => setNewUser({...newUser, username: e.target.value})} required />
+                  <input className="checkout-input" placeholder={t('auth.email')} type="email" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} required />
+                  <input className="checkout-input" placeholder={t('auth.password')} type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} required />
                 </div>
               )}
             </>
@@ -391,16 +461,16 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
         {hasItems && (
           <div className="checkout-sidebar">
             <h3>{t('checkout.summary')}</h3>
-            <div style={{ padding: '20px 0' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <div className="checkout-summary">
+              <div className="checkout-summary-row">
                 <span>{t('checkout.subtotal')}</span>
                 <span>${total.toFixed(2)}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid var(--border)' }}>
+              <div className="checkout-summary-row">
                 <span>{t('checkout.shipping')}</span>
                 <span>${ship.toFixed(2)}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2em', fontWeight: 'bold' }}>
+              <div className="checkout-summary-row total">
                 <span>{t('checkout.total')}</span>
                 <span>${finalTotal.toFixed(2)}</span>
               </div>
