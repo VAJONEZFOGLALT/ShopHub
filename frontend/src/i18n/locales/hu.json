@@ -224,6 +224,8 @@
     "tracking": "Nyomkövetés",
     "shippingTo": "Szállítás:",
     "total": "Összesen",
+    "item": "tétel",
+    "itemsCount": "tétel",
     "itemInOrder": "{count} tétel",
     "itemsInOrder": "{count} tétele",
     "backToProfile": "Vissza a profilhoz",

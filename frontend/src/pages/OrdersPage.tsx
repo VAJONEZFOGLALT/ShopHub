@@ -34,33 +34,33 @@ export default function OrdersPage() {
   const { user } = useAuth();
   const { showToast } = useToast();
   const [orders, setOrders] = useState<any[]>([]);
-  const [orderItems, setOrderItems] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadOrders = async () => {
       try {
-        const requests = [api.getOrders()];
-        let itemsPromise: Promise<any[]> = Promise.resolve([]);
-        if (api.getOrderItems) {
-          itemsPromise = api.getOrderItems();
-        }
-        requests.push(itemsPromise as unknown as Promise<any[]>);
-
-        const results = await Promise.all(requests);
-        const allOrders = results[0] as any[];
-        const items = results[1] as any[];
+        const [allOrders, allProducts] = await Promise.all([
+          api.getOrders(),
+          api.getProducts(),
+        ]);
 
         const userOrders: any[] = [];
         for (let i = 0; i < allOrders.length; i += 1) {
           const order = allOrders[i];
-          if (order.userId === user?.id) {
+          if (Number(order.userId) === user?.id) {
             userOrders.push(order);
           }
         }
-        userOrders.reverse(); // Show newest first
+
+        userOrders.sort((a, b) => {
+          const aDate = new Date(a.createdAt || 0).getTime();
+          const bDate = new Date(b.createdAt || 0).getTime();
+          return bDate - aDate;
+        });
+
         setOrders(userOrders);
-        setOrderItems(items);
+        setProducts(allProducts);
       } catch (e) {
         showToast(t('orders.failedToLoadOrders'), 'error');
       } finally {
@@ -85,15 +85,13 @@ export default function OrdersPage() {
     return <div className="view"><p>{t('orders.loading')}</p></div>;
   }
 
-  const getOrderItems = (orderId: number) => {
-    const matched: any[] = [];
-    for (let i = 0; i < orderItems.length; i += 1) {
-      const item = orderItems[i];
-      if (item.orderId === orderId) {
-        matched.push(item);
-      }
-    }
-    return matched;
+  const getProductName = (productId: number) => {
+    const product = products.find((item: any) => item.id === productId);
+    return product ? product.name : `#${productId}`;
+  };
+
+  const formatItemCount = (count: number) => {
+    return `${count} ${count === 1 ? t('orders.item') : t('orders.itemsCount')}`;
   };
 
   return (
@@ -109,13 +107,15 @@ export default function OrdersPage() {
       ) : (
         <div className="orders-list">
           {orders.map((order) => {
-            const items = getOrderItems(order.id);
+            const items = Array.isArray(order.orderItems) ? order.orderItems : [];
+            const itemCount = items.reduce((sum: number, item: any) => sum + Number(item.quantity || 0), 0);
             return (
               <div key={order.id} className="order-card">
                 <div className="order-header">
                   <div className="order-id">
                     <span className="order-label">{t('orders.orderNumber')}</span>
                     <span className="order-number">#{order.id}</span>
+                    <span className="order-meta">{new Date(order.createdAt || Date.now()).toLocaleDateString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                   </div>
                   <div className="order-status">
                     {(() => {
@@ -132,12 +132,8 @@ export default function OrdersPage() {
                 <div className="order-body">
                   <div className="order-info">
                     <div className="info-row">
-                      <span className="info-label">{t('orders.date')}</span>
-                      <span className="info-value">{new Date(order.createdAt || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                    </div>
-                    <div className="info-row">
                       <span className="info-label">{t('orders.items')}</span>
-                      <span className="info-value">{items.length} {items.length === 1 ? t('orders.item') : t('orders.itemsCount')}</span>
+                      <span className="info-value">{formatItemCount(itemCount)}</span>
                     </div>
                     {order.courier && (
                       <div className="info-row">
@@ -165,7 +161,7 @@ export default function OrdersPage() {
                   </div>
                   <div className="order-total">
                     <span className="total-label">{t('orders.total')}</span>
-                    <span className="total-amount">${order.totalPrice?.toFixed(2) || '0.00'}</span>
+                    <span className="total-amount">${Number(order.totalPrice || 0).toFixed(2)}</span>
                   </div>
                 </div>
                 {items.length > 0 && (
@@ -174,8 +170,9 @@ export default function OrdersPage() {
                     <div className="items-grid">
                       {items.map((item: any) => (
                         <div key={item.id} className="item-summary">
-                          <span className="item-name">{item.productName}</span>
+                          <span className="item-name">{getProductName(item.productId)}</span>
                           <span className="item-qty">x{item.quantity}</span>
+                          <span className="item-price">${Number(item.price || 0).toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
