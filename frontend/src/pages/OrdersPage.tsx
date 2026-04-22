@@ -24,7 +24,7 @@ function getCourierIcon(courier: CourierService): { icon: string; name: string }
     'UPS': { icon: '🚚', name: 'UPS Express' },
     'PACKETA': { icon: '📦', name: 'Packeta' },
     'DPD': { icon: '🚛', name: 'DPD' },
-    'INPOST': { icon: '🏤', name: 'InPost' },
+    'INPOST': { icon: '📮', name: 'Magyar Posta' },
   };
   return couriers[courier] || { icon: '📦', name: courier };
 }
@@ -189,7 +189,7 @@ export default function OrdersPage() {
                             <span style={{ marginRight: '8px', fontSize: '1.05em' }}>
                               {getCourierIcon(order.courier as CourierService).icon}
                             </span>
-                            {order.courier}
+                            {getCourierIcon(order.courier as CourierService).name}
                           </>
                         ) : '—'}
                       </div>
