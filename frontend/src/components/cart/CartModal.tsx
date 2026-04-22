@@ -74,7 +74,6 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
                 <div key={item.productId} className="cart-item">
                   <div className="cart-item-info">
                     <div className="cart-item-name">{item.name}</div>
-                    <div className="cart-item-price">{formatPriceHUF(item.price)}</div>
                   </div>
                   <div className="cart-item-actions">
                     <div className="cart-item-quantity">
