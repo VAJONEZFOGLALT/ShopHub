@@ -5,6 +5,8 @@ type OrderItemInput = { productId: number; quantity: number };
 
 export default function OrdersView() {
   const [orders, setOrders] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,8 +21,14 @@ export default function OrdersView() {
     setLoading(true);
     setError(null);
     try {
-      const data = await api.getOrders();
-      setOrders(data);
+      const [ordersData, productsData, usersData] = await Promise.all([
+        api.getOrders(),
+        api.getProducts(),
+        api.getUsers()
+      ]);
+      setOrders(ordersData);
+      setProducts(productsData);
+      setUsers(usersData);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -143,7 +151,6 @@ export default function OrdersView() {
         </div>
         <button type="submit" disabled={loading}>Create Order</button>
       </form>
-
       <div className="search-bar">
         <input
           type="text"
@@ -152,7 +159,6 @@ export default function OrdersView() {
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
-
       <div className="list">
         {loading ? (
           <table>
@@ -160,12 +166,16 @@ export default function OrdersView() {
               <tr>
                 <th>ID</th>
                 <th>User ID</th>
+                <th>User Name</th>
+                <th>Products</th>
+                <th>Total</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {skeletonRows.map((_, idx) => (
                 <tr key={`s-${idx}`}>
+                  <td><div className="skeleton-line" /></td>
                   <td><div className="skeleton-line" /></td>
                   <td><div className="skeleton-line" /></td>
                   <td><div className="skeleton-line" /></td>
@@ -181,22 +191,63 @@ export default function OrdersView() {
               <tr>
                 <th>ID</th>
                 <th>User ID</th>
+                <th>User Name</th>
+                <th>Products</th>
+                <th>Total</th>
+                <th>Teljesítve</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {pagedOrders.map((o: any) => (
-                <tr key={o.id}>
-                  <td>{o.id}</td>
-                  <td>{o.userId}</td>
-                  <td><button className="danger" onClick={() => onDelete(o.id)}>Delete</button></td>
-                </tr>
-              ))}
+              {pagedOrders.map((o: any) => {
+                const user = users.find((u: any) => u.id === o.userId);
+                return (
+                  <tr key={o.id}>
+                    <td>{o.id}</td>
+                    <td>{o.userId}</td>
+                    <td>{user ? user.name : '-'}</td>
+                    <td>
+                      {Array.isArray(o.orderItems) && o.orderItems.length > 0 ? (
+                        <ul style={{margin:0,padding:0,listStyle:'none'}}>
+                          {o.orderItems.map((item: any) => {
+                            const product = products.find((p: any) => p.id === item.productId);
+                            return (
+                              <li key={item.id}>
+                                {product ? product.name : `ID: ${item.productId}`} (x{item.quantity})
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      ) : <span className="muted">No items</span>}
+                    </td>
+                    <td>{typeof o.totalPrice === 'number' ? o.totalPrice.toFixed(2) : '-'}</td>
+                    <td>
+                      <button
+                        className={o.teljesitve ? "fulfilled" : "danger"}
+                        style={{
+                          marginLeft: 4,
+                          backgroundColor: o.teljesitve ? '#2ecc40' : '#ffeb3b',
+                          color: o.teljesitve ? 'white' : '#333',
+                          border: 'none',
+                          padding: '4px 8px',
+                          borderRadius: '4px',
+                        }}
+                        onClick={async () => {
+                          await api.fulfillOrder(o.id, !o.teljesitve);
+                          await load();
+                        }}
+                      >
+                        {o.teljesitve ? 'Vond vissza' : 'Teljesítsd'}
+                      </button>
+                    </td>
+                    <td><button className="danger" onClick={() => onDelete(o.id)}>Delete</button></td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
       </div>
-
       {!loading && filtered.length > pageSize && (
         <div className="pager">
           <button type="button" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>

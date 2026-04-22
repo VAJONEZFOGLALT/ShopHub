@@ -131,6 +131,7 @@ model Orders {
   courier         CourierService @default(UPS)
   shippingAddress String?
   trackingNumber  String?
+  teljesitve      Boolean        @default(false)
   user            Users          @relation(fields: [userId], references: [id])
   orderItems      OrderItems[]
 
