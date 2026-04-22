@@ -5,6 +5,7 @@ import { api } from '../services/api';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useWishlist } from '../hooks/useWishlist';
+import { useCompare } from '../hooks/useCompare';
 import { useToast } from '../contexts/ToastContext';
 import { ReviewsModal } from '../components/ReviewsModal';
 import { ProductDetailSkeleton } from '../components/SkeletonLoader';
@@ -20,9 +21,9 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const { add } = useCart();
   const { user, isAuthenticated } = useAuth();
-  const { wishlistIds, handleToggleWishlist } = useWishlist();
+  const { wishlistIds, handleToggleWishlist, isWishlistPending } = useWishlist();
+  const { compareIds, toggleCompare, isComparePending } = useCompare();
   const { showToast } = useToast();
-  const [compareIds, setCompareIds] = useState<number[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [reviewSummary, setReviewSummary] = useState<{ average: number; count: number }>({ average: 0, count: 0 });
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
@@ -72,18 +73,6 @@ export default function ProductDetailPage() {
     loadLists();
   }, [product, user]);
 
-  useEffect(() => {
-    const loadLists = async () => {
-      if (!user) {
-        setCompareIds([]);
-        return;
-      }
-      const compare = await api.getCompare(user.id);
-      setCompareIds(compare.map((item: any) => item.productId));
-    };
-    loadLists();
-  }, [user]);
-
   function handleAdd() {
     if (product) {
       const payload = { productId: product.id, name: product.name, price: Number(product.price) };
@@ -108,22 +97,10 @@ export default function ProductDetailPage() {
 
 
   const handleToggleCompare = async () => {
-    if (!isAuthenticated) {
-      showToast(t('products.logInToCompare'), 'warning');
+    if (!product) {
       return;
     }
-
-    if (compareIds.includes(product.id)) {
-      await api.removeCompare(user!.id, product.id);
-    } else {
-      try {
-        await api.addCompare({ userId: user!.id, productId: product.id });
-      } catch (err: any) {
-        showToast(err.message || 'Failed to add to compare', 'error');
-      }
-    }
-    const updated = await api.getCompare(user!.id);
-    setCompareIds(updated.map((item: any) => item.productId));
+    await toggleCompare(product);
   };
 
   const handleReviewSubmitted = async () => {
@@ -171,17 +148,19 @@ export default function ProductDetailPage() {
             <div className="detail-media-actions">
               <button 
                 type="button" 
-                className={`wishlist-btn ${wishlistIds.includes(product.id) ? 'active' : ''}`} 
+                  className={`wishlist-btn ${wishlistIds.includes(product.id) ? 'active' : ''} ${isWishlistPending(product.id) ? 'is-loading' : ''}`.trim()} 
                 onClick={() => handleToggleWishlist(product.id, product.name)}
                 title={!isAuthenticated ? t('products.logInToWishlist') : wishlistIds.includes(product.id) ? t('products.removeFromWishlist') : t('products.addToWishlist')}
+                  disabled={isWishlistPending(product.id)}
               >
                 ♥
               </button>
               <button 
                 type="button" 
-                className={`compare-action ${compareIds.includes(product.id) ? 'active' : ''}`} 
+                  className={`compare-action ${compareIds.includes(product.id) ? 'active' : ''} ${isComparePending(product.id) ? 'is-loading' : ''}`.trim()} 
                 onClick={handleToggleCompare}
                 title={!isAuthenticated ? t('products.logInToCompare') : compareIds.includes(product.id) ? 'Remove from compare' : 'Add to compare'}
+                  disabled={isComparePending(product.id)}
               >
                 {compareIds.includes(product.id) ? t('products.compared') : t('products.compare')}
               </button>

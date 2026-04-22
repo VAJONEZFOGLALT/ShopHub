@@ -10,9 +10,11 @@ type ProductCardProps = {
   showWishlist?: boolean;
   isWishlisted?: boolean;
   onToggleWishlist?: (productId: number, productName?: string) => void;
+  isWishlistPending?: boolean;
   showCompare?: boolean;
   isCompared?: boolean;
-  onToggleCompare?: (productId: number) => void;
+  onToggleCompare?: (product: any) => void;
+  isComparePending?: boolean;
   showStockBadge?: boolean;
 };
 
@@ -22,9 +24,11 @@ function ProductCard({
   showWishlist,
   isWishlisted,
   onToggleWishlist,
+  isWishlistPending,
   showCompare,
   isCompared,
   onToggleCompare,
+  isComparePending,
   showStockBadge,
 }: ProductCardProps) {
   const { t } = useTranslation();
@@ -70,22 +74,24 @@ function ProductCard({
         {showWishlist && (
           <button
             type="button"
-            className={`wishlist-btn ${isWishlisted ? 'active' : ''}`}
+            className={`wishlist-btn ${isWishlisted ? 'active' : ''} ${isWishlistPending ? 'is-loading' : ''}`.trim()}
             onClick={(e) => { e.stopPropagation(); onToggleWishlist?.(product.id, product.name); }}
             title={isWishlisted ? t('products.removeFromWishlist') : t('products.addToWishlist')}
+            disabled={isWishlistPending}
           >
             ♥
           </button>
         )}
         {showCompare && (
           <label
-            className={`compare-toggle ${isCompared ? 'active' : ''}`}
+            className={`compare-toggle ${isCompared ? 'active' : ''} ${isComparePending ? 'is-loading' : ''}`.trim()}
             onClick={(e) => e.stopPropagation()}
           >
             <input
               type="checkbox"
               checked={!!isCompared}
-              onChange={() => onToggleCompare?.(product.id)}
+              onChange={() => onToggleCompare?.(product)}
+              disabled={isComparePending}
             />
             {t('products.compare')}
           </label>

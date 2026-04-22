@@ -5,9 +5,8 @@ import { api } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { ProductCardSkeleton } from '../components/SkeletonLoader';
 import CompareDrawer from '../components/CompareDrawer';
-import { useAuth } from '../contexts/AuthContext';
 import { useWishlist } from '../hooks/useWishlist';
-import { useToast } from '../contexts/ToastContext';
+import { useCompare } from '../hooks/useCompare';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 
 export default function AllProductsPage() {
@@ -17,16 +16,13 @@ export default function AllProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { user, isAuthenticated } = useAuth();
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [sortBy, setSortBy] = useState('name');
   const [searchTerm, setSearchTerm] = useState('');
   const [inStockOnly, setInStockOnly] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const { wishlistIds, handleToggleWishlist } = useWishlist();
-  const { showToast } = useToast();
-  const [compareIds, setCompareIds] = useState<number[]>([]);
-  const [compareItems, setCompareItems] = useState<any[]>([]);
+  const { wishlistIds, handleToggleWishlist, isWishlistPending } = useWishlist();
+  const { compareIds, compareItems, toggleCompare, clearCompare, isComparePending } = useCompare();
 
   const rawSearch = searchParams.get('search');
   let searchQuery = '';
@@ -47,22 +43,7 @@ export default function AllProductsPage() {
       setLoading(false);
     }
   }
-  useEffect(() => { load(); }, [i18n.language, showToast]);
-
-  useEffect(() => {
-    const loadLists = async () => {
-      if (!user) {
-        setCompareIds([]);
-        return;
-      }
-      const compare = await api.getCompare(user.id);
-      if (Array.isArray(compare)) {
-        setCompareIds(compare.map((item: any) => item.productId));
-        setCompareItems(compare.map((item: any) => item.product));
-      }
-    };
-    loadLists();
-  }, [user]);
+  useEffect(() => { load(); }, [i18n.language]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -143,43 +124,11 @@ export default function AllProductsPage() {
   }, [products, compareIds]);
 
   const resolvedCompareItems = useMemo(() => {
-    if (user && compareItems.length > 0) {
+    if (compareItems.length > 0) {
       return compareItems;
     }
     return compareItemsFallback;
-  }, [user, compareItems, compareItemsFallback]);
-
-
-
-  const handleToggleCompare = async (productId: number) => {
-    if (!isAuthenticated) {
-      showToast(t('products.logInToCompare'), 'warning');
-      return;
-    }
-
-    if (compareIds.includes(productId)) {
-      await api.removeCompare(user!.id, productId);
-    } else {
-      try {
-        await api.addCompare({ userId: user!.id, productId });
-      } catch (err: any) {
-        showToast(err.message || 'Failed to add to compare', 'error');
-      }
-    }
-    const updated = await api.getCompare(user!.id);
-    setCompareIds(updated.map((item: any) => item.productId));
-    setCompareItems(updated.map((item: any) => item.product));
-  };
-
-  const handleClearCompare = async () => {
-    if (!user) {
-      setCompareIds([]);
-      return;
-    }
-    await api.clearCompare(user.id);
-    setCompareIds([]);
-    setCompareItems([]);
-  };
+  }, [compareItems, compareItemsFallback]);
 
   return (
     <div className="view category-view">
@@ -289,9 +238,11 @@ export default function AllProductsPage() {
                   showWishlist={true}
                   isWishlisted={wishlistIds.includes(p.id)}
                   onToggleWishlist={handleToggleWishlist}
+                  isWishlistPending={isWishlistPending(p.id)}
                   showCompare={true}
                   isCompared={compareIds.includes(p.id)}
-                  onToggleCompare={handleToggleCompare}
+                  onToggleCompare={toggleCompare}
+                  isComparePending={isComparePending(p.id)}
                   showStockBadge={true}
                 />
               ))}
@@ -301,7 +252,10 @@ export default function AllProductsPage() {
         </main>
       </div>
 
-      <CompareDrawer items={resolvedCompareItems} onRemove={handleToggleCompare} onClear={handleClearCompare} />
+      <CompareDrawer items={resolvedCompareItems} onRemove={(productId) => {
+        const found = products.find((product) => product.id === productId);
+        toggleCompare(found || { id: productId });
+      }} onClear={clearCompare} />
             </>
           )}
     </div>
