@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
@@ -12,6 +13,7 @@ const couriers = [
 ];
 
 export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) => void }) {
+  const { t } = useTranslation();
   const { items, remove, clear, total } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -62,13 +64,13 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
     <div className="checkout-wrapper">
       <div className="checkout-container">
         <div className="checkout-main">
-          <h2>Checkout</h2>
+          <h2>{t('checkout.title')}</h2>
           {error && <div className="error">{error}</div>}
 
           <div className="checkout-section">
-            <h3>Items ({items.length})</h3>
+            <h3>{t('checkout.items')} ({items.length})</h3>
             {items.length === 0 ? (
-              <p className="muted">Cart is empty</p>
+              <p className="muted">{t('cart.empty')}</p>
             ) : (
               items.map(it => (
                 <div key={it.productId} className="checkout-item">
@@ -76,14 +78,14 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                     <strong>{it.name}</strong> x {it.quantity}
                     <span>${(it.price * it.quantity).toFixed(2)}</span>
                   </div>
-                  <button className="btn-text" onClick={() => remove(it.productId)}>Remove</button>
+                  <button className="btn-text" onClick={() => remove(it.productId)}>{t('checkout.remove')}</button>
                 </div>
               ))
             )}
           </div>
 
           <div className="checkout-section">
-            <h3>Delivery</h3>
+            <h3>{t('checkout.delivery')}</h3>
             {couriers.map(c => (
               <label key={c.id} style={{ display: 'flex', gap: '10px', margin: '10px 0', padding: '10px', border: '1px solid var(--border)', borderRadius: '6px' }}>
                 <input type="radio" value={c.id} checked={courier === c.id} onChange={e => setCourier(e.target.value)} />
@@ -97,7 +99,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
 
           {user && addresses.length > 0 && (
             <div className="checkout-section">
-              <h3>Address</h3>
+              <h3>{t('checkout.address')}</h3>
               {addresses.map(a => (
                 <label key={a.id} style={{ display: 'flex', gap: '10px', margin: '10px 0', padding: '10px', border: '1px solid var(--border)', borderRadius: '6px' }}>
                   <input type="radio" checked={selectedAddr === a.id} onChange={() => setSelectedAddr(a.id)} />
@@ -112,32 +114,32 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
 
           {!user && (
             <div className="checkout-section">
-              <h3>Account Info</h3>
-              <input placeholder="Username" value={newUser.username} onChange={e => setNewUser({...newUser, username: e.target.value})} style={{ width: '100%', marginBottom: '8px', padding: '8px' }} required />
-              <input placeholder="Email" type="email" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} style={{ width: '100%', marginBottom: '8px', padding: '8px' }} required />
-              <input placeholder="Password" type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} style={{ width: '100%', padding: '8px' }} required />
+              <h3>{t('checkout.accountInfo')}</h3>
+              <input placeholder={t('common.username')} value={newUser.username} onChange={e => setNewUser({...newUser, username: e.target.value})} style={{ width: '100%', marginBottom: '8px', padding: '8px' }} required />
+              <input placeholder={t('auth.email')} type="email" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} style={{ width: '100%', marginBottom: '8px', padding: '8px' }} required />
+              <input placeholder={t('auth.password')} type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} style={{ width: '100%', padding: '8px' }} required />
             </div>
           )}
         </div>
 
         <div className="checkout-sidebar">
-          <h3>Summary</h3>
+          <h3>{t('checkout.summary')}</h3>
           <div style={{ padding: '20px 0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span>Subtotal</span>
+              <span>{t('checkout.subtotal')}</span>
               <span>${total.toFixed(2)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid var(--border)' }}>
-              <span>Shipping</span>
+              <span>{t('checkout.shipping')}</span>
               <span>${ship.toFixed(2)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2em', fontWeight: 'bold' }}>
-              <span>Total</span>
+              <span>{t('checkout.total')}</span>
               <span>${finalTotal.toFixed(2)}</span>
             </div>
           </div>
           <button className="btn-primary btn-block" onClick={handleOrder} disabled={loading || items.length === 0}>
-            {loading ? 'Processing...' : 'Place Order'}
+            {loading ? t('checkout.processing') : t('checkout.placeOrder')}
           </button>
         </div>
       </div>
