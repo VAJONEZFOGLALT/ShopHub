@@ -20,7 +20,7 @@ type OrderSummary = {
 };
 
 type AdminInfoViewProps = {
-  onNavigateToTab: (tab: 'users' | 'orders') => void;
+  onNavigateToTab: (tab: 'users' | 'orders' | 'products') => void;
 };
 
 const getErrorMessage = (error: unknown) => {
@@ -123,13 +123,13 @@ export default function AdminInfoView({ onNavigateToTab }: AdminInfoViewProps) {
             <div className="stat-label">Users (open users page)</div>
           </div>
         </button>
-        <div className="stat-item">
+        <button type="button" className="stat-item stat-item-action" onClick={() => onNavigateToTab('products')}>
           <div className="stat-icon">📦</div>
           <div className="stat-info">
             <div className="stat-value">{stats.productCount}</div>
-            <div className="stat-label">Products</div>
+            <div className="stat-label">Products (open products page)</div>
           </div>
-        </div>
+        </button>
         <button type="button" className="stat-item stat-item-action" onClick={() => onNavigateToTab('orders')}>
           <div className="stat-icon">🧾</div>
           <div className="stat-info">
