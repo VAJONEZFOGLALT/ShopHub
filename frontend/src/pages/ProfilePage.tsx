@@ -148,6 +148,28 @@ export default function ProfilePage() {
     return { user: email.substring(0, atIndex), domain: email.substring(atIndex) };
   };
 
+  const renderFullName = (fullName: string) => {
+    const parts = fullName.trim().split(/\s+/).filter(Boolean);
+
+    if (parts.length <= 2) {
+      return fullName;
+    }
+
+    if (parts.length === 3) {
+      return (
+        <>
+          {parts.slice(0, 2).join(' ')}<wbr /> {parts[2]}
+        </>
+      );
+    }
+
+    return (
+      <>
+        {parts.slice(0, 2).join(' ')}<wbr /> {parts.slice(2).join(' ')}
+      </>
+    );
+  };
+
   const validatePasswordStrength = (pwd: string): string | null => {
     if (pwd.length < 8) return 'Jelszó minimum 8 karakter hosszú kell legyen';
     if (!/[A-Z]/.test(pwd)) return 'Jelszóban kell lennie nagy betűnek';
@@ -330,7 +352,7 @@ export default function ProfilePage() {
               </div>
               <div className="profile-field">
                 <label>{t('profile.fullName')}</label>
-                <div className="profile-value profile-fullname">{user.name || '—'}</div>
+                <div className="profile-value profile-fullname">{user.name ? renderFullName(user.name) : '—'}</div>
               </div>
               <div className="profile-field">
                 <label>{t('profile.accountType')}</label>
@@ -356,7 +378,7 @@ export default function ProfilePage() {
                   <strong>{preferredAddress.label}</strong>
                   {preferredAddress.isDefault && <span className="default-badge">{t('profile.defaultAddress')}</span>}
                 </div>
-                <div className="profile-address-line address-line-fullname">{preferredAddress.fullName}</div>
+                <div className="profile-address-line address-line-fullname">{renderFullName(preferredAddress.fullName)}</div>
                 <div className="profile-address-line">{preferredAddress.street}</div>
                 <div className="profile-address-line">{preferredAddress.city}, {preferredAddress.state} {preferredAddress.zipCode}</div>
                 <div className="profile-address-line">{preferredAddress.country}</div>
@@ -506,7 +528,7 @@ export default function ProfilePage() {
                         {addr.isDefault && <span className="default-badge">{t('profile.defaultAddress')}</span>}
                       </div>
                       <div style={{fontSize: '0.9em', color: 'var(--text-secondary)', lineHeight: '1.4'}}>
-                        <div>{addr.fullName}</div>
+                        <div className="address-line-fullname">{renderFullName(addr.fullName)}</div>
                         <div>{addr.street}</div>
                         <div>{addr.city}, {addr.state} {addr.zipCode}</div>
                         <div>{addr.country}</div>
@@ -539,27 +561,34 @@ export default function ProfilePage() {
               <button className="modal-close" onClick={handleCancelEdit}>✕</button>
             </div>
             <form className="profile-edit-form modal-body" onSubmit={handleSaveProfile}>
-              <label>
-                {t('profile.username')}
-                <input value={usernameInput} onChange={(e) => setUsernameInput(e.target.value)} maxLength={16} required />
-              </label>
-              <label>
-                {t('profile.email')}
-                <input type="email" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required />
-              </label>
-              <label>
-                {t('profile.fullName')}
-                <input value={nameInput} onChange={(e) => setNameInput(e.target.value)} />
-              </label>
-              <div className="profile-edit-password-section"></div>
-              <label>
-                {t('profile.oldPassword')}
-                <input type="password" value={oldPasswordInput} onChange={(e) => setOldPasswordInput(e.target.value)} placeholder={t('profile.oldPasswordPlaceholder')} />
-              </label>
-              <label>
-                {t('profile.newPassword')}
-                <input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} placeholder={t('profile.leaveBlank')} />
-              </label>
+              <section className="profile-edit-section">
+                <h3>{t('profile.general')}</h3>
+                <label>
+                  {t('profile.username')}
+                  <input value={usernameInput} onChange={(e) => setUsernameInput(e.target.value)} maxLength={16} required />
+                </label>
+                <label>
+                  {t('profile.email')}
+                  <input type="email" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required />
+                </label>
+                <label>
+                  {t('profile.fullName')}
+                  <input value={nameInput} onChange={(e) => setNameInput(e.target.value)} />
+                </label>
+              </section>
+
+              <section className="profile-edit-section profile-edit-password-section">
+                <h3>{t('profile.password')}</h3>
+                <label>
+                  {t('profile.oldPassword')}
+                  <input type="password" value={oldPasswordInput} onChange={(e) => setOldPasswordInput(e.target.value)} placeholder={t('profile.oldPasswordPlaceholder')} />
+                </label>
+                <label>
+                  {t('profile.newPassword')}
+                  <input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} placeholder={t('profile.leaveBlank')} />
+                </label>
+              </section>
+
               <div className="profile-edit-actions">
                 <button type="button" className="btn-secondary" onClick={handleCancelEdit}>{t('common.cancel')}</button>
                 <button type="submit" className="btn-primary">{t('common.save')}</button>

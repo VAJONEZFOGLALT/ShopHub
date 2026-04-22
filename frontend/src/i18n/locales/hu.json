@@ -150,6 +150,8 @@
   "profile": {
     "title": "Profilom",
     "loginRequired": "Kérjük jelentkezzen be a profil megtekintéséhez",
+    "general": "Általános",
+    "password": "Jelszó",
     "accountInfo": "Fiókadatok",
     "email": "E-mail",
     "fullName": "Teljes név",
