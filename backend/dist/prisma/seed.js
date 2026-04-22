@@ -55,12 +55,12 @@ const users = [
     { username: 'charlie', email: 'charlie@outlook.com', password: 'charlie123', role: 'USER' },
     { username: 'diana', email: 'diana@gmail.com', password: 'diana123', role: 'USER' },
 ];
-const categories = ['Electronics', 'Accessories', 'Office', 'Home', 'Fashion', 'Sports'];
+const categories = ['Elektronika', 'Kiegészítők', 'Iroda', 'Otthon', 'Divat', 'Sport'];
 const productNames = [
-    'Wireless Headphones', 'USB-C Cable', 'Laptop Stand', 'Mechanical Keyboard', 'Mouse Pad',
-    '4K Webcam', 'USB Hub', 'Desk Lamp', 'Phone Case', 'Portable SSD',
-    'Monitor Arm', 'Cable Organizer', 'Bluetooth Speaker', 'Screen Protector', 'Desk Organizer',
-    'Desk Chair', 'Monitor Stand', 'Keyboard Wrist Rest', 'Cable Clip', 'Desk Pad',
+    'Vezeték nélküli fejhallgató', 'USB-C kábel', 'Laptoptartó', 'Mechanikus billentyűzet', 'Egérpad',
+    '4K webkamera', 'USB hub', 'Asztali lámpa', 'Telefontok', 'Hordozható SSD',
+    'Monitorkar', 'Kábel szervező', 'Bluetooth hangszóró', 'Képernyővédő', 'Asztalvégz szervező',
+    'Gamer szék', 'Monitortartó', 'Billentyűzet csuklótámasz', 'Kábel csipesz', 'Asztalterítő',
 ];
 const statuses = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
 const couriers = ['UPS', 'PACKETA', 'DPD', 'INPOST'];
@@ -91,26 +91,26 @@ async function main() {
     }
     const createdProducts = [];
     const productDescriptions = [
-        'Premium wireless headphones with active noise cancellation and 30-hour battery life',
-        'High-speed USB-C cable for charging and data transfer',
-        'Ergonomic laptop stand for improved posture and cooling',
-        'Mechanical keyboard with RGB lighting and custom switches',
-        'Large mouse pad with non-slip base',
-        '4K Ultra HD webcam with auto-focus',
-        'Multi-port USB Hub with power delivery',
-        'LED desk lamp with adjustable brightness',
-        'Protective phone case with drop protection',
-        'Fast SSD with 1TB storage capacity',
-        'Adjustable monitor arm mount',
-        'Cable organizer clips for desk organization',
-        'Portable Bluetooth speaker with waterproof design',
-        'Tempered glass screen protector',
-        'Wooden desk organizer with multiple compartments',
-        'Gaming desk chair with lumbar support',
-        'Adjustable monitor stand riser',
-        'Wrist rest for keyboard ergonomics',
-        'Cable clips and clips for wire management',
-        'Large desk pad for mouse and keyboard',
+        'Prémium vezeték nélküli fejhallgató aktív zajszűrővel és 30 órás akkumulátorral',
+        'Gyors USB-C kábel töltéshez és adatátvitelhez',
+        'Ergonomikus laptoptartó a jó testtartásért és hűtésért',
+        'Mechanikus billentyűzet RGB világítással és egyedi billentykükkel',
+        'Nagy egérpad csúszásmentes alappal',
+        '4K Ultra HD webkamera autofókusszal',
+        'Többportos USB hub teljesítménytovábbítással',
+        'LED asztali lámpa állítható fényerővel',
+        'Védő telefontok ütésálló védelemmel',
+        'Gyors SSD 1TB tárkapacitással',
+        'Állítható monitorkar rögzítéssel',
+        'Kábel szervező csipeszek asztal szervezéshez',
+        'Hordozható Bluetooth hangszóró vízálló kialakítással',
+        'Edzett üveg képernyővédő',
+        'Fa asztal szervező több rekesszel',
+        'Gamer szék ágyéktámasszal',
+        'Állítható monitortartó emelő',
+        'Csuklótámasz billentyűzet ergonómiájához',
+        'Kábel csipeszek és rögzítők vezeték kezeléséhez',
+        'Nagy asztalterítő egér és billentyűzet alá',
     ];
     for (let i = 0; i < productNames.length; i++) {
         const existing = await prisma.products.findFirst({
