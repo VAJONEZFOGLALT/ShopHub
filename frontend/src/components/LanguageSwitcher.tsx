@@ -7,12 +7,7 @@ export const LanguageSwitcher = () => {
   const languages = [
     { code: 'hu', label: 'Magyar' },
     { code: 'en', label: 'English' },
-    { code: 'de', label: 'Deutsch' },
-    { code: 'fr', label: 'Français' },
     { code: 'es', label: 'Español' },
-    { code: 'pl', label: 'Polski' },
-    { code: 'cz', label: 'Čeština' },
-    { code: 'it', label: 'Italiano' },
   ];
 
   const handleLanguageChange = (langCode: string) => {
