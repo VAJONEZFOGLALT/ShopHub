@@ -155,7 +155,7 @@ function App() {
               <Route 
                 path="/shop/*" 
                 element={
-                  <Layout onAuth={() => setModal('login')} onCart={() => setCartOpen(true)}>
+                  <Layout onAuth={(mode = 'login') => setModal(mode)} onCart={() => setCartOpen(true)}>
                     <Routes>
                       <Route path="/" element={<HomePage />} />
                       <Route path="all" element={<AllProductsPage />} />

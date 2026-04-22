@@ -275,7 +275,9 @@
       "selectPickupPoint": "Select a pickup point/locker for the chosen courier.",
       "selectAddress": "Select a shipping address.",
       "fillRequiredAddressFields": "Fill in all required shipping address fields.",
-      "emailDeliveryFailed": "Email could not be sent: {{reason}}"
+      "emailDeliveryFailed": "Email could not be sent: {{reason}}",
+      "loginRequired": "You need to sign in to place an order.",
+      "cartItemsUnavailable": "{{count}} product(s) are no longer available and were removed from your cart. Please review your order again."
     }
   },
   "auth": {

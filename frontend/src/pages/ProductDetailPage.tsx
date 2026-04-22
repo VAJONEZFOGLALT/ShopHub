@@ -40,15 +40,8 @@ export default function ProductDetailPage() {
       setLoading(true);
       setError(null);
       try {
-        const products = await api.getProducts(i18n.language);
-        let found: any = null;
         const targetId = Number(id);
-        for (let i = 0; i < products.length; i += 1) {
-          if (products[i].id === targetId) {
-            found = products[i];
-            break;
-          }
-        }
+        const found = await api.getProductById(targetId, i18n.language);
         if (!found) {
           throw new Error('Product not found');
         }

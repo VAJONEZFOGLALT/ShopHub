@@ -124,7 +124,39 @@ export const formatAddressSingleLine = (address: {
   state?: string;
   zipCode?: string;
   country?: string;
-}) => {
-  const cityStateZip = [address.city, address.state, address.zipCode].filter(Boolean).join(' ');
-  return [address.fullName, address.street, cityStateZip, address.country].filter(Boolean).join(', ');
+}, options?: { includeFullName?: boolean }) => {
+  const city = (address.city || '').trim();
+  const state = (address.state || '').trim();
+  const zip = (address.zipCode || '').trim();
+
+  const cityStateZipParts: string[] = [];
+  if (city) {
+    cityStateZipParts.push(city);
+  }
+
+  if (state && state.toLowerCase() !== city.toLowerCase()) {
+    cityStateZipParts.push(state);
+  }
+
+  if (zip) {
+    cityStateZipParts.push(zip);
+  }
+
+  const lineParts: string[] = [];
+  if (options?.includeFullName && address.fullName) {
+    lineParts.push(address.fullName);
+  }
+  if (address.street) {
+    lineParts.push(address.street);
+  }
+
+  const cityStateZip = cityStateZipParts.join(' ');
+  if (cityStateZip) {
+    lineParts.push(cityStateZip);
+  }
+  if (address.country) {
+    lineParts.push(address.country);
+  }
+
+  return lineParts.join(', ');
 };
