@@ -2101,18 +2101,27 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 
 .profile-content { 
   display: grid; 
-  grid-template-columns: 1fr 340px; 
+  grid-template-columns: 1fr;
   gap: 32px; 
   margin: 0 0 40px;
 }
 
 .profile-main { 
   display: grid; 
+  grid-template-columns: 1fr 1fr;
   gap: 28px; 
+}
+
+/* Full width cards: Account Info, Addresses, Profile Actions */
+.profile-main > :nth-child(1),
+.profile-main > :nth-child(4),
+.profile-main > :nth-child(5) {
+  grid-column: 1 / -1;
 }
 
 .profile-sidebar { 
   display: grid; 
+  grid-template-columns: 1fr 1fr;
   gap: 28px; 
   align-content: flex-start; 
 }
@@ -2208,7 +2217,7 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 
 .profile-grid { 
   display: grid; 
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+  grid-template-columns: repeat(2, 1fr); 
   gap: 16px; 
 }
 
@@ -2260,11 +2269,19 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 
 .profile-field { 
   display: grid; 
-  grid-template-columns: 160px 1fr; 
-  gap: 20px; 
+  grid-template-columns: 1fr;
+  gap: 8px; 
   padding: 18px 0; 
   border-bottom: 1px solid var(--border); 
-  align-items: center; 
+  align-items: flex-start; 
+}
+
+@media (min-width: 900px) {
+  .profile-field { 
+    grid-template-columns: 160px 1fr;
+    gap: 20px;
+    align-items: center;
+  }
 }
 
 .profile-field:last-child { 
@@ -2327,7 +2344,7 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 .address-actions button:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
 /* Profile Stats */
-.stats-grid { display: grid; gap: 12px; }
+.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .stat-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--surface-hover); border-radius: 10px; border: 1px solid var(--border); transition: all 0.2s; }
 .stat-item:hover { border-color: var(--primary); background: var(--primary-light); transform: translateX(4px); }
 .stat-item-action {
