@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useTranslateDynamic } from '../hooks/useTranslateDynamic';
 import { api } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { ProductCardSkeleton } from '../components/SkeletonLoader';
@@ -22,12 +21,10 @@ const normalizeCategory = (value: string) => value.trim().toLowerCase();
 
 export default function CategoryPage() {
   const { t, i18n } = useTranslation();
-  const { translateBatch } = useTranslateDynamic();
   const { name } = useParams<{ name: string }>();
   const decodedCategoryName = decodeURIComponent(name || '');
   const navigate = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
-  const [translatedProducts, setTranslatedProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
@@ -52,33 +49,7 @@ export default function CategoryPage() {
       setLoading(false);
     }
   }
-  useEffect(() => { load(); }, []);
-
-  // Translate product names when language changes or products load
-  useEffect(() => {
-    const translateProducts = async () => {
-      if (products.length === 0 || i18n.language === 'en') {
-        setTranslatedProducts(products);
-        return;
-      }
-
-      try {
-        const names = products.map(p => p.name);
-        const translated = await translateBatch(names, i18n.language);
-        
-        const updated = products.map((p, idx) => ({
-          ...p,
-          name: translated[idx] || p.name,
-        }));
-        setTranslatedProducts(updated);
-      } catch (err) {
-        console.error('Failed to translate products:', err);
-        setTranslatedProducts(products);
-      }
-    };
-
-    translateProducts();
-  }, [products, i18n.language, translateBatch]);
+  useEffect(() => { load(); }, [i18n.language]);
 
   useEffect(() => {
     const loadLists = async () => {
@@ -94,8 +65,7 @@ export default function CategoryPage() {
   }, [user]);
 
   const filtered = useMemo(() => {
-    // Use translated products if available, otherwise original
-    const displayProducts = translatedProducts.length > 0 ? translatedProducts : products;
+    const displayProducts = products;
     
     const byCategory: any[] = [];
     for (let i = 0; i < displayProducts.length; i += 1) {
@@ -149,7 +119,13 @@ export default function CategoryPage() {
     }
 
     return filteredBySearch;
-  }, [translatedProducts, products, decodedCategoryName, priceRange, sortBy, inStockOnly, searchTerm]);
+  }, [products, decodedCategoryName, priceRange, sortBy, inStockOnly, searchTerm]);
+
+  const categoryDisplayName = useMemo(() => {
+    const normalizedTarget = normalizeCategory(decodedCategoryName);
+    const matched = products.find((product) => normalizeCategory(getProductCategory(product)) === normalizedTarget);
+    return matched?.categoryLabel || decodedCategoryName;
+  }, [products, decodedCategoryName]);
 
   const compareItemsFallback = useMemo(() => {
     return products.filter(p => compareIds.includes(p.id));
@@ -243,7 +219,7 @@ export default function CategoryPage() {
     <div className="category-view">
       <div className="category-header">
         <button className="back-btn" onClick={() => navigate('/shop')}>{t('common.backToShop')}</button>
-        <h1>{decodedCategoryName}</h1>
+        <h1>{categoryDisplayName}</h1>
         <p className="category-count">{filtered.length} {t('products.items')}</p>
       </div>
 

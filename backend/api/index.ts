@@ -11,19 +11,6 @@ async function bootstrapServer(): Promise<express.Express> {
   if (!cachedServer) {
     try {
       const expressApp = express();
-      
-      // Rewrite routes to ensure API prefix is consistent
-      expressApp.use((req: Request, res: any, next: any) => {
-        // Remove /api prefix if present but don't add yet (Nest will do it)
-        if (req.url.startsWith('/api/')) {
-          req.url = req.url.replace(/^\/api/, '');
-        }
-        // Ensure routes without leading slash have it
-        if (!req.url.startsWith('/')) {
-          req.url = '/' + req.url;
-        }
-        next();
-      });
 
       const adapter = new ExpressAdapter(expressApp);
       

@@ -13,12 +13,20 @@ const getProductCategory = (product: any) => {
   return rawCategory.trim();
 };
 
+const getProductCategoryLabel = (product: any) => {
+  const rawCategory = product?.categoryLabel ?? product?.category ?? product?.categoryName ?? product?.category?.name;
+  if (typeof rawCategory !== 'string') {
+    return '';
+  }
+  return rawCategory.trim();
+};
+
 export default function HomePage() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { showToast } = useToast();
   const [products, setProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Array<{ key: string; label: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [carouselIndex, setCarouselIndex] = useState(0);
 
@@ -37,15 +45,16 @@ export default function HomePage() {
         setProducts(featured);
 
         const unique: Record<string, boolean> = {};
-        const collected: string[] = [];
+        const collected: Array<{ key: string; label: string }> = [];
         for (let i = 0; i < prods.length; i += 1) {
           const cat = getProductCategory(prods[i]);
+          const label = getProductCategoryLabel(prods[i]);
           if (cat && !unique[cat]) {
             unique[cat] = true;
-            collected.push(cat);
+            collected.push({ key: cat, label: label || cat });
           }
         }
-        collected.sort();
+        collected.sort((a, b) => a.label.localeCompare(b.label));
         setCategories(collected);
       } catch (e) {
         showToast('Failed to load data', 'error');
@@ -54,7 +63,7 @@ export default function HomePage() {
       }
     };
     load();
-  }, []);
+  }, [i18n.language]);
 
   // Auto-scroll carousel
   useEffect(() => {
@@ -101,9 +110,9 @@ export default function HomePage() {
         <h2>{t('home.featuredCategories')}</h2>
         <div className="categories-grid">
           {categories.map((cat) => (
-            <div key={cat} className="category-card" onClick={() => navigate(`/shop/category/${encodeURIComponent(cat)}`)}>
+            <div key={cat.key} className="category-card" onClick={() => navigate(`/shop/category/${encodeURIComponent(cat.key)}`)}>
               <div className="category-card-icon">📦</div>
-              <h3>{cat}</h3>
+              <h3>{cat.label}</h3>
             </div>
           ))}
         </div>

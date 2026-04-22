@@ -1,3 +1,4 @@
+// main.ts
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -5,10 +6,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(
-    AppModule,
-  );
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  // --- CORS setup ---
   const origins = [
     process.env.FRONTEND_URL,
     'https://webshopfrontend.vercel.app',
@@ -24,7 +24,9 @@ async function bootstrap() {
     optionsSuccessStatus: 200,
   });
 
-  // Setup Swagger/OpenAPI documentation
+  app.setGlobalPrefix('api');
+
+  // --- Swagger / OpenAPI setup ---
   const config = new DocumentBuilder()
     .setTitle('WebShop API')
     .setDescription('Complete API documentation for the WebShop e-commerce platform')
@@ -47,9 +49,11 @@ async function bootstrap() {
     },
   });
 
+  // --- Global validation pipe ---
   app.useGlobalPipes(new ValidationPipe());
 
   await app.listen(process.env.PORT ?? 3000);
+  console.log(`Backend running on port ${process.env.PORT ?? 3000}`);
 }
-void bootstrap();
 
+void bootstrap();

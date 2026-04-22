@@ -1,46 +1,49 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../../services/api';
 import { useToast } from '../../contexts/ToastContext';
 
 export default function CategoriesBar() {
-  const [categories, setCategories] = useState<string[]>([]);
+  const { t, i18n } = useTranslation();
+  const [categories, setCategories] = useState<Array<{ key: string; label: string }>>([]);
   const { showToast } = useToast();
   useEffect(() => {
     const loadCategories = async () => {
       try {
         const products = await api.getProducts();
         const seen: Record<string, boolean> = {};
-        const list: string[] = [];
+        const list: Array<{ key: string; label: string }> = [];
         for (let i = 0; i < products.length; i += 1) {
           const cat = products[i]?.category;
+          const catLabel = products[i]?.categoryLabel || cat;
           if (cat && !seen[cat]) {
             seen[cat] = true;
-            list.push(cat);
+            list.push({ key: cat, label: catLabel });
           }
         }
-        list.sort();
+        list.sort((a, b) => a.label.localeCompare(b.label));
         setCategories(list);
       } catch (e) {
         showToast('Failed to load categories', 'error');
       }
     };
     loadCategories();
-  }, []);
+  }, [showToast, i18n.language]);
 
   return (
     <div className="categories-bar">
       <div className="categories-bar-container">
         <Link to="/shop/all" className="categories-item" style={{ fontWeight: 600 }}>
-          All Products
+          {t('products.allProducts')}
         </Link>
         {categories.map((cat) => (
           <Link
-            key={cat}
-            to={`/shop/category/${encodeURIComponent(cat)}`}
+            key={cat.key}
+            to={`/shop/category/${encodeURIComponent(cat.key)}`}
             className="categories-item"
           >
-            {cat}
+            {cat.label}
           </Link>
         ))}
       </div>
