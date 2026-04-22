@@ -56,6 +56,9 @@ __decorate([
 ], ProductsController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    (0, common_1.Header)('Cache-Control', 'no-cache, no-store, must-revalidate'),
+    (0, common_1.Header)('Pragma', 'no-cache'),
+    (0, common_1.Header)('Expires', '0'),
     __param(0, (0, common_1.Query)('lang')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -63,6 +66,9 @@ __decorate([
 ], ProductsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
+    (0, common_1.Header)('Cache-Control', 'no-cache, no-store, must-revalidate'),
+    (0, common_1.Header)('Pragma', 'no-cache'),
+    (0, common_1.Header)('Expires', '0'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Query)('lang')),
     __metadata("design:type", Function),

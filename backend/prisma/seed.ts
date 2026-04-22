@@ -36,6 +36,17 @@ const couriers = ['UPS', 'PACKETA', 'DPD', 'INPOST'] as const;
 async function main() {
   console.log('🌱 Starting database seed...\n');
 
+  // Clear existing data (in reverse order of dependencies)
+  console.log('🧹 Clearing old data...');
+  await prisma.reviews.deleteMany({});
+  await prisma.orderItems.deleteMany({});
+  await prisma.orders.deleteMany({});
+  await prisma.wishlist.deleteMany({});
+  await prisma.compareItems.deleteMany({});
+  await prisma.recentlyViewed.deleteMany({});
+  await prisma.products.deleteMany({});
+  console.log('✓ Old data cleared\n');
+
   // Create Users with properly hashed passwords
   const createdUsers: any[] = [];
   for (const userData of users) {
@@ -88,35 +99,17 @@ async function main() {
   ];
 
   for (let i = 0; i < productNames.length; i++) {
-    const existing = await prisma.products.findFirst({
-      where: { name: productNames[i] },
+    const created = await prisma.products.create({
+      data: {
+        name: productNames[i],
+        description: productDescriptions[i],
+        category: randomElement(categories),
+        price: random(15, 500),
+        stock: random(10, 200),
+        image: null,
+      },
     });
-
-    if (existing) {
-      const updated = await prisma.products.update({
-        where: { id: existing.id },
-        data: {
-          description: productDescriptions[i],
-          category: randomElement(categories),
-          price: random(15, 500),
-          stock: random(10, 200),
-          image: null,
-        },
-      });
-      createdProducts.push(updated);
-    } else {
-      const created = await prisma.products.create({
-        data: {
-          name: productNames[i],
-          description: productDescriptions[i],
-          category: randomElement(categories),
-          price: random(15, 500),
-          stock: random(10, 200),
-          image: null,
-        },
-      });
-      createdProducts.push(created);
-    }
+    createdProducts.push(created);
   }
   console.log(`✓ Created ${createdProducts.length} products\n`);
 

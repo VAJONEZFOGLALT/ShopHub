@@ -17,10 +17,9 @@ export const LanguageSwitcher = () => {
     params.set('lang', langCode);
     const query = params.toString();
     const nextUrl = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`;
-    window.history.replaceState(null, '', nextUrl);
-
-    void i18n.changeLanguage(langCode);
     localStorage.setItem('language', langCode);
+    // Reload page immediately to fetch fresh data with new language
+    window.location.href = nextUrl;
   };
 
   const currentLanguage = normalizeLanguage(i18n.resolvedLanguage || i18n.language || 'hu');
