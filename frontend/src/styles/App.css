@@ -2257,6 +2257,26 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   margin: 0 auto;
 }
 
+.profile-page-loading {
+  display: grid;
+  gap: 24px;
+}
+
+.profile-page-loading-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px;
+}
+
+.profile-page-loading-card {
+  min-height: 320px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 37%, rgba(255,255,255,0.03) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.2s ease-in-out infinite;
+  border: 1px solid var(--border);
+}
+
 .profile-header { 
   display: flex; 
   gap: 32px; 
