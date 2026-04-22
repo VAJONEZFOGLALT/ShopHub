@@ -44,6 +44,35 @@ let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: Error) 
 
 const normalizeLanguage = (value: string) => value.toLowerCase().split('-')[0];
 
+const PRODUCTS_CACHE_TTL_MS = 5 * 60 * 1000;
+type ProductsCacheEntry = { expiresAt: number; data: any[] };
+const productsCache = new Map<string, ProductsCacheEntry>();
+const productsInFlight = new Map<string, Promise<any[]>>();
+
+const readProductsCache = (lang: string): any[] | null => {
+  const cached = productsCache.get(lang);
+  if (!cached) {
+    return null;
+  }
+  if (Date.now() > cached.expiresAt) {
+    productsCache.delete(lang);
+    return null;
+  }
+  return cached.data;
+};
+
+const writeProductsCache = (lang: string, data: any[]) => {
+  productsCache.set(lang, {
+    expiresAt: Date.now() + PRODUCTS_CACHE_TTL_MS,
+    data,
+  });
+};
+
+const clearProductsCache = () => {
+  productsCache.clear();
+  productsInFlight.clear();
+};
+
 const getCurrentLanguage = () => {
   const explicitLanguage = localStorage.getItem('language');
   if (explicitLanguage) {
@@ -228,10 +257,33 @@ export const api = {
   },
 
   // Products
-  getProducts: async (language?: string) => {
+  getProducts: async (language?: string, options?: { forceRefresh?: boolean }) => {
     const lang = normalizeLanguage(language || getCurrentLanguage());
-    const data = await request<any[]>(`/products?lang=${lang}`);
-    return Array.isArray(data) ? data : [];
+
+    if (!options?.forceRefresh) {
+      const cached = readProductsCache(lang);
+      if (cached) {
+        return cached;
+      }
+      const inFlight = productsInFlight.get(lang);
+      if (inFlight) {
+        return inFlight;
+      }
+    }
+
+    const fetchPromise = (async () => {
+      const data = await request<any[]>(`/products?lang=${lang}`);
+      const normalized = Array.isArray(data) ? data : [];
+      writeProductsCache(lang, normalized);
+      return normalized;
+    })();
+
+    productsInFlight.set(lang, fetchPromise);
+    try {
+      return await fetchPromise;
+    } finally {
+      productsInFlight.delete(lang);
+    }
   },
   getProductById: async (id: number, language?: string) => {
     const lang = normalizeLanguage(language || getCurrentLanguage());
@@ -240,16 +292,19 @@ export const api = {
   },
   createProduct: async (data: { name: string; description?: string; category: string; price: number; stock: number }) => {
     const created = await request<any>('/products', { method: 'POST', body: JSON.stringify(data) });
+    clearProductsCache();
     return created;
   },
   uploadProductImage: async (id: number, file: File) => {
     const body = new FormData();
     body.append('file', file);
     const updated = await request<any>(`/products/${id}/image`, { method: 'POST', body });
+    clearProductsCache();
     return updated;
   },
   deleteProduct: async (id: number) => {
     const res = await request<void>(`/products/${id}`, { method: 'DELETE' });
+    clearProductsCache();
     return res;
   },
 
