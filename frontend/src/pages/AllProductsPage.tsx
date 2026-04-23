@@ -10,6 +10,16 @@ import { useCompare } from '../hooks/useCompare';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { formatPriceHUF } from '../utils/currency';
 
+const getSliderCeiling = (maxProductPrice: number) => {
+  if (!Number.isFinite(maxProductPrice) || maxProductPrice <= 0) {
+    return 1000;
+  }
+
+  const buffered = maxProductPrice * 1.1;
+  const step = buffered < 10000 ? 500 : 1000;
+  return Math.ceil(buffered / step) * step;
+};
+
 export default function AllProductsPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -55,11 +65,11 @@ export default function AllProductsPage() {
   }, [searchQuery]);
 
   const maxPrice = useMemo(() => {
-    let max = 1000;
+    let max = 0;
     if (products.length > 0) {
       max = products.reduce((acc, p) => Math.max(acc, p.price), products[0].price || 0);
     }
-    return max;
+    return getSliderCeiling(max);
   }, [products]);
 
   useEffect(() => {
