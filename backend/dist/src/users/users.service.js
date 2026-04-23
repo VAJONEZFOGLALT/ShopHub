@@ -54,7 +54,8 @@ let UsersService = class UsersService {
     async create(createUserDto) {
         const { password, ...rest } = createUserDto;
         const hashedPassword = await bcrypt.hash(password, 10);
-        return this.prisma.users.create({ data: { ...rest, password_hash: hashedPassword } });
+        const normalizedName = (rest.name && rest.name.trim()) ? rest.name.trim() : rest.username;
+        return this.prisma.users.create({ data: { ...rest, name: normalizedName, password_hash: hashedPassword } });
     }
     findAll() {
         return this.prisma.users.findMany();
@@ -62,9 +63,38 @@ let UsersService = class UsersService {
     findOne(id) {
         return this.prisma.users.findUnique({ where: { id } });
     }
+    validatePasswordStrength(password) {
+        if (password.length < 8) {
+            throw new common_1.BadRequestException('Password must be at least 8 characters long');
+        }
+        if (!/[A-Z]/.test(password)) {
+            throw new common_1.BadRequestException('Password must contain at least one uppercase letter');
+        }
+        if (!/[a-z]/.test(password)) {
+            throw new common_1.BadRequestException('Password must contain at least one lowercase letter');
+        }
+        if (!/[0-9]/.test(password)) {
+            throw new common_1.BadRequestException('Password must contain at least one number');
+        }
+    }
     async update(id, updateUserDto) {
-        const { password, ...rest } = updateUserDto;
+        const { password, oldPassword, ...rest } = updateUserDto;
+        const existing = await this.prisma.users.findUnique({
+            where: { id },
+            select: { password_hash: true },
+        });
+        if (!existing) {
+            throw new common_1.NotFoundException(`User with id ${id} not found`);
+        }
         if (password) {
+            if (!oldPassword) {
+                throw new common_1.BadRequestException('Old password is required to set a new password');
+            }
+            const matches = await bcrypt.compare(oldPassword, existing.password_hash);
+            if (!matches) {
+                throw new common_1.BadRequestException('Old password is incorrect');
+            }
+            this.validatePasswordStrength(password);
             const hashedPassword = await bcrypt.hash(password, 10);
             return this.prisma.users.update({ where: { id }, data: { ...rest, password_hash: hashedPassword } });
         }

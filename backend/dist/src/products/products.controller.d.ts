@@ -6,46 +6,20 @@ export declare class ProductsController {
     private readonly productsService;
     private readonly cloudinaryService;
     constructor(productsService: ProductsService, cloudinaryService: CloudinaryService);
-    create(createProductDto: CreateProductDto): Promise<{
-        id: number;
-        name: string;
-        description: string | null;
-        category: string;
-        price: number;
-        stock: number;
-        image: string | null;
-        deletedAt: Date | null;
+    private assertAdmin;
+    create(createProductDto: CreateProductDto, req: any): Promise<runtime.Types.Result.GetResult<import("../../generated/prisma/models").$ProductsPayload<ExtArgs>, T, "create", GlobalOmitOptions>>;
+    findAll(lang?: string): Promise<any>;
+    getFeatured(lang?: string): Promise<{
+        categories: {
+            key: string;
+            label: string;
+            viewsCount: number;
+            productCount: number;
+        }[];
+        products: any[];
     }>;
-    findAll(lang?: string): Promise<any[]>;
     findOne(id: string, lang?: string): Promise<any>;
-    update(id: string, updateProductDto: UpdateProductDto): Promise<{
-        id: number;
-        name: string;
-        description: string | null;
-        category: string;
-        price: number;
-        stock: number;
-        image: string | null;
-        deletedAt: Date | null;
-    }>;
-    uploadImage(id: string, file: Express.Multer.File): Promise<{
-        id: number;
-        name: string;
-        description: string | null;
-        category: string;
-        price: number;
-        stock: number;
-        image: string | null;
-        deletedAt: Date | null;
-    }>;
-    remove(id: string): Promise<{
-        id: number;
-        name: string;
-        description: string | null;
-        category: string;
-        price: number;
-        stock: number;
-        image: string | null;
-        deletedAt: Date | null;
-    }>;
+    update(id: string, updateProductDto: UpdateProductDto, req: any): Promise<runtime.Types.Result.GetResult<import("../../generated/prisma/models").$ProductsPayload<ExtArgs>, T, "update", GlobalOmitOptions>>;
+    uploadImage(id: string, file: Express.Multer.File, req: any): Promise<runtime.Types.Result.GetResult<import("../../generated/prisma/models").$ProductsPayload<ExtArgs>, T, "update", GlobalOmitOptions>>;
+    remove(id: string, req: any): Promise<runtime.Types.Result.GetResult<import("../../generated/prisma/models").$ProductsPayload<ExtArgs>, T, "update", GlobalOmitOptions>>;
 }

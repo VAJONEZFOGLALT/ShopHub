@@ -8,7 +8,7 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const origins = [
         process.env.FRONTEND_URL,
-        'https://webshopfrontend.vercel.app',
+        'https://shophub-fe.vercel.app',
         'http://localhost:5173',
         'http://localhost:5174',
     ].filter((origin) => Boolean(origin));
@@ -21,21 +21,30 @@ async function bootstrap() {
     });
     app.setGlobalPrefix('api');
     const config = new swagger_1.DocumentBuilder()
-        .setTitle('WebShop API')
-        .setDescription('Complete API documentation for the WebShop e-commerce platform')
+        .setTitle('ShopHub API')
+        .setDescription('Detailed API documentation for the ShopHub e-commerce platform. It covers authentication, products, orders, addresses, reviews, wishlist, compare, recently viewed, translations, and admin operations.')
         .setVersion('1.0.0')
-        .addBearerAuth()
-        .addTag('auth', 'Authentication endpoints')
-        .addTag('products', 'Product management')
-        .addTag('orders', 'Order management')
-        .addTag('users', 'User management')
-        .addTag('wishlist', 'Wishlist management')
-        .addTag('reviews', 'Product reviews')
-        .addTag('compare', 'Product comparison')
-        .addTag('addresses', 'Shipping addresses')
+        .addBearerAuth({
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Paste the access token returned by the auth endpoints.',
+    }, 'bearer-auth')
+        .addTag('auth', 'Registration, login, and token refresh')
+        .addTag('products', 'Product catalog, search, and featured showcase')
+        .addTag('orders', 'Order creation, ownership checks, and status updates')
+        .addTag('users', 'User registration, profile, and avatar management')
+        .addTag('wishlist', 'Wishlist operations')
+        .addTag('reviews', 'Product review read/write operations')
+        .addTag('compare', 'Compare list operations')
+        .addTag('addresses', 'Shipping address management')
+        .addTag('recently-viewed', 'Recently viewed product tracking')
+        .addTag('translations', 'Text translation helper endpoints')
+        .addTag('order-items', 'Admin order item management')
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);
-    swagger_1.SwaggerModule.setup('api/docs', app, document, {
+    swagger_1.SwaggerModule.setup('docs', app, document, {
+        useGlobalPrefix: true,
         swaggerOptions: {
             persistAuthorization: true,
         },

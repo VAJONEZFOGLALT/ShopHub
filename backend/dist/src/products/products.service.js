@@ -19,6 +19,21 @@ let ProductsService = class ProductsService {
     listCache = new Map();
     itemCache = new Map();
     cacheTtlMs = 60 * 1000;
+    categoryTranslationOverrides = {
+        en: {
+            elektronika: 'Electronics',
+            kiegeszitok: 'Accessories',
+            iroda: 'Office',
+            otthon: 'Home',
+            divat: 'Fashion',
+            sport: 'Sports',
+            gaming: 'Gaming',
+            audio: 'Audio',
+        },
+    };
+    productNameTranslationContext = 'These are product names in a webshop. Keep them short, natural, and product-like. Do not turn them into sentences or verb phrases. Prefer conventional e-commerce naming for product titles.';
+    productDescriptionTranslationContext = 'These are product descriptions for an e-commerce store. Translate naturally and accurately. Keep marketing tone and technical meaning, but do not add extra claims or shorten meaningful details.';
+    categoryTranslationContext = 'These are website product category labels for an e-commerce store. Translate them as short category names, not verbs or sentences. Prefer common storefront category terms such as Home, Electronics, Clothing, Accessories, Shoes, Beauty, Toys, Furniture, Sports, Garden, Books, or Pet Supplies when appropriate.';
     constructor(prisma, translateService) {
         this.prisma = prisma;
         this.translateService = translateService;
@@ -47,6 +62,15 @@ let ProductsService = class ProductsService {
         this.listCache.clear();
         this.itemCache.clear();
     }
+    resolveCategoryLabel(originalCategory, translatedCategory, normalizedLang) {
+        const normalizedCategory = (originalCategory || '').trim().toLowerCase();
+        const langOverrides = this.categoryTranslationOverrides[normalizedLang] || {};
+        const overridden = langOverrides[normalizedCategory];
+        if (overridden) {
+            return overridden;
+        }
+        return translatedCategory || originalCategory;
+    }
     async findAll(language) {
         try {
             const normalizedLang = this.normalizeLanguage(language || 'hu');
@@ -70,16 +94,16 @@ let ProductsService = class ProductsService {
             const descriptions = products.map((p) => p.description || '');
             const categories = products.map((p) => p.category || '');
             const [translatedNames, translatedDescriptions, translatedCategories] = await Promise.all([
-                this.translateService.translateBatch(names, 'hu', normalizedLang),
-                this.translateService.translateBatch(descriptions, 'hu', normalizedLang),
-                this.translateService.translateBatch(categories, 'hu', normalizedLang),
+                this.translateService.translateBatch(names, 'hu', normalizedLang, this.productNameTranslationContext),
+                this.translateService.translateBatch(descriptions, 'hu', normalizedLang, this.productDescriptionTranslationContext),
+                this.translateService.translateBatch(categories, 'hu', normalizedLang, this.categoryTranslationContext),
             ]);
             const translatedProducts = products.map((product, index) => ({
                 ...product,
                 name: translatedNames[index] || product.name,
                 description: translatedDescriptions[index] || product.description,
                 category: product.category,
-                categoryLabel: translatedCategories[index] || product.category,
+                categoryLabel: this.resolveCategoryLabel(product.category, translatedCategories[index], normalizedLang),
             }));
             this.setCache(this.listCache, listCacheKey, translatedProducts);
             return translatedProducts;
@@ -88,6 +112,73 @@ let ProductsService = class ProductsService {
             console.error('Products findAll error:', error);
             throw new common_1.BadRequestException(`Failed to fetch products: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
+    }
+    async getFeaturedShowcase(language) {
+        const products = await this.findAll(language);
+        const recentViews = await this.prisma.recentlyViewed.findMany({
+            where: {
+                product: {
+                    deletedAt: null,
+                },
+            },
+            select: {
+                productId: true,
+            },
+        });
+        const viewCounts = new Map();
+        for (const row of recentViews) {
+            viewCounts.set(row.productId, (viewCounts.get(row.productId) || 0) + 1);
+        }
+        const enrichedProducts = products.map((product) => ({
+            ...product,
+            viewsCount: viewCounts.get(product.id) || 0,
+        }));
+        const categories = new Map();
+        for (const product of enrichedProducts) {
+            const key = (product.category || '').trim();
+            if (!key) {
+                continue;
+            }
+            const label = (product.categoryLabel || product.category || key).trim();
+            const existing = categories.get(key);
+            if (existing) {
+                existing.viewsCount += product.viewsCount || 0;
+                existing.productCount += 1;
+                continue;
+            }
+            categories.set(key, {
+                key,
+                label,
+                viewsCount: product.viewsCount || 0,
+                productCount: 1,
+            });
+        }
+        const featuredProducts = [...enrichedProducts]
+            .sort((a, b) => {
+            const viewDelta = (b.viewsCount || 0) - (a.viewsCount || 0);
+            if (viewDelta !== 0) {
+                return viewDelta;
+            }
+            return b.id - a.id;
+        })
+            .slice(0, 12);
+        const featuredCategories = [...categories.values()]
+            .sort((a, b) => {
+            const viewDelta = b.viewsCount - a.viewsCount;
+            if (viewDelta !== 0) {
+                return viewDelta;
+            }
+            const labelDelta = a.label.localeCompare(b.label);
+            if (labelDelta !== 0) {
+                return labelDelta;
+            }
+            return b.productCount - a.productCount;
+        })
+            .slice(0, 6);
+        return {
+            categories: featuredCategories,
+            products: featuredProducts,
+        };
     }
     async create(createProductDto) {
         try {
@@ -126,16 +217,16 @@ let ProductsService = class ProductsService {
                 return originalProduct;
             }
             const [translatedName, translatedDescription, translatedCategory] = await Promise.all([
-                this.translateService.translate(product.name || '', 'hu', normalizedLang),
-                this.translateService.translate(product.description || '', 'hu', normalizedLang),
-                this.translateService.translate(product.category || '', 'hu', normalizedLang),
+                this.translateService.translate(product.name || '', 'hu', normalizedLang, this.productNameTranslationContext),
+                this.translateService.translate(product.description || '', 'hu', normalizedLang, this.productDescriptionTranslationContext),
+                this.translateService.translate(product.category || '', 'hu', normalizedLang, this.categoryTranslationContext),
             ]);
             const translatedProduct = {
                 ...product,
                 name: translatedName.translatedText || product.name,
                 description: translatedDescription.translatedText || product.description,
                 category: product.category,
-                categoryLabel: translatedCategory.translatedText || product.category,
+                categoryLabel: this.resolveCategoryLabel(product.category, translatedCategory.translatedText, normalizedLang),
             };
             this.setCache(this.itemCache, itemCacheKey, translatedProduct);
             return translatedProduct;

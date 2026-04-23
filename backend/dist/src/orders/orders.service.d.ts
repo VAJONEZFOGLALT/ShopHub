@@ -1,94 +1,18 @@
 import { PrismaService } from '../prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 export declare class OrdersService {
     private readonly prisma;
-    constructor(prisma: PrismaService);
-    create(createOrderDto: CreateOrderDto): Promise<{
-        orderItems: {
-            id: number;
-            price: number;
-            quantity: number;
-            productId: number;
-            orderId: number;
-        }[];
-    } & {
-        totalPrice: number;
-        createdAt: Date;
-        status: import("@prisma/client").$Enums.OrderStatus;
-        courier: import("@prisma/client").$Enums.CourierService;
-        shippingAddress: string | null;
-        trackingNumber: string | null;
-        teljesitve: boolean;
-        id: number;
-        userId: number;
+    private readonly notificationsService;
+    constructor(prisma: PrismaService, notificationsService: NotificationsService);
+    private generateTrackingNumber;
+    create(createOrderDto: CreateOrderDto): Promise<any>;
+    findAll(): runtime.Types.Public.PrismaPromise<T>;
+    findByUser(userId: number): runtime.Types.Public.PrismaPromise<T>;
+    findOne(id: number): import("../../generated/prisma/models").Prisma__OrdersClient<any, null, runtime.Types.Extensions.DefaultArgs, {
+        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
-    findAll(): import("@prisma/client").Prisma.PrismaPromise<({
-        orderItems: {
-            id: number;
-            price: number;
-            quantity: number;
-            productId: number;
-            orderId: number;
-        }[];
-    } & {
-        totalPrice: number;
-        createdAt: Date;
-        status: import("@prisma/client").$Enums.OrderStatus;
-        courier: import("@prisma/client").$Enums.CourierService;
-        shippingAddress: string | null;
-        trackingNumber: string | null;
-        teljesitve: boolean;
-        id: number;
-        userId: number;
-    })[]>;
-    findOne(id: number): import("@prisma/client").Prisma.Prisma__OrdersClient<({
-        orderItems: {
-            id: number;
-            price: number;
-            quantity: number;
-            productId: number;
-            orderId: number;
-        }[];
-    } & {
-        totalPrice: number;
-        createdAt: Date;
-        status: import("@prisma/client").$Enums.OrderStatus;
-        courier: import("@prisma/client").$Enums.CourierService;
-        shippingAddress: string | null;
-        trackingNumber: string | null;
-        teljesitve: boolean;
-        id: number;
-        userId: number;
-    }) | null, null, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
-    update(id: number, updateOrderDto: UpdateOrderDto): import("@prisma/client").Prisma.Prisma__OrdersClient<{
-        orderItems: {
-            id: number;
-            price: number;
-            quantity: number;
-            productId: number;
-            orderId: number;
-        }[];
-    } & {
-        totalPrice: number;
-        createdAt: Date;
-        status: import("@prisma/client").$Enums.OrderStatus;
-        courier: import("@prisma/client").$Enums.CourierService;
-        shippingAddress: string | null;
-        trackingNumber: string | null;
-        teljesitve: boolean;
-        id: number;
-        userId: number;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
-    remove(id: number): Promise<{
-        totalPrice: number;
-        createdAt: Date;
-        status: import("@prisma/client").$Enums.OrderStatus;
-        courier: import("@prisma/client").$Enums.CourierService;
-        shippingAddress: string | null;
-        trackingNumber: string | null;
-        teljesitve: boolean;
-        id: number;
-        userId: number;
-    }>;
+    update(id: number, updateOrderDto: UpdateOrderDto): Promise<runtime.Types.Result.GetResult<import("../../generated/prisma/models").$OrdersPayload<ExtArgs>, T, "update", GlobalOmitOptions>>;
+    remove(id: number): Promise<runtime.Types.Utils.JsPromise<R>>;
 }

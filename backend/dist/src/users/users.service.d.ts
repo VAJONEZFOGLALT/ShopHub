@@ -4,49 +4,12 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export declare class UsersService {
     private readonly prisma;
     constructor(prisma: PrismaService);
-    create(createUserDto: CreateUserDto): Promise<{
-        username: string;
-        email: string;
-        password_hash: string;
-        name: string;
-        avatar: string | null;
-        role: string;
-        id: number;
+    create(createUserDto: CreateUserDto): Promise<runtime.Types.Result.GetResult<import("../../generated/prisma/models").$UsersPayload<ExtArgs>, T, "create", GlobalOmitOptions>>;
+    findAll(): runtime.Types.Public.PrismaPromise<T>;
+    findOne(id: number): import("../../generated/prisma/models").Prisma__UsersClient<any, null, runtime.Types.Extensions.DefaultArgs, {
+        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
-    findAll(): import("@prisma/client").Prisma.PrismaPromise<{
-        username: string;
-        email: string;
-        password_hash: string;
-        name: string;
-        avatar: string | null;
-        role: string;
-        id: number;
-    }[]>;
-    findOne(id: number): import("@prisma/client").Prisma.Prisma__UsersClient<{
-        username: string;
-        email: string;
-        password_hash: string;
-        name: string;
-        avatar: string | null;
-        role: string;
-        id: number;
-    } | null, null, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
-    update(id: number, updateUserDto: UpdateUserDto): Promise<{
-        username: string;
-        email: string;
-        password_hash: string;
-        name: string;
-        avatar: string | null;
-        role: string;
-        id: number;
-    }>;
-    remove(id: number): Promise<{
-        username: string;
-        email: string;
-        password_hash: string;
-        name: string;
-        avatar: string | null;
-        role: string;
-        id: number;
-    }>;
+    private validatePasswordStrength;
+    update(id: number, updateUserDto: UpdateUserDto): Promise<runtime.Types.Result.GetResult<import("../../generated/prisma/models").$UsersPayload<ExtArgs>, T, "update", GlobalOmitOptions>>;
+    remove(id: number): Promise<runtime.Types.Utils.JsPromise<R>>;
 }

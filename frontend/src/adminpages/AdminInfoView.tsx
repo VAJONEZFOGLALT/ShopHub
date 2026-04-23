@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { api } from '../services/api';
+import { api, getApiErrorMessage } from '../services/api';
 import { formatPriceHUF } from '../utils/currency';
 
 type UserSummary = {
@@ -25,13 +25,6 @@ type AdminInfoViewProps = {
   onNavigateToTab: (tab: 'users' | 'orders' | 'products') => void;
 };
 
-const getErrorMessage = (error: unknown) => {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return 'Unknown error';
-};
-
 export default function AdminInfoView({ onNavigateToTab }: AdminInfoViewProps) {
   const { t } = useTranslation();
   const [users, setUsers] = useState<UserSummary[]>([]);
@@ -53,7 +46,7 @@ export default function AdminInfoView({ onNavigateToTab }: AdminInfoViewProps) {
       setProducts(Array.isArray(productsData) ? (productsData as ProductSummary[]) : []);
       setOrders(Array.isArray(ordersData) ? (ordersData as OrderSummary[]) : []);
     } catch (e: unknown) {
-      setError(getErrorMessage(e));
+      setError(getApiErrorMessage(e, t('admin.loadFailed')));
     } finally {
       setLoading(false);
     }

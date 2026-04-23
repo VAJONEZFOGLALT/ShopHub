@@ -9,6 +9,7 @@ export declare class CreateOrderDto {
     items: OrderItemInput[];
     courier?: CourierService;
     shippingAddress?: string;
+    language?: 'hu' | 'en';
 }
 export declare class OrderItemInput {
     productId: number;

@@ -24,6 +24,7 @@ class CreateOrderDto {
     items;
     courier;
     shippingAddress;
+    language;
 }
 exports.CreateOrderDto = CreateOrderDto;
 __decorate([
@@ -46,6 +47,11 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "shippingAddress", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsIn)(['hu', 'en']),
+    __metadata("design:type", String)
+], CreateOrderDto.prototype, "language", void 0);
 class OrderItemInput {
     productId;
     quantity;

@@ -17,6 +17,9 @@ let WishlistService = class WishlistService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    findOne(id) {
+        return this.prisma.wishlist.findUnique({ where: { id } });
+    }
     findByUser(userId) {
         return this.prisma.wishlist.findMany({
             where: {

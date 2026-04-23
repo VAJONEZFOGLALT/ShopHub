@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
+import { getApiErrorMessage } from '../../services/api';
 
 interface RegisterModalProps {
   isOpen: boolean;
@@ -45,11 +46,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
       onClose();
       navigate('/shop');
     } catch (err) {
-      let message = t('auth.registrationFailed');
-      if (err instanceof Error) {
-        message = err.message;
-      }
-      setError(message);
+      setError(getApiErrorMessage(err, t('auth.registrationFailed')));
     } finally {
       setIsLoading(false);
     }

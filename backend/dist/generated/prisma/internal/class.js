@@ -43,7 +43,7 @@ const config = {
             "value": "prisma-client"
         },
         "output": {
-            "value": "c:\\Users\\Diák\\Desktop\\project\\project\\backend\\generated\\prisma",
+            "value": "D:\\ShopHub\\backend\\generated\\prisma",
             "fromEnvVar": null
         },
         "config": {
@@ -58,7 +58,7 @@ const config = {
             }
         ],
         "previewFeatures": [],
-        "sourceFilePath": "c:\\Users\\Diák\\Desktop\\project\\project\\backend\\prisma\\schema.prisma",
+        "sourceFilePath": "D:\\ShopHub\\backend\\prisma\\schema.prisma",
         "isCustomOutput": true
     },
     "relativePath": "../../prisma",
@@ -68,6 +68,7 @@ const config = {
         "db"
     ],
     "activeProvider": "mysql",
+    "postinstall": false,
     "inlineDatasources": {
         "db": {
             "url": {

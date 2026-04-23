@@ -6,10 +6,12 @@ export declare class UsersController {
     private readonly usersService;
     private readonly cloudinaryService;
     constructor(usersService: UsersService, cloudinaryService: CloudinaryService);
+    private isAdmin;
+    private assertSelfOrAdmin;
     create(createUserDto: CreateUserDto): Promise<any>;
-    findAll(): Promise<any[]>;
-    findOne(id: string): Promise<any>;
-    update(id: string, updateUserDto: UpdateUserDto): Promise<any>;
-    uploadAvatar(id: string, file: Express.Multer.File): Promise<any>;
-    remove(id: string): Promise<any>;
+    findAll(req: any): Promise<any[]>;
+    findOne(id: string, req: any): Promise<any>;
+    update(id: string, updateUserDto: UpdateUserDto, req: any): Promise<any>;
+    uploadAvatar(id: string, file: Express.Multer.File, req: any): Promise<any>;
+    remove(id: string, req: any): Promise<any>;
 }

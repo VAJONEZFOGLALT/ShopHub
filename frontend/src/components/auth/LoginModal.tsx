@@ -31,8 +31,12 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalPr
       navigate('/shop');
     } catch (err) {
       let message = t('auth.loginFailed');
-      if (err instanceof Error) {
-        message = err.message;
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const api = await import('../../services/api');
+        message = api.getApiErrorMessage(err, t('auth.loginFailed'));
+      } catch {
+        if (err instanceof Error) message = err.message;
       }
       setError(message);
     } finally {

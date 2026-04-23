@@ -2,40 +2,14 @@ import { PrismaService } from '../prisma.service';
 export declare class WishlistService {
     private readonly prisma;
     constructor(prisma: PrismaService);
-    findByUser(userId: number): import("@prisma/client").Prisma.PrismaPromise<({
-        product: {
-            id: number;
-            name: string;
-            description: string | null;
-            category: string;
-            price: number;
-            stock: number;
-            image: string | null;
-            deletedAt: Date | null;
-        };
-    } & {
-        id: number;
-        userId: number;
-        productId: number;
-        createdAt: Date;
-    })[]>;
-    add(userId: number, productId: number): Promise<{
-        id: number;
-        userId: number;
-        productId: number;
-        createdAt: Date;
+    findOne(id: number): import("../../generated/prisma/models").Prisma__WishlistClient<any, null, runtime.Types.Extensions.DefaultArgs, {
+        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
     }>;
-    remove(id: number): import("@prisma/client").Prisma.Prisma__WishlistClient<{
-        id: number;
-        userId: number;
-        productId: number;
-        createdAt: Date;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
-    removeByUserProduct(userId: number, productId: number): Promise<{
-        id: number;
-        userId: number;
-        productId: number;
-        createdAt: Date;
-    } | null>;
+    findByUser(userId: number): runtime.Types.Public.PrismaPromise<T>;
+    add(userId: number, productId: number): Promise<runtime.Types.Result.GetResult<import("../../generated/prisma/models").$WishlistPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>>;
+    remove(id: number): import("../../generated/prisma/models").Prisma__WishlistClient<runtime.Types.Result.GetResult<import("../../generated/prisma/models").$WishlistPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, runtime.Types.Extensions.DefaultArgs, {
+        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
+    }>;
+    removeByUserProduct(userId: number, productId: number): Promise<any>;
     isInWishlist(userId: number, productId: number): Promise<boolean>;
 }

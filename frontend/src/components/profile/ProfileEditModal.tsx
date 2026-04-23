@@ -30,7 +30,15 @@ export function ProfileEditModal({ isOpen, onClose, onSave, currentData }: Profi
       });
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Failed to update profile');
+      let message = t('profile.saveFailed');
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const api = await import('../../services/api');
+        message = api.getApiErrorMessage(err, t('profile.saveFailed'));
+      } catch {
+        if (err instanceof Error) message = err.message;
+      }
+      setError(message);
     } finally {
       setLoading(false);
     }

@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateOrderItemDto = void 0;
+const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class CreateOrderItemDto {
     orderId;
@@ -19,24 +20,28 @@ class CreateOrderItemDto {
 }
 exports.CreateOrderItemDto = CreateOrderItemDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 690001 }),
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.IsPositive)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Number)
 ], CreateOrderItemDto.prototype, "orderId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 240154 }),
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.IsPositive)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Number)
 ], CreateOrderItemDto.prototype, "productId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 2 }),
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.IsPositive)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Number)
 ], CreateOrderItemDto.prototype, "quantity", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 9787.07 }),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsPositive)(),
     (0, class_validator_1.IsNotEmpty)(),

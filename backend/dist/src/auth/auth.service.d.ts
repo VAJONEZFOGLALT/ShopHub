@@ -34,13 +34,5 @@ export declare class AuthService {
         token: string;
         refreshToken: string;
     }>;
-    validateUser(userId: number): Promise<{
-        id: number;
-        username: string;
-        email: string;
-        password_hash: string;
-        name: string;
-        avatar: string | null;
-        role: string;
-    } | null>;
+    validateUser(userId: number): Promise<any>;
 }

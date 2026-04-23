@@ -30,6 +30,9 @@ let ReviewsService = class ReviewsService {
             orderBy: { createdAt: 'desc' },
         });
     }
+    findOne(id) {
+        return this.prisma.reviews.findUnique({ where: { id } });
+    }
     async getAverage(productId) {
         const agg = await this.prisma.reviews.aggregate({
             where: { productId },
@@ -42,16 +45,32 @@ let ReviewsService = class ReviewsService {
         };
     }
     create(data) {
-        return this.prisma.reviews.upsert({
-            where: { userId_productId: { userId: data.userId, productId: data.productId } },
-            update: { rating: data.rating, title: data.title, comment: data.comment },
-            create: {
-                userId: data.userId,
-                productId: data.productId,
-                rating: data.rating,
-                title: data.title,
-                comment: data.comment,
-            },
+        return this.prisma.$transaction(async (tx) => {
+            const user = await tx.users.findUnique({
+                where: { id: data.userId },
+                select: { id: true },
+            });
+            if (!user) {
+                throw new common_1.BadRequestException('User not found');
+            }
+            const product = await tx.products.findFirst({
+                where: { id: data.productId, deletedAt: null },
+                select: { id: true },
+            });
+            if (!product) {
+                throw new common_1.BadRequestException('Product not found');
+            }
+            return tx.reviews.upsert({
+                where: { userId_productId: { userId: data.userId, productId: data.productId } },
+                update: { rating: data.rating, title: data.title, comment: data.comment },
+                create: {
+                    userId: data.userId,
+                    productId: data.productId,
+                    rating: data.rating,
+                    title: data.title,
+                    comment: data.comment,
+                },
+            });
         });
     }
     update(id, data) {

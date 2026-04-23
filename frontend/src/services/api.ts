@@ -28,6 +28,66 @@ const requestUrl = (path: string) => {
 
 const fetchApi = (path: string, init: RequestInit) => fetch(requestUrl(path), cloneRequestInit(init));
 
+export class ApiError extends Error {
+  status: number;
+  code?: string;
+  details?: unknown;
+  rawMessage?: string;
+
+  constructor(
+    message: string,
+    options: { status: number; code?: string; details?: unknown; rawMessage?: string },
+  ) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = options.status;
+    this.code = options.code;
+    this.details = options.details;
+    this.rawMessage = options.rawMessage;
+  }
+}
+
+const mapStatusToMessage = (status: number, serverMessage?: string) => {
+  if (status === 400) return serverMessage || 'A kuldott adatok ervenytelenek.';
+  if (status === 401) return 'A munkamenet lejart vagy ervenytelen. Jelentkezz be ujra.';
+  if (status === 403) return 'Nincs jogosultsagod ehhez a muvelethez.';
+  if (status === 404) return 'A kert eroforras nem talalhato.';
+  if (status === 409) return serverMessage || 'Utkozes tortent, a muvelet nem hajthato vegre.';
+  if (status >= 500) return 'Szerverhiba tortent. Probald meg kesobb.';
+  return serverMessage || 'Varatlan hiba tortent.';
+};
+
+const readServerMessage = (payload: unknown, fallbackText: string) => {
+  if (!payload || typeof payload !== 'object') {
+    return fallbackText;
+  }
+
+  const maybeMessage = (payload as { message?: unknown }).message;
+  if (Array.isArray(maybeMessage)) {
+    return maybeMessage.map((item) => String(item)).join(' ');
+  }
+  if (typeof maybeMessage === 'string' && maybeMessage.trim()) {
+    return maybeMessage;
+  }
+
+  const maybeError = (payload as { error?: unknown }).error;
+  if (typeof maybeError === 'string' && maybeError.trim()) {
+    return maybeError;
+  }
+
+  return fallbackText;
+};
+
+export const getApiErrorMessage = (error: unknown, fallback = 'Varatlan hiba tortent.') => {
+  if (error instanceof ApiError) {
+    return error.message || fallback;
+  }
+  if (error instanceof Error) {
+    return error.message || fallback;
+  }
+  return fallback;
+};
+
 let authToken = '';
 let refreshToken = '';
 const storedToken = localStorage.getItem('authToken');
@@ -130,7 +190,7 @@ const clearTokens = () => {
 
 async function refreshAccessToken(): Promise<string> {
   if (!refreshToken) {
-    throw new Error('No refresh token');
+    throw new ApiError('A munkamenet lejart. Jelentkezz be ujra.', { status: 401 });
   }
   if (isRefreshing) {
     return new Promise((resolve, reject) => {
@@ -146,7 +206,9 @@ async function refreshAccessToken(): Promise<string> {
       body: JSON.stringify({ refreshToken }),
     });
     if (!res.ok) {
-      throw new Error('Refresh failed');
+      throw new ApiError('A munkamenet frissitese sikertelen. Jelentkezz be ujra.', {
+        status: res.status,
+      });
     }
     const data = (await res.json()) as { token: string; refreshToken?: string };
     applyTokens(data.token, data.refreshToken);
@@ -194,13 +256,31 @@ async function request<T>(path: string, init?: RequestInit, retry = true) {
 
   if (!res.ok) {
     let text = '';
+    let payload: unknown;
     try {
-      text = await res.text();
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        payload = await res.json();
+      } else {
+        text = await res.text();
+      }
     } catch {
       text = '';
     }
-    const message = text || res.statusText;
-    throw new Error(`HTTP ${res.status}: ${message}`);
+
+    const serverMessage = readServerMessage(payload, text || res.statusText);
+    const message = mapStatusToMessage(res.status, serverMessage);
+    const code =
+      payload && typeof payload === 'object' && 'error' in payload
+        ? String((payload as { error?: unknown }).error || '')
+        : undefined;
+
+    throw new ApiError(message, {
+      status: res.status,
+      code,
+      details: payload,
+      rawMessage: serverMessage,
+    });
   }
 
   const contentType = res.headers.get('content-type') || '';
@@ -500,4 +580,3 @@ export const api = {
   },
 };
 
-export type ApiError = Error;

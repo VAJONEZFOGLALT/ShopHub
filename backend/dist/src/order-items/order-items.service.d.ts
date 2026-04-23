@@ -4,39 +4,17 @@ import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 export declare class OrderItemsService {
     private readonly prisma;
     constructor(prisma: PrismaService);
-    create(createOrderItemDto: CreateOrderItemDto): import("@prisma/client").Prisma.Prisma__OrderItemsClient<{
-        id: number;
-        price: number;
-        productId: number;
-        orderId: number;
-        quantity: number;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
-    findAll(): import("@prisma/client").Prisma.PrismaPromise<{
-        id: number;
-        price: number;
-        productId: number;
-        orderId: number;
-        quantity: number;
-    }[]>;
-    findOne(id: number): import("@prisma/client").Prisma.Prisma__OrderItemsClient<{
-        id: number;
-        price: number;
-        productId: number;
-        orderId: number;
-        quantity: number;
-    } | null, null, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
-    update(id: number, updateOrderItemDto: UpdateOrderItemDto): import("@prisma/client").Prisma.Prisma__OrderItemsClient<{
-        id: number;
-        price: number;
-        productId: number;
-        orderId: number;
-        quantity: number;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
-    remove(id: number): import("@prisma/client").Prisma.Prisma__OrderItemsClient<{
-        id: number;
-        price: number;
-        productId: number;
-        orderId: number;
-        quantity: number;
-    }, never, import("@prisma/client/runtime/library").DefaultArgs, import("@prisma/client").Prisma.PrismaClientOptions>;
+    create(createOrderItemDto: CreateOrderItemDto): import("../../generated/prisma/models").Prisma__OrderItemsClient<runtime.Types.Result.GetResult<import("../../generated/prisma/models").$OrderItemsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, runtime.Types.Extensions.DefaultArgs, {
+        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
+    }>;
+    findAll(): runtime.Types.Public.PrismaPromise<T>;
+    findOne(id: number): import("../../generated/prisma/models").Prisma__OrderItemsClient<any, null, runtime.Types.Extensions.DefaultArgs, {
+        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
+    }>;
+    update(id: number, updateOrderItemDto: UpdateOrderItemDto): import("../../generated/prisma/models").Prisma__OrderItemsClient<runtime.Types.Result.GetResult<import("../../generated/prisma/models").$OrderItemsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, runtime.Types.Extensions.DefaultArgs, {
+        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
+    }>;
+    remove(id: number): import("../../generated/prisma/models").Prisma__OrderItemsClient<runtime.Types.Result.GetResult<import("../../generated/prisma/models").$OrderItemsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, runtime.Types.Extensions.DefaultArgs, {
+        omit: import("../../generated/prisma/internal/prismaNamespace").GlobalOmitConfig | undefined;
+    }>;
 }
