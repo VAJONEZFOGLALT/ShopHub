@@ -11,6 +11,7 @@ import { ReviewsModal } from '../components/ReviewsModal';
 import CompareDrawer from '../components/CompareDrawer';
 import { ProductDetailSkeleton } from '../components/SkeletonLoader';
 import { getDetailImageUrl } from '../utils/imageOptimization';
+import { formatPriceHUF } from '../utils/currency';
 
 export default function ProductDetailPage() {
   const { t, i18n } = useTranslation();
@@ -212,7 +213,7 @@ export default function ProductDetailPage() {
             </div>
           </div>
           <div className="detail-footer">
-            <div className="price-large">${Number(product.price).toFixed(2)}</div>
+            <div className="price-large">{formatPriceHUF(Number(product.price))}</div>
             <div className="qty-selector">
               <label>{t('cart.quantity')}:</label>
               <input
