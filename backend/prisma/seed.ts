@@ -195,6 +195,38 @@ async function main() {
   }
   console.log(`✓ Created ${createdUsers.length} users\n`);
 
+  // Create addresses for users
+  const cityByCountry = [
+    { country: 'Hungary', city: 'Budapest' },
+    { country: 'Hungary', city: 'Szeged' },
+    { country: 'Hungary', city: 'Debrecen' },
+    { country: 'Austria', city: 'Vienna' },
+    { country: 'Germany', city: 'Berlin' },
+  ] as const;
+
+  let addressCount = 0;
+  for (const user of createdUsers) {
+    const addressTotal = chance(0.35) ? 2 : 1;
+    for (let i = 0; i < addressTotal; i++) {
+      const location = randomElement(cityByCountry);
+      await prisma.address.create({
+        data: {
+          userId: user.id,
+          label: i === 0 ? 'Home' : 'Work',
+          fullName: user.name || user.username,
+          street: `${random(1, 140)} ${faker.location.street()}`,
+          city: location.city,
+          state: faker.location.state(),
+          zipCode: faker.location.zipCode(),
+          country: location.country,
+          isDefault: i === 0,
+        },
+      });
+      addressCount++;
+    }
+  }
+  console.log(`✓ Created ${addressCount} addresses\n`);
+
   // Create products
   const productCatalog = buildProductCatalog();
   const createdProducts: any[] = [];
@@ -277,6 +309,66 @@ async function main() {
     });
   }
   console.log(`✓ Created ${reviewPairs.size} reviews\n`);
+
+  // Create wishlist items
+  const wishlistTarget = 150;
+  const wishlistPairs = new Set<string>();
+  while (wishlistPairs.size < wishlistTarget) {
+    const user = randomElement(createdUsers);
+    const product = randomElement(createdProducts);
+    const pairKey = `${user.id}:${product.id}`;
+    if (wishlistPairs.has(pairKey)) continue;
+    wishlistPairs.add(pairKey);
+
+    await prisma.wishlist.create({
+      data: {
+        userId: user.id,
+        productId: product.id,
+        createdAt: randomPastDate(120),
+      },
+    });
+  }
+  console.log(`✓ Created ${wishlistPairs.size} wishlist items\n`);
+
+  // Create compare items
+  const compareTarget = 120;
+  const comparePairs = new Set<string>();
+  while (comparePairs.size < compareTarget) {
+    const user = randomElement(createdUsers);
+    const product = randomElement(createdProducts);
+    const pairKey = `${user.id}:${product.id}`;
+    if (comparePairs.has(pairKey)) continue;
+    comparePairs.add(pairKey);
+
+    await prisma.compareItems.create({
+      data: {
+        userId: user.id,
+        productId: product.id,
+        createdAt: randomPastDate(90),
+      },
+    });
+  }
+  console.log(`✓ Created ${comparePairs.size} compare items\n`);
+
+  // Create recently viewed
+  const viewedTarget = 260;
+  const viewedPairs = new Set<string>();
+  while (viewedPairs.size < viewedTarget) {
+    const user = randomElement(createdUsers);
+    const product = randomElement(createdProducts);
+    const pairKey = `${user.id}:${product.id}`;
+    if (viewedPairs.has(pairKey)) continue;
+    viewedPairs.add(pairKey);
+
+    await prisma.recentlyViewed.create({
+      data: {
+        userId: user.id,
+        productId: product.id,
+        viewedAt: randomPastDate(45),
+      },
+    });
+  }
+  console.log(`✓ Created ${viewedPairs.size} recently viewed items\n`);
 
   // Create translations for categories and product names
   let translationCount = 0;
