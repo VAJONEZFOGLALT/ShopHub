@@ -49,6 +49,16 @@ npm install
 A gyökér `postinstall` script lefuttatja a `setup.js`-t, ami külön telepíti a backend és frontend függőségeket, majd Prisma generate és migrate lépéseket is futtat.
 Seed automatikusan nem fut.
 
+### TL;DR Lokális Tesztelés
+
+1. `npm install`
+2. `npm run local:dev`
+3. Frontend: `http://localhost:5173` (ha foglalt, Vite automatikusan másik portra vált, pl. `5174`)
+4. Backend API: `http://localhost:3000/api`
+5. Swagger: `http://localhost:3000/api/docs`
+
+Ez a folyamat csak `generate + migrate + dev` lépéseket futtat, seedet nem.
+
 ## Fejlesztői Indítás
 
 ### Gyors Lokális Indítás (Ajánlott)
