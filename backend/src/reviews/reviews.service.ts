@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
@@ -35,16 +35,34 @@ export class ReviewsService {
 	}
 
 	create(data: CreateReviewDto) {
-		return this.prisma.reviews.upsert({
-			where: { userId_productId: { userId: data.userId, productId: data.productId } },
-			update: { rating: data.rating, title: data.title, comment: data.comment },
-			create: {
-				userId: data.userId,
-				productId: data.productId,
-				rating: data.rating,
-				title: data.title,
-				comment: data.comment,
-			},
+		return this.prisma.$transaction(async (tx) => {
+			const user = await tx.users.findUnique({
+				where: { id: data.userId },
+				select: { id: true },
+			});
+			if (!user) {
+				throw new BadRequestException('User not found');
+			}
+
+			const product = await tx.products.findFirst({
+				where: { id: data.productId, deletedAt: null },
+				select: { id: true },
+			});
+			if (!product) {
+				throw new BadRequestException('Product not found');
+			}
+
+			return tx.reviews.upsert({
+				where: { userId_productId: { userId: data.userId, productId: data.productId } },
+				update: { rating: data.rating, title: data.title, comment: data.comment },
+				create: {
+					userId: data.userId,
+					productId: data.productId,
+					rating: data.rating,
+					title: data.title,
+					comment: data.comment,
+				},
+			});
 		});
 	}
 

@@ -20,6 +20,14 @@ export class CompareService {
   }
 
   async add(data: CreateCompareDto) {
+    const user = await this.prisma.users.findUnique({
+      where: { id: data.userId },
+      select: { id: true },
+    });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
     const product = await this.prisma.products.findFirst({
       where: {
         id: data.productId,

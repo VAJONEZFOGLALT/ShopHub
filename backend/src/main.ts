@@ -11,7 +11,7 @@ async function bootstrap() {
   // --- CORS setup ---
   const origins = [
     process.env.FRONTEND_URL,
-    'https://webshopfrontend.vercel.app',
+    'https://shophub-fe.vercel.app',
     'http://localhost:5173',
     'http://localhost:5174',
   ].filter((origin): origin is string => Boolean(origin));

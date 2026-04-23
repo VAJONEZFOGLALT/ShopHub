@@ -16,6 +16,10 @@ export interface TranslateResponse {
 export class LibreTranslateService {
   constructor(private readonly openaiService: OpenaiService) {}
 
+  private fallbackTranslation(text: string): string {
+    return text;
+  }
+
   private readonly libApiUrl = process.env.LIBRETRANSLATE_API_URL || 'https://api.libretranslate.de';
   private readonly libApiKey = process.env.LIBRETRANSLATE_API_KEY;
   private readonly deepLApiUrl = 'https://api-free.deepl.com/v1/translate';
@@ -76,7 +80,7 @@ export class LibreTranslateService {
               return { translatedText };
             } catch (memoryError) {
               console.error('All translation services failed:', { deepLError, openaiError, libError, memoryError });
-              throw new BadRequestException('All translation services unavailable');
+              return { translatedText: this.fallbackTranslation(text) };
             }
           }
         }
@@ -107,7 +111,7 @@ export class LibreTranslateService {
             return { translatedText };
           } catch (memoryError) {
             console.error('All translation services failed:', { openaiError, deepLError, libError, memoryError });
-            throw new BadRequestException('All translation services unavailable');
+            return { translatedText: this.fallbackTranslation(text) };
           }
         }
       }
@@ -209,7 +213,7 @@ export class LibreTranslateService {
         const results = await Promise.all(
           texts.map((text) => this.translate(text, source, target)),
         );
-        return results.map((r) => r.translatedText);
+        return results.map((r, index) => r.translatedText || this.fallbackTranslation(texts[index]));
       }
     }
 
@@ -224,7 +228,7 @@ export class LibreTranslateService {
       const results = await Promise.all(
         texts.map((text) => this.translate(text, source, target)),
       );
-      return results.map((r) => r.translatedText);
+      return results.map((r, index) => r.translatedText || this.fallbackTranslation(texts[index]));
     }
   }
 }

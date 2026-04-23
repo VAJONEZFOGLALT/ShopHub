@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { CreateRecentlyViewedDto } from './dto/create-recently-viewed.dto';
@@ -22,6 +22,14 @@ export class RecentlyViewedService {
   }
 
   async upsert(data: CreateRecentlyViewedDto) {
+    const user = await this.prisma.users.findUnique({
+      where: { id: data.userId },
+      select: { id: true },
+    });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
     const product = await this.prisma.products.findFirst({
       where: {
         id: data.productId,
@@ -30,7 +38,7 @@ export class RecentlyViewedService {
       select: { id: true },
     });
     if (!product) {
-      return null;
+      throw new BadRequestException('Product not found');
     }
 
     try {
