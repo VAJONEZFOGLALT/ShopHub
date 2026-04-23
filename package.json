@@ -5,6 +5,8 @@
   "scripts": {
     "postinstall": "node setup.js",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "local:setup": "npm run db:generate && npm run db:migrate",
+    "local:dev": "npm run local:setup && npm run dev",
     "dev:backend": "cd backend && npm run start:dev",
     "dev:frontend": "cd frontend && npm run dev",
     "build": "npm run build:backend && npm run build:frontend",

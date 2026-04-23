@@ -50,6 +50,22 @@ A gyökér `postinstall` script lefuttatja a `setup.js`-t, ami külön telepíti
 
 ## Fejlesztői Indítás
 
+### Gyors Lokális Indítás (Ajánlott)
+
+Ezt a flow-t használd, ha a frontend és backend Vercelen is megy, de lokálisan is ugyanazzal a TiDB Cloud adatbázissal akarsz tesztelni:
+
+```bash
+npm install
+npm run local:dev
+```
+
+Mit csinál:
+
+- `local:setup`: Prisma client generálás + migrációk futtatása backend kontextusban
+- `dev`: backend + frontend párhuzamos indítása
+
+Ha a `3000` vagy `5173` port foglalt, állítsd át a portot `.env`-ben, vagy zárd be a korábban futó folyamatot.
+
 ### Teljes alkalmazás
 
 ```bash
@@ -79,6 +95,8 @@ npm run db:generate
 npm run db:migrate
 npm run db:seed
 ```
+
+Fontos: a Prisma parancsokat mindig backend kontextusban futtasd (például a fenti npm scriptekkel), ne közvetlenül a repo gyökeréből `npx prisma ...` formában.
 
 ### Mit csinálnak ezek
 
