@@ -47,6 +47,7 @@ npm install
 ```
 
 A gyökér `postinstall` script lefuttatja a `setup.js`-t, ami külön telepíti a backend és frontend függőségeket, majd Prisma generate és migrate lépéseket is futtat.
+Seed automatikusan nem fut.
 
 ## Fejlesztői Indítás
 
@@ -63,6 +64,8 @@ Mit csinál:
 
 - `local:setup`: Prisma client generálás + migrációk futtatása backend kontextusban
 - `dev`: backend + frontend párhuzamos indítása
+
+Fontos: ez a flow nem futtat seedet, így a meglévő TiDB adatok érintetlenek maradnak.
 
 Ha a `3000` vagy `5173` port foglalt, állítsd át a portot `.env`-ben, vagy zárd be a korábban futó folyamatot.
 
@@ -88,12 +91,11 @@ npm run dev:frontend
 
 A projekt adatbázisa TiDB Cloudon fut, és a jelenlegi alapadatok már fel vannak töltve.
 
-### Prisma és seed
+### Prisma műveletek
 
 ```bash
 npm run db:generate
 npm run db:migrate
-npm run db:seed
 ```
 
 Fontos: a Prisma parancsokat mindig backend kontextusban futtasd (például a fenti npm scriptekkel), ne közvetlenül a repo gyökeréből `npx prisma ...` formában.
@@ -102,7 +104,12 @@ Fontos: a Prisma parancsokat mindig backend kontextusban futtasd (például a fe
 
 - `db:generate`: legenerálja a Prisma klienst
 - `db:migrate`: backend oldali migrációs parancs
-- `db:seed`: seed script, ha a mintaadatokat újra akarod tölteni
+
+Seedet csak kézzel futtass, ha kifejezetten újra akarod tölteni a mintaadatokat:
+
+```bash
+npm run db:seed
+```
 
 ## Hasznos Parancsok
 

@@ -28,6 +28,7 @@ run('npm install', path.join(__dirname, 'frontend'));
 console.log('\n3️⃣  Setting up database...');
 run('npm exec prisma generate', path.join(__dirname, 'backend'));
 run('npm exec prisma migrate deploy', path.join(__dirname, 'backend'));
+console.log('ℹ️  Seed was intentionally skipped (existing TiDB data is preserved).');
 
 console.log('\n✅ Setup complete!');
 console.log('\n📝 Next steps:');
