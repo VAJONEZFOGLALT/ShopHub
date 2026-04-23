@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { SupportedLanguage } from '@prisma/client';
+import { SupportedLanguage } from '../../generated/prisma/enums';
 
 @Injectable()
 export class TranslationsService {

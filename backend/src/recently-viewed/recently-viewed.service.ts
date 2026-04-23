@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../generated/prisma/client';
 import { PrismaService } from '../prisma.service';
 import { CreateRecentlyViewedDto } from './dto/create-recently-viewed.dto';
 

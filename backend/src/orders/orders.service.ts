@@ -45,10 +45,10 @@ export class OrdersService {
       throw new BadRequestException(`Products unavailable: ${unavailableIds.join(', ')}`);
     }
 
-    const priceMap = new Map(products.map((p) => [p.id, p.price]));
-    const nameMap = new Map(products.map((p) => [p.id, p.name]));
+    const priceMap = new Map<number, number>(products.map((p) => [p.id, Number(p.price)]));
+    const nameMap = new Map<number, string>(products.map((p) => [p.id, String(p.name)]));
 
-    const orderItemsData = items.map((item) => {
+    const orderItemsData: Array<{ productId: number; quantity: number; price: number }> = items.map((item) => {
       const price = priceMap.get(item.productId) ?? 0;
       return {
         productId: item.productId,
@@ -57,7 +57,7 @@ export class OrdersService {
       };
     });
 
-    const emailItems = items.map((item) => ({
+    const emailItems: Array<{ name: string; quantity: number; price: number }> = items.map((item) => ({
       name: nameMap.get(item.productId) || `#${item.productId}`,
       quantity: item.quantity,
       price: priceMap.get(item.productId) ?? 0,
@@ -75,7 +75,7 @@ export class OrdersService {
         courier: courier || 'UPS',
         shippingAddress,
         trackingNumber: this.generateTrackingNumber(courier),
-        orderItems: { create: orderItemsData },
+        orderItems: { createMany: { data: orderItemsData } },
       },
       include: { orderItems: true },
     });
@@ -221,7 +221,7 @@ export class OrdersService {
       throw new NotFoundException(`Order with id ${id} not found`);
     }
 
-    return this.prisma.$transaction(async (tx) => {
+    return this.prisma.$transaction(async (tx: any) => {
       await tx.orderItems.deleteMany({ where: { orderId: id } });
       return tx.orders.delete({ where: { id } });
     });

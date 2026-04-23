@@ -39,7 +39,7 @@ export class ReviewsService {
 	}
 
 	create(data: CreateReviewDto) {
-		return this.prisma.$transaction(async (tx) => {
+		return this.prisma.$transaction(async (tx: any) => {
 			const user = await tx.users.findUnique({
 				where: { id: data.userId },
 				select: { id: true },

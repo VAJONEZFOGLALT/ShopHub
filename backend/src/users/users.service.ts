@@ -74,7 +74,7 @@ export class UsersService {
         throw new NotFoundException(`User with id ${id} not found`);
       }
 
-      return await this.prisma.$transaction(async (tx) => {
+      return await this.prisma.$transaction(async (tx: any) => {
         await tx.orderItems.deleteMany({ where: { order: { userId: id } } });
         await tx.orders.deleteMany({ where: { userId: id } });
         await tx.reviews.deleteMany({ where: { userId: id } });
