@@ -340,6 +340,15 @@ export const api = {
     return res;
   },
 
+  updateOrderStatus: async (id: number, status: string) => {
+    const res = await request<any>(`/orders/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    return res;
+  },
+
   fulfillOrder: async (id: number, teljesitve: boolean = true) => {
     const res = await request<any>(`/orders/${id}/fulfill`, {
       method: 'PATCH',

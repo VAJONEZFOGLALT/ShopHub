@@ -194,15 +194,16 @@ export default function OrdersView() {
                 <th>User Name</th>
                 <th>Products</th>
                 <th>Total</th>
-                <th>Teljesítve</th>
+                <th>Státusz</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {pagedOrders.map((o: any) => {
                 const user = users.find((u: any) => u.id === o.userId);
+                const statusUpper = String(o.status || '').toUpperCase();
                 return (
-                  <tr key={o.id} className={o.teljesitve ? 'order-row-fulfilled' : ''}>
+                  <tr key={o.id} className={statusUpper === 'DELIVERED' ? 'order-row-fulfilled' : ''}>
                     <td>{o.id}</td>
                     <td>{o.userId}</td>
                     <td>{user ? user.name : '-'}</td>
@@ -222,25 +223,24 @@ export default function OrdersView() {
                     </td>
                     <td>{typeof o.totalPrice === 'number' ? o.totalPrice.toFixed(2) : '-'}</td>
                     <td>
-                      <button
-                        className={o.teljesitve ? "fulfilled" : "danger"}
-                        style={{
-                          marginLeft: 4,
-                          backgroundColor: o.teljesitve ? 'rgba(46, 204, 113, 0.18)' : '#ff2d55',
-                          color: o.teljesitve ? '#d8f3e4' : '#ffffff',
-                          border: o.teljesitve ? '1px solid rgba(46, 204, 113, 0.32)' : '1px solid #ff2d55',
-                          padding: '4px 8px',
-                          borderRadius: '4px',
-                          fontWeight: o.teljesitve ? 500 : 700,
-                          boxShadow: o.teljesitve ? 'none' : '0 0 0 2px rgba(255, 45, 85, 0.2)',
-                        }}
-                        onClick={async () => {
-                          await api.fulfillOrder(o.id, !o.teljesitve);
-                          await load();
+                      <select
+                        value={(o.status || 'PENDING').toUpperCase()}
+                        onChange={async (e) => {
+                          const next = e.target.value;
+                          try {
+                            await api.updateOrderStatus(o.id, next);
+                            await load();
+                          } catch (err: any) {
+                            setError(err?.message || String(err));
+                          }
                         }}
                       >
-                        {o.teljesitve ? 'Vond vissza' : 'Teljesítsd'}
-                      </button>
+                        <option value="PENDING">PENDING</option>
+                        <option value="PROCESSING">PROCESSING</option>
+                        <option value="SHIPPED">SHIPPED</option>
+                        <option value="DELIVERED">DELIVERED</option>
+                        <option value="CANCELLED">CANCELLED</option>
+                      </select>
                     </td>
                     <td><button className="danger" onClick={() => onDelete(o.id)}>Delete</button></td>
                   </tr>
