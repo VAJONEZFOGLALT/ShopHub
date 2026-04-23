@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 
 type OrderItemInput = { productId: number; quantity: number };
 
 export default function OrdersView() {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
@@ -66,11 +68,11 @@ export default function OrdersView() {
     e.preventDefault();
     setError(null);
     if (Number(userId) <= 0) {
-      setError('User ID must be greater than 0');
+      setError(t('admin.common.userIdPositive'));
       return;
     }
     if (items.length === 0) {
-      setError('Add at least one item');
+      setError(t('admin.common.addAtLeastOneItem'));
       return;
     }
     try {
@@ -78,11 +80,11 @@ export default function OrdersView() {
       for (let i = 0; i < items.length; i += 1) {
         const it = items[i];
         if (Number(it.productId) <= 0) {
-          setError('Product ID must be greater than 0');
+          setError(t('admin.common.productIdPositive'));
           return;
         }
         if (Number(it.quantity) < 1) {
-          setError('Quantity must be at least 1');
+          setError(t('admin.common.quantityAtLeastOne'));
           return;
         }
         mappedItems.push({ productId: Number(it.productId), quantity: Number(it.quantity) });
@@ -96,7 +98,7 @@ export default function OrdersView() {
   }
 
   async function onDelete(id: number) {
-    const message = 'Delete order #' + id + '?';
+    const message = t('admin.common.confirmDeleteOrder', { id });
     const ok = confirm(message);
     if (!ok) {
       return;
@@ -123,38 +125,38 @@ export default function OrdersView() {
 
   return (
     <div className="view">
-      <h2>Orders</h2>
+      <h2>{t('admin.orders')}</h2>
       {error && <div className="error">{error}</div>}
       <form className="form" onSubmit={onCreate}>
         <div className="grid">
           <label>
-            <span>User ID</span>
+            <span>{t('admin.common.userId')}</span>
             <input type="number" value={userId} onChange={e => setUserId(Number(e.target.value))} required />
           </label>
         </div>
         <div className="items">
-          <h3>Items</h3>
+          <h3>{t('admin.common.items')}</h3>
           {items.map((it, idx) => (
             <div key={idx} className="item-row">
               <label>
-                <span>Product ID</span>
+                <span>{t('admin.common.productId')}</span>
                 <input type="number" value={it.productId} onChange={e => updateItem(idx, { productId: Number(e.target.value) })} required />
               </label>
               <label>
-                <span>Quantity</span>
+                <span>{t('admin.common.quantity')}</span>
                 <input type="number" min={1} value={it.quantity} onChange={e => updateItem(idx, { quantity: Number(e.target.value) })} required />
               </label>
-              <button type="button" className="danger" onClick={() => removeItem(idx)}>Remove</button>
+              <button type="button" className="danger" onClick={() => removeItem(idx)}>{t('admin.common.remove')}</button>
             </div>
           ))}
-          <button type="button" onClick={addItem}>Add Item</button>
+          <button type="button" onClick={addItem}>{t('admin.common.addItem')}</button>
         </div>
-        <button type="submit" disabled={loading}>Create Order</button>
+        <button type="submit" disabled={loading}>{t('admin.common.createOrder')}</button>
       </form>
       <div className="search-bar">
         <input
           type="text"
-          placeholder="Search by order id or user id"
+          placeholder={t('admin.common.searchByOrderIdOrUserId')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -164,12 +166,12 @@ export default function OrdersView() {
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>User ID</th>
-                <th>User Name</th>
-                <th>Products</th>
-                <th>Total</th>
-                <th>Actions</th>
+                <th>{t('admin.common.id')}</th>
+                <th>{t('admin.common.userId')}</th>
+                <th>{t('admin.common.userName')}</th>
+                <th>{t('admin.common.products')}</th>
+                <th>{t('admin.common.total')}</th>
+                <th>{t('admin.common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -184,18 +186,18 @@ export default function OrdersView() {
             </tbody>
           </table>
         ) : pagedOrders.length === 0 ? (
-          <p className="muted">No orders found.</p>
+          <p className="muted">{t('admin.common.noOrdersFound')}</p>
         ) : (
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>User ID</th>
-                <th>User Name</th>
-                <th>Products</th>
-                <th>Total</th>
-                <th>Státusz</th>
-                <th>Actions</th>
+                <th>{t('admin.common.id')}</th>
+                <th>{t('admin.common.userId')}</th>
+                <th>{t('admin.common.userName')}</th>
+                <th>{t('admin.common.products')}</th>
+                <th>{t('admin.common.total')}</th>
+                <th>{t('admin.common.status')}</th>
+                <th>{t('admin.common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -219,7 +221,7 @@ export default function OrdersView() {
                             );
                           })}
                         </ul>
-                      ) : <span className="muted">No items</span>}
+                      ) : <span className="muted">{t('admin.common.noItems')}</span>}
                     </td>
                     <td>{typeof o.totalPrice === 'number' ? o.totalPrice.toFixed(2) : '-'}</td>
                     <td>
@@ -235,14 +237,14 @@ export default function OrdersView() {
                           }
                         }}
                       >
-                        <option value="PENDING">PENDING</option>
-                        <option value="PROCESSING">PROCESSING</option>
-                        <option value="SHIPPED">SHIPPED</option>
-                        <option value="DELIVERED">DELIVERED</option>
-                        <option value="CANCELLED">CANCELLED</option>
+                        <option value="PENDING">{t('admin.status.pending')}</option>
+                        <option value="PROCESSING">{t('admin.status.processing')}</option>
+                        <option value="SHIPPED">{t('admin.status.shipped')}</option>
+                        <option value="DELIVERED">{t('admin.status.delivered')}</option>
+                        <option value="CANCELLED">{t('admin.status.cancelled')}</option>
                       </select>
                     </td>
-                    <td><button className="danger" onClick={() => onDelete(o.id)}>Delete</button></td>
+                    <td><button className="danger" onClick={() => onDelete(o.id)}>{t('admin.common.delete')}</button></td>
                   </tr>
                 );
               })}
@@ -253,11 +255,11 @@ export default function OrdersView() {
       {!loading && filtered.length > pageSize && (
         <div className="pager">
           <button type="button" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>
-            Prev
+            {t('admin.common.prev')}
           </button>
-          <span className="muted">Page {currentPage} of {totalPages}</span>
+          <span className="muted">{t('admin.common.page', { current: currentPage, total: totalPages })}</span>
           <button type="button" disabled={currentPage >= totalPages} onClick={() => setPage(currentPage + 1)}>
-            Next
+            {t('admin.common.next')}
           </button>
         </div>
       )}

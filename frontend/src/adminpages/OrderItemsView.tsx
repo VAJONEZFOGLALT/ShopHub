@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 
 export default function OrderItemsView() {
+  const { t } = useTranslation();
   const [orderItems, setOrderItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,19 +37,19 @@ export default function OrderItemsView() {
     e.preventDefault();
     setError(null);
     if (Number(form.orderId) <= 0) {
-      setError('Order ID must be greater than 0');
+      setError(t('admin.common.orderIdPositive'));
       return;
     }
     if (Number(form.productId) <= 0) {
-      setError('Product ID must be greater than 0');
+      setError(t('admin.common.productIdPositive'));
       return;
     }
     if (Number(form.quantity) < 1) {
-      setError('Quantity must be at least 1');
+      setError(t('admin.common.quantityAtLeastOne'));
       return;
     }
     if (Number(form.price) < 0) {
-      setError('Price must be 0 or more');
+      setError(t('admin.common.priceNonNegative'));
       return;
     }
     try {
@@ -64,7 +66,7 @@ export default function OrderItemsView() {
   }
 
   async function onDelete(id: number) {
-    const message = 'Delete item #' + id + '?';
+    const message = t('admin.common.confirmDeleteItem', { id });
     const ok = confirm(message);
     if (!ok) {
       return;
@@ -92,34 +94,34 @@ export default function OrderItemsView() {
 
   return (
     <div className="view">
-      <h2>Order Items</h2>
+      <h2>{t('admin.common.orderItems')}</h2>
       {error && <div className="error">{error}</div>}
       <form className="form" onSubmit={onCreate}>
         <div className="grid">
           <label>
-            <span>Order ID</span>
+            <span>{t('admin.common.orderId')}</span>
             <input type="number" value={form.orderId} onChange={e => updateForm({ orderId: Number(e.target.value) })} required />
           </label>
           <label>
-            <span>Product ID</span>
+            <span>{t('admin.common.productId')}</span>
             <input type="number" value={form.productId} onChange={e => updateForm({ productId: Number(e.target.value) })} required />
           </label>
           <label>
-            <span>Quantity</span>
+            <span>{t('admin.common.quantity')}</span>
             <input type="number" min={1} value={form.quantity} onChange={e => updateForm({ quantity: Number(e.target.value) })} required />
           </label>
           <label>
-            <span>Price</span>
+            <span>{t('admin.common.price')}</span>
             <input type="number" step="0.01" min={0} value={form.price} onChange={e => updateForm({ price: Number(e.target.value) })} required />
           </label>
         </div>
-        <button type="submit" disabled={loading}>Create Order Item</button>
+        <button type="submit" disabled={loading}>{t('admin.common.createOrderItem')}</button>
       </form>
 
       <div className="search-bar">
         <input
           type="text"
-          placeholder="Search by id, order id, product id"
+          placeholder={t('admin.common.searchByIdOrderProductId')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -130,12 +132,12 @@ export default function OrderItemsView() {
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Order ID</th>
-                <th>Product ID</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Actions</th>
+                <th>{t('admin.common.id')}</th>
+                <th>{t('admin.common.orderId')}</th>
+                <th>{t('admin.common.productId')}</th>
+                <th>{t('admin.common.quantity')}</th>
+                <th>{t('admin.common.price')}</th>
+                <th>{t('admin.common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -152,17 +154,17 @@ export default function OrderItemsView() {
             </tbody>
           </table>
         ) : pagedItems.length === 0 ? (
-          <p className="muted">No order items found.</p>
+          <p className="muted">{t('admin.common.noOrderItemsFound')}</p>
         ) : (
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Order ID</th>
-                <th>Product ID</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Actions</th>
+                <th>{t('admin.common.id')}</th>
+                <th>{t('admin.common.orderId')}</th>
+                <th>{t('admin.common.productId')}</th>
+                <th>{t('admin.common.quantity')}</th>
+                <th>{t('admin.common.price')}</th>
+                <th>{t('admin.common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -173,7 +175,7 @@ export default function OrderItemsView() {
                   <td>{oi.productId}</td>
                   <td>{oi.quantity}</td>
                   <td>{oi.price}</td>
-                  <td><button className="danger" onClick={() => onDelete(oi.id)}>Delete</button></td>
+                  <td><button className="danger" onClick={() => onDelete(oi.id)}>{t('admin.common.delete')}</button></td>
                 </tr>
               ))}
             </tbody>
@@ -184,11 +186,11 @@ export default function OrderItemsView() {
       {!loading && filtered.length > pageSize && (
         <div className="pager">
           <button type="button" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>
-            Prev
+            {t('admin.common.prev')}
           </button>
-          <span className="muted">Page {currentPage} of {totalPages}</span>
+          <span className="muted">{t('admin.common.page', { current: currentPage, total: totalPages })}</span>
           <button type="button" disabled={currentPage >= totalPages} onClick={() => setPage(currentPage + 1)}>
-            Next
+            {t('admin.common.next')}
           </button>
         </div>
       )}

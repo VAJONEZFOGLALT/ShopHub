@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 
 export default function UsersView() {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,15 +38,15 @@ export default function UsersView() {
     e.preventDefault();
     setError(null);
     if (!form.username.trim()) {
-      setError('Username is required');
+      setError(t('admin.common.requiredUsername'));
       return;
     }
     if (!form.email.includes('@')) {
-      setError('Valid email is required');
+      setError(t('admin.common.requiredEmail'));
       return;
     }
     if (form.password.trim().length < 8) {
-      setError('Password must be at least 8 characters');
+      setError(t('admin.common.passwordTooShort'));
       return;
     }
     try {
@@ -58,7 +60,7 @@ export default function UsersView() {
   }
 
   async function onDelete(id: number) {
-    const message = 'Delete user #' + id + '?';
+    const message = t('admin.common.confirmDeleteUser', { id });
     const ok = confirm(message);
     if (!ok) {
       return;
@@ -95,30 +97,30 @@ export default function UsersView() {
 
   return (
     <div className="view">
-      <h2>Users</h2>
+      <h2>{t('admin.users')}</h2>
       {error && <div className="error">{error}</div>}
       <form className="form" onSubmit={onCreate}>
         <div className="grid">
           <label>
-            <span>Username</span>
+            <span>{t('admin.common.username')}</span>
             <input value={form.username} onChange={e => updateForm({ username: e.target.value })} required />
           </label>
           <label>
-            <span>Email</span>
+            <span>{t('admin.common.email')}</span>
             <input type="email" value={form.email} onChange={e => updateForm({ email: e.target.value })} required />
           </label>
           <label>
-            <span>Password</span>
+            <span>{t('admin.common.password')}</span>
             <input type="password" value={form.password} onChange={e => updateForm({ password: e.target.value })} required />
           </label>
         </div>
-        <button type="submit" disabled={loading}>Create User</button>
+        <button type="submit" disabled={loading}>{t('admin.common.createUser')}</button>
       </form>
 
       <div className="search-bar">
         <input
           type="text"
-          placeholder="Search by username or email"
+          placeholder={t('admin.common.searchByUsernameOrEmail')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -129,11 +131,11 @@ export default function UsersView() {
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Actions</th>
+                <th>{t('admin.common.id')}</th>
+                <th>{t('admin.common.username')}</th>
+                <th>{t('admin.common.email')}</th>
+                <th>{t('admin.common.role')}</th>
+                <th>{t('admin.common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -149,16 +151,16 @@ export default function UsersView() {
             </tbody>
           </table>
         ) : pagedUsers.length === 0 ? (
-          <p className="muted">No users found.</p>
+          <p className="muted">{t('admin.common.noUsersFound')}</p>
         ) : (
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Actions</th>
+                <th>{t('admin.common.id')}</th>
+                <th>{t('admin.common.username')}</th>
+                <th>{t('admin.common.email')}</th>
+                <th>{t('admin.common.role')}</th>
+                <th>{t('admin.common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -173,12 +175,12 @@ export default function UsersView() {
                       onChange={(e) => onRoleChange(u.id, e.target.value)}
                       disabled={loading}
                     >
-                      <option value="USER">USER</option>
-                      <option value="ADMIN">ADMIN</option>
+                      <option value="USER">{t('admin.roles.user')}</option>
+                      <option value="ADMIN">{t('admin.roles.admin')}</option>
                     </select>
                   </td>
                   <td>
-                    <button className="danger" onClick={() => onDelete(u.id)}>Delete</button>
+                    <button className="danger" onClick={() => onDelete(u.id)}>{t('admin.common.delete')}</button>
                   </td>
                 </tr>
               ))}
@@ -190,11 +192,11 @@ export default function UsersView() {
       {!loading && filtered.length > pageSize && (
         <div className="pager">
           <button type="button" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>
-            Prev
+            {t('admin.common.prev')}
           </button>
-          <span className="muted">Page {currentPage} of {totalPages}</span>
+          <span className="muted">{t('admin.common.page', { current: currentPage, total: totalPages })}</span>
           <button type="button" disabled={currentPage >= totalPages} onClick={() => setPage(currentPage + 1)}>
-            Next
+            {t('admin.common.next')}
           </button>
         </div>
       )}

@@ -1,10 +1,13 @@
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './LanguageSwitcher.module.css';
 
 const normalizeLanguage = (value: string) => value.toLowerCase().split('-')[0];
 
 export const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const languages = [
     { code: 'hu', label: 'Magyar' },
@@ -15,10 +18,10 @@ export const LanguageSwitcher = () => {
     const params = new URLSearchParams(window.location.search);
     params.set('lang', langCode);
     const query = params.toString();
-    const nextUrl = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`;
+    const nextUrl = `${location.pathname}${query ? `?${query}` : ''}${location.hash}`;
     localStorage.setItem('language', langCode);
-    // Reload page immediately to fetch fresh data with new language
-    window.location.href = nextUrl;
+    void i18n.changeLanguage(langCode);
+    navigate(nextUrl, { replace: true });
   };
 
   const currentLanguage = normalizeLanguage(i18n.resolvedLanguage || i18n.language || 'hu');
@@ -49,6 +52,8 @@ export const LanguageSwitcher = () => {
 
 export const InlineLanguageSwitcher = () => {
   const { i18n } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const languages = [
     { code: 'hu', label: 'Magyar' },
@@ -59,9 +64,10 @@ export const InlineLanguageSwitcher = () => {
     const params = new URLSearchParams(window.location.search);
     params.set('lang', langCode);
     const query = params.toString();
-    const nextUrl = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`;
+    const nextUrl = `${location.pathname}${query ? `?${query}` : ''}${location.hash}`;
     localStorage.setItem('language', langCode);
-    window.location.href = nextUrl;
+    void i18n.changeLanguage(langCode);
+    navigate(nextUrl, { replace: true });
   };
 
   const currentLanguage = normalizeLanguage(i18n.resolvedLanguage || i18n.language || 'hu');

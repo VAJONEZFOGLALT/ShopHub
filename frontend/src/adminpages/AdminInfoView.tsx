@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 
 type UserSummary = {
@@ -31,6 +32,7 @@ const getErrorMessage = (error: unknown) => {
 };
 
 export default function AdminInfoView({ onNavigateToTab }: AdminInfoViewProps) {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<UserSummary[]>([]);
   const [products, setProducts] = useState<ProductSummary[]>([]);
   const [orders, setOrders] = useState<OrderSummary[]>([]);
@@ -112,7 +114,7 @@ export default function AdminInfoView({ onNavigateToTab }: AdminInfoViewProps) {
 
   return (
     <div className="view">
-      <h2>Overview</h2>
+      <h2>{t('admin.overview')}</h2>
       {error && <div className="error">{error}</div>}
 
       <div className="stats-grid products-stats">
@@ -120,28 +122,28 @@ export default function AdminInfoView({ onNavigateToTab }: AdminInfoViewProps) {
           <div className="stat-icon">👥</div>
           <div className="stat-info">
             <div className="stat-value">{stats.userCount}</div>
-            <div className="stat-label">Users (open users page)</div>
+            <div className="stat-label">{t('admin.common.usersOpen')}</div>
           </div>
         </button>
         <button type="button" className="stat-item stat-item-action" onClick={() => onNavigateToTab('products')}>
           <div className="stat-icon">📦</div>
           <div className="stat-info">
             <div className="stat-value">{stats.productCount}</div>
-            <div className="stat-label">Products (open products page)</div>
+            <div className="stat-label">{t('admin.common.productsOpen')}</div>
           </div>
         </button>
         <button type="button" className="stat-item stat-item-action" onClick={() => onNavigateToTab('orders')}>
           <div className="stat-icon">🧾</div>
           <div className="stat-info">
             <div className="stat-value">{stats.orderCount}</div>
-            <div className="stat-label">Orders (open orders page)</div>
+            <div className="stat-label">{t('admin.common.ordersOpen')}</div>
           </div>
         </button>
         <div className="stat-item">
           <div className="stat-icon">⏳</div>
           <div className="stat-info">
             <div className="stat-value">{stats.pendingOrders}</div>
-            <div className="stat-label">Pending orders</div>
+            <div className="stat-label">{t('admin.common.pendingOrders')}</div>
           </div>
         </div>
       </div>
@@ -151,47 +153,47 @@ export default function AdminInfoView({ onNavigateToTab }: AdminInfoViewProps) {
           <div className="stat-icon">⚠️</div>
           <div className="stat-info">
             <div className="stat-value">{stats.lowStock + stats.outOfStock}</div>
-            <div className="stat-label">Need attention (low/out)</div>
+            <div className="stat-label">{t('admin.common.needAttention')}</div>
           </div>
         </div>
         <div className="stat-item">
           <div className="stat-icon">🚫</div>
           <div className="stat-info">
             <div className="stat-value">{stats.outOfStock}</div>
-            <div className="stat-label">Out of stock</div>
+            <div className="stat-label">{t('admin.common.outOfStock')}</div>
           </div>
         </div>
         <div className="stat-item">
           <div className="stat-icon">💰</div>
           <div className="stat-info">
             <div className="stat-value">${stats.inventoryValue.toFixed(0)}</div>
-            <div className="stat-label">Inventory value</div>
+            <div className="stat-label">{t('admin.common.inventoryValue')}</div>
           </div>
         </div>
         <div className="stat-item">
           <div className="stat-icon">🏦</div>
           <div className="stat-info">
             <div className="stat-value">${stats.totalRevenue.toFixed(0)}</div>
-            <div className="stat-label">Total order value</div>
+            <div className="stat-label">{t('admin.common.totalOrderValue')}</div>
           </div>
         </div>
       </div>
 
       <div className="list">
-        <h3 style={{ marginTop: 0 }}>Recent Orders</h3>
+        <h3 style={{ marginTop: 0 }}>{t('admin.common.recentOrders')}</h3>
         {loading ? (
-          <p className="muted">Loading...</p>
+          <p className="muted">{t('admin.common.loading')}</p>
         ) : recentOrders.length === 0 ? (
-          <p className="muted">No orders found.</p>
+          <p className="muted">{t('admin.common.noOrdersFound')}</p>
         ) : (
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>User ID</th>
-                <th>Status</th>
-                <th>Total</th>
-                <th>Created</th>
+                <th>{t('admin.common.id')}</th>
+                <th>{t('admin.common.userId')}</th>
+                <th>{t('admin.common.status')}</th>
+                <th>{t('admin.common.total')}</th>
+                <th>{t('admin.common.created')}</th>
               </tr>
             </thead>
             <tbody>

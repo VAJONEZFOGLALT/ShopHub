@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 
 export default function ProductsView() {
+  const { t } = useTranslation();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,19 +39,19 @@ export default function ProductsView() {
     e.preventDefault();
     setError(null);
     if (!form.name.trim()) {
-      setError('Name is required');
+      setError(t('admin.common.requiredName'));
       return;
     }
     if (!form.category.trim()) {
-      setError('Category is required');
+      setError(t('admin.common.requiredCategory'));
       return;
     }
     if (Number(form.price) < 0) {
-      setError('Price must be 0 or more');
+      setError(t('admin.common.priceNonNegative'));
       return;
     }
     if (Number(form.stock) < 0) {
-      setError('Stock must be 0 or more');
+      setError(t('admin.common.stockNonNegative'));
       return;
     }
     try {
@@ -67,7 +69,7 @@ export default function ProductsView() {
   }
 
   async function onDelete(id: number) {
-    const message = 'Delete product #' + id + '?';
+    const message = t('admin.common.confirmDeleteProduct', { id });
     const ok = confirm(message);
     if (!ok) {
       return;
@@ -127,7 +129,7 @@ export default function ProductsView() {
   async function onUploadImage(id: number) {
     const file = selectedFiles[id];
     if (!file) {
-      setError('Please select an image first.');
+      setError(t('admin.common.selectImageFirst'));
       return;
     }
     setError(null);
@@ -158,52 +160,52 @@ export default function ProductsView() {
           }}
         />
         <button type="button" className={dimmed ? 'subtle' : undefined} onClick={() => inputRef.current?.click()}>
-          Fajl kivalaszt
+          {t('admin.common.selectFile')}
         </button>
-        <span className="filename">{currentName ?? 'No file selected'}</span>
+        <span className="filename">{currentName ?? t('admin.common.noFileSelected')}</span>
       </div>
     );
   }
 
   return (
     <div className="view">
-      <h2>Products</h2>
+      <h2>{t('admin.products')}</h2>
       {error && <div className="error">{error}</div>}
       <form className="form" onSubmit={onCreate}>
         <div className="grid">
           <label>
-            <span>Name</span>
+            <span>{t('admin.common.name')}</span>
             <input value={form.name} onChange={e => updateForm({ name: e.target.value })} required />
           </label>
           <label>
-            <span>Description</span>
+            <span>{t('admin.common.description')}</span>
             <input value={form.description} onChange={e => updateForm({ description: e.target.value })} />
           </label>
           <label>
-            <span>Category</span>
+            <span>{t('admin.common.category')}</span>
             <input value={form.category} onChange={e => updateForm({ category: e.target.value })} required />
           </label>
           <label>
-            <span>Price</span>
+            <span>{t('admin.common.price')}</span>
             <input type="number" step="0.01" value={form.price} onChange={e => updateForm({ price: Number(e.target.value) })} required />
           </label>
           <label>
-            <span>Stock</span>
+            <span>{t('admin.common.stock')}</span>
             <input type="number" value={form.stock} onChange={e => updateForm({ stock: Number(e.target.value) })} required />
           </label>
         </div>
-        <button type="submit" disabled={loading}>Create Product</button>
+        <button type="submit" disabled={loading}>{t('admin.common.createProduct')}</button>
       </form>
 
       <div className="search-bar">
         <input
           type="text"
-          placeholder="Search by name or category"
+          placeholder={t('admin.common.searchByNameOrCategory')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
         <div className="products-search-meta">
-          Showing {pagedProducts.length} of {filtered.length} items • {stats.categories} categories • {stats.outOfStock} out of stock
+          {t('admin.common.showingSummary', { shown: pagedProducts.length, total: filtered.length, categories: stats.categories, outOfStock: stats.outOfStock })}
         </div>
       </div>
 
@@ -212,13 +214,13 @@ export default function ProductsView() {
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Actions</th>
+                <th>{t('admin.common.id')}</th>
+                <th>{t('admin.common.image')}</th>
+                <th>{t('admin.common.name')}</th>
+                <th>{t('admin.common.category')}</th>
+                <th>{t('admin.common.price')}</th>
+                <th>{t('admin.common.stock')}</th>
+                <th>{t('admin.common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -236,18 +238,18 @@ export default function ProductsView() {
             </tbody>
           </table>
         ) : pagedProducts.length === 0 ? (
-          <p className="muted">No products found.</p>
+          <p className="muted">{t('admin.common.noProductsFound')}</p>
         ) : (
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Actions</th>
+                <th>{t('admin.common.id')}</th>
+                <th>{t('admin.common.image')}</th>
+                <th>{t('admin.common.name')}</th>
+                <th>{t('admin.common.category')}</th>
+                <th>{t('admin.common.price')}</th>
+                <th>{t('admin.common.stock')}</th>
+                <th>{t('admin.common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -258,7 +260,7 @@ export default function ProductsView() {
                     {p.image ? (
                       <img src={p.image} alt={p.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6 }} />
                     ) : (
-                      <span className="muted">No image</span>
+                      <span className="muted">{t('admin.common.noImage')}</span>
                     )}
                   </td>
                   <td>{p.name}</td>
@@ -278,9 +280,9 @@ export default function ProductsView() {
                         disabled={!!uploading[p.id]}
                         className={p.image ? 'subtle' : undefined}
                       >
-                        {uploading[p.id] ? 'Uploading…' : 'Upload Image'}
+                        {uploading[p.id] ? t('admin.common.uploading') : t('admin.common.uploadImage')}
                       </button>
-                      <button className="danger" onClick={() => onDelete(p.id)}>Delete</button>
+                      <button className="danger" onClick={() => onDelete(p.id)}>{t('admin.common.delete')}</button>
                     </div>
                   </td>
                 </tr>
@@ -293,11 +295,11 @@ export default function ProductsView() {
       {!loading && filtered.length > pageSize && (
         <div className="pager">
           <button type="button" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>
-            Prev
+            {t('admin.common.prev')}
           </button>
-          <span className="muted">Page {currentPage} of {totalPages}</span>
+          <span className="muted">{t('admin.common.page', { current: currentPage, total: totalPages })}</span>
           <button type="button" disabled={currentPage >= totalPages} onClick={() => setPage(currentPage + 1)}>
-            Next
+            {t('admin.common.next')}
           </button>
         </div>
       )}

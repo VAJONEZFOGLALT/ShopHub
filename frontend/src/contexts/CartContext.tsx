@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useToast } from './ToastContext';
 
 export type CartItem = {
@@ -48,6 +49,7 @@ function readStoredCart(): CartItem[] {
 export default function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(() => readStoredCart());
   const { showToast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     try {
@@ -61,10 +63,10 @@ export default function CartProvider({ children }: { children: React.ReactNode }
     setItems(prev => {
       const exists = prev.find(i => i.productId === item.productId);
       if (exists) {
-        showToast(`🛒 Updated "${item.name}"`, 'success');
+        showToast(t('toasts.cartUpdated', { item: item.name }), 'success');
         return prev.map(i => i.productId === item.productId ? { ...i, quantity: i.quantity + qty } : i);
       }
-      showToast(`🛒 Added "${item.name}"`, 'success');
+      showToast(t('toasts.cartAdded', { item: item.name }), 'success');
       return [...prev, { ...item, quantity: qty }];
     });
   };
@@ -76,7 +78,7 @@ export default function CartProvider({ children }: { children: React.ReactNode }
   const remove = (productId: number) => {
     const name = items.find(i => i.productId === productId)?.name;
     setItems(prev => prev.filter(i => i.productId !== productId));
-    if (name) showToast(`🗑️ Removed "${name}"`, 'info');
+    if (name) showToast(t('toasts.cartRemoved', { item: name }), 'info');
   };
 
   const clear = () => {
@@ -86,7 +88,7 @@ export default function CartProvider({ children }: { children: React.ReactNode }
     } catch {
       // Ignore storage write failures.
     }
-    showToast('🛒 Cart cleared', 'info');
+    showToast(t('toasts.cartCleared'), 'info');
   };
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);

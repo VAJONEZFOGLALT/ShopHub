@@ -45,14 +45,14 @@ export default function OrderDetailPage() {
     const loadOrderDetail = async () => {
       try {
         if (!orderId) {
-          showToast('Invalid order ID', 'error');
+          showToast(t('toasts.orderInvalidId'), 'error');
           navigate('/shop/orders');
           return;
         }
 
         const orderIdNum = Number(orderId);
         if (!Number.isFinite(orderIdNum) || orderIdNum <= 0) {
-          showToast('Invalid order ID', 'error');
+          showToast(t('toasts.orderInvalidId'), 'error');
           navigate('/shop/orders');
           return;
         }
@@ -63,13 +63,13 @@ export default function OrderDetailPage() {
         ]);
 
         if (!foundOrder || Number(foundOrder.id) !== orderIdNum) {
-          showToast('Order not found', 'error');
+          showToast(t('toasts.orderNotFound'), 'error');
           navigate('/shop/orders');
           return;
         }
 
         if (user && Number(foundOrder.userId) !== user.id) {
-          showToast('Order not found', 'error');
+          showToast(t('toasts.orderNotFound'), 'error');
           navigate('/shop/orders');
           return;
         }
@@ -78,7 +78,7 @@ export default function OrderDetailPage() {
         setProducts(allProducts);
       } catch (error) {
         console.error('Failed to load order:', error);
-        showToast('Failed to load order', 'error');
+        showToast(t('toasts.orderLoadFailed'), 'error');
         navigate('/shop/orders');
       } finally {
         setLoading(false);

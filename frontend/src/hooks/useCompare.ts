@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { api } from '../services/api';
@@ -54,6 +55,7 @@ const emitCompareUpdated = (count: number) => {
 export function useCompare() {
   const { user, isAuthenticated } = useAuth();
   const { showToast } = useToast();
+  const { t } = useTranslation();
   const [compareIds, setCompareIds] = useState<number[]>([]);
   const [compareItems, setCompareItems] = useState<any[]>([]);
   const [pendingIds, setPendingIds] = useState<number[]>([]);
@@ -133,7 +135,7 @@ export function useCompare() {
     }
 
     if (!isAuthenticated || !user) {
-      showToast('Please log in to compare products', 'warning');
+      showToast(t('toasts.compareLogin'), 'warning');
       return;
     }
 
@@ -148,7 +150,7 @@ export function useCompare() {
     const exists = previousIds.includes(productId);
 
     if (!exists && previousIds.length >= COMPARE_LIMIT) {
-      showToast(`You can compare up to ${COMPARE_LIMIT} products`, 'warning');
+      showToast(t('toasts.compareLimitReached', { count: COMPARE_LIMIT }), 'warning');
       return;
     }
 
@@ -184,7 +186,7 @@ export function useCompare() {
       setCompareItems(previousItems);
       persistCompareCache(user.id, previousIds);
       emitCompareUpdated(previousIds.length);
-      showToast(err?.message || 'Failed to update compare list', 'error');
+      showToast(t('toasts.compareUpdateFailed'), 'error');
     } finally {
       pendingIdsRef.current = pendingIdsRef.current.filter((id) => id !== productId);
       setPendingIds(pendingIdsRef.current);
@@ -193,7 +195,7 @@ export function useCompare() {
 
   const clearCompare = async () => {
     if (!isAuthenticated || !user) {
-      showToast('Please log in to compare products', 'warning');
+      showToast(t('toasts.compareLogin'), 'warning');
       return;
     }
 
@@ -216,7 +218,7 @@ export function useCompare() {
       setCompareItems(previousItems);
       persistCompareCache(user.id, previousIds);
       emitCompareUpdated(previousIds.length);
-      showToast('Failed to clear compare list', 'error');
+      showToast(t('toasts.compareClearFailed'), 'error');
     }
   };
 

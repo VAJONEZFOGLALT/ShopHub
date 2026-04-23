@@ -27,6 +27,7 @@ import OrdersPage from './pages/OrdersPage'
 import OrderDetailPage from './pages/OrderDetailPage'
 import { Toast } from './components/Toast'
 import { ScrollToTop } from './components/ScrollToTop'
+import { InlineLanguageSwitcher } from './components/LanguageSwitcher'
 import { useTranslation } from 'react-i18next';
 
 type Modals = 'none' | 'login' | 'register'
@@ -41,11 +42,6 @@ function LanguageUrlSync() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const isAdminRoute = location.pathname.startsWith('/admin');
-    if (isAdminRoute) {
-      return;
-    }
-
     const params = new URLSearchParams(location.search);
     const rawUrlLang = params.get('lang');
     const urlLang = rawUrlLang ? normalizeLanguage(rawUrlLang) : null;
@@ -79,6 +75,7 @@ function LanguageUrlSync() {
 function AdminPanel() {
   const [tab, setTab] = useState<AdminTab>('overview')
   const navigate = useNavigate()
+  const { t } = useTranslation();
   
   const views: Record<AdminTab, React.JSX.Element> = {
     overview: <AdminInfoView onNavigateToTab={setTab} />,
@@ -88,10 +85,10 @@ function AdminPanel() {
   }
 
   const labels: Record<AdminTab, string> = {
-    overview: 'Overview',
-    users: 'Users',
-    products: 'Products',
-    orders: 'Orders',
+    overview: t('admin.overview'),
+    users: t('admin.users'),
+    products: t('admin.products'),
+    orders: t('admin.orders'),
   }
 
   const [theme, setTheme] = useState<string>(() => {
@@ -110,14 +107,15 @@ function AdminPanel() {
     <div className="app">
       <header className="header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <h1 style={{ marginRight: 12 }}>Admin Dashboard</h1>
+          <h1 style={{ marginRight: 12 }}>{t('admin.dashboardTitle')}</h1>
           <button className="back-btn" onClick={() => navigate('/shop')}>
-            ← Back to Shop
+            {t('common.backToShop')}
           </button>
+          <InlineLanguageSwitcher />
           <button
             className="mode-toggle"
             onClick={() => setTheme(prev => (prev === 'light' ? 'dark' : 'light'))}
-            title="Toggle theme"
+            title={t('admin.toggleTheme')}
             style={{ marginLeft: 8 }}
           >
             {theme === 'light' ? '🌙' : '☀️'}
