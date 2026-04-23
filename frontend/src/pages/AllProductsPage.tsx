@@ -8,6 +8,7 @@ import CompareDrawer from '../components/CompareDrawer';
 import { useWishlist } from '../hooks/useWishlist';
 import { useCompare } from '../hooks/useCompare';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { formatPriceHUF } from '../utils/currency';
 
 export default function AllProductsPage() {
   const { t, i18n } = useTranslation();
@@ -208,7 +209,7 @@ export default function AllProductsPage() {
               className="price-slider"
             />
             <div className="price-display">
-              ${priceRange[0].toFixed(2)} - ${priceRange[1].toFixed(2)}
+              {formatPriceHUF(priceRange[0])} - {formatPriceHUF(priceRange[1])}
             </div>
           </div>
 

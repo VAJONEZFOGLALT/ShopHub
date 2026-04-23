@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { formatPriceHUF } from '../utils/currency';
 import { useToast } from '../contexts/ToastContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 
@@ -129,7 +130,7 @@ export default function OrderDetailPage() {
             <div className="detail-item">
               <span className="detail-label">{t('orders.total') || 'Total'}</span>
               <span className="detail-value" style={{fontWeight: 700, color: 'var(--primary)', fontSize: '18px'}}>
-                ${Number(order.totalPrice || 0).toFixed(2)}
+                {formatPriceHUF(Number(order.totalPrice || 0))}
               </span>
             </div>
             <div className="detail-item">
@@ -171,9 +172,9 @@ export default function OrderDetailPage() {
                   <tr key={item.id}>
                     <td className="product-name">{getProductName(item.productId)}</td>
                     <td className="text-center">{item.quantity}</td>
-                    <td className="text-right">${Number(item.price || 0).toFixed(2)}</td>
+                    <td className="text-right">{formatPriceHUF(Number(item.price || 0))}</td>
                     <td className="text-right" style={{fontWeight: 600}}>
-                      ${(Number(item.price || 0) * Number(item.quantity || 0)).toFixed(2)}
+                      {formatPriceHUF(Number(item.price || 0) * Number(item.quantity || 0))}
                     </td>
                   </tr>
                 ))}

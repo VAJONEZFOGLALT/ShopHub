@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
+import { formatPriceHUF } from '../utils/currency';
 import { useToast } from '../contexts/ToastContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 
@@ -147,7 +148,7 @@ export default function OrdersPage() {
                       </div>
                       <div className="info-row">
                         <span className="info-label">{t('orders.total')}</span>
-                        <span className="info-value" style={{fontWeight: 700, color: 'var(--primary)'}}>${Number(order.totalPrice || 0).toFixed(2)}</span>
+                        <span className="info-value" style={{fontWeight: 700, color: 'var(--primary)'}}>{formatPriceHUF(Number(order.totalPrice || 0))}</span>
                       </div>
                       {hasCourier && (
                         <div className="info-row">

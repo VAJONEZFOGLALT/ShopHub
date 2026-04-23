@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { api } from '../services/api';
 import { COUNTRY_ADDRESS_CONFIGS, DEFAULT_COUNTRY_CODE, formatAddressSingleLine, getCountryAddressConfig } from '../utils/addressing';
+import { formatPriceHUF } from '../utils/currency';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 
 declare global {
@@ -397,7 +398,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                       <div className="checkout-item-info">
                         <strong>{it.name}</strong>
                         <span className="muted">{t('cart.quantity')}: {it.quantity}</span>
-                        <span>${(it.price * it.quantity).toFixed(2)}</span>
+                        <span>{formatPriceHUF(it.price * it.quantity)}</span>
                       </div>
                       <button className="btn-text" onClick={() => remove(it.productId)}>{t('checkout.remove')}</button>
                     </div>
@@ -418,7 +419,7 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
                       }}
                     />
                     <div className="checkout-courier-content">
-                      <div><strong>{t(c.nameKey)}</strong> - ${c.price.toFixed(2)}</div>
+                      <div><strong>{t(c.nameKey)}</strong> - {formatPriceHUF(c.price)}</div>
                       <div className="muted checkout-courier-days">{t(c.daysKey)}</div>
                     </div>
                   </label>
@@ -541,15 +542,15 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
           <div className="checkout-summary">
             <div className="checkout-summary-row">
               <span>{t('checkout.subtotal')}</span>
-              <span>${total.toFixed(2)}</span>
+              <span>{formatPriceHUF(total)}</span>
             </div>
             <div className="checkout-summary-row">
               <span>{t('checkout.shipping')}</span>
-              <span>${ship.toFixed(2)}</span>
+              <span>{formatPriceHUF(ship)}</span>
             </div>
             <div className="checkout-summary-row total">
               <span>{t('checkout.total')}</span>
-              <span>${finalTotal.toFixed(2)}</span>
+              <span>{formatPriceHUF(finalTotal)}</span>
             </div>
           </div>
           <button className="btn-primary btn-block" onClick={handleOrder} disabled={loading || !hasItems}>

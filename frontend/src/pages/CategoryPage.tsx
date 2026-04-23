@@ -8,6 +8,7 @@ import CompareDrawer from '../components/CompareDrawer';
 import { useWishlist } from '../hooks/useWishlist';
 import { useCompare } from '../hooks/useCompare';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { formatPriceHUF } from '../utils/currency';
 
 const getProductCategory = (product: any) => {
   const rawCategory = product?.category ?? product?.categoryName ?? product?.category?.name;
@@ -150,14 +151,12 @@ export default function CategoryPage() {
   }, [products, decodedCategoryName]);
 
   useEffect(() => {
-    const nextMin = Number(searchParams.get('min') || '0');
-    const nextMax = Number(searchParams.get('max') || String(maxPrice));
-    const safeMax = Number.isFinite(nextMax) ? Math.max(nextMin, nextMax) : maxPrice;
-    setPriceRange([Math.max(0, nextMin), Math.min(maxPrice, safeMax)]);
+    // Reset price range to the current category max to avoid stale limits (e.g. old max=1000 URL param).
+    setPriceRange([0, maxPrice]);
     setSortBy(searchParams.get('sort') || 'name');
     setSearchTerm(searchParams.get('q') || '');
     setInStockOnly(searchParams.get('stock') === '1');
-  }, [decodedCategoryName]);
+  }, [decodedCategoryName, maxPrice]);
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
@@ -168,17 +167,9 @@ export default function CategoryPage() {
       params.delete('q');
     }
 
-    if (priceRange[0] > 0) {
-      params.set('min', String(priceRange[0]));
-    } else {
-      params.delete('min');
-    }
-
-    if (priceRange[1] < maxPrice) {
-      params.set('max', String(priceRange[1]));
-    } else {
-      params.delete('max');
-    }
+    // Keep category URLs stable and avoid stale filter carry-over between categories.
+    params.delete('min');
+    params.delete('max');
 
     if (sortBy !== 'name') {
       params.set('sort', sortBy);
@@ -296,7 +287,7 @@ export default function CategoryPage() {
               className="price-slider"
             />
             <div className="price-display">
-              ${priceRange[0].toFixed(2)} - ${priceRange[1].toFixed(2)}
+              {formatPriceHUF(priceRange[0])} - {formatPriceHUF(priceRange[1])}
             </div>
           </div>
 

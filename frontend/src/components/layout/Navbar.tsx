@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { api } from '../../services/api';
 import { getThumbnailUrl } from '../../utils/imageOptimization';
+import { formatPriceHUF } from '../../utils/currency';
 import { InlineLanguageSwitcher } from '../LanguageSwitcher';
 
 const readCompareCount = (userId?: number): number => {
@@ -212,7 +213,7 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
                   {p.image && <img src={getThumbnailUrl(p.image)} alt={p.name} loading="lazy" />}
                   <div className="search-result-content">
                     <div>{p.name}</div>
-                    <div className="muted">{p.categoryLabel || p.category} • ${p.price.toFixed(2)}</div>
+                        <div className="muted">{p.categoryLabel || p.category} • {formatPriceHUF(Number(p.price))}</div>
                   </div>
                 </div>
               ))}

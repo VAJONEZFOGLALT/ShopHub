@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatPriceHUF } from '../../utils/currency';
 
 export interface CourierOption {
   id: string;
@@ -61,7 +62,7 @@ export function CourierSelectionModal({
                 <div className="courier-info">
                   <div className="courier-name">{courier.name}</div>
                   <div className="courier-details">
-                    <span className="courier-price">${courier.price.toFixed(2)}</span>
+                    <span className="courier-price">{formatPriceHUF(courier.price)}</span>
                     <span className="courier-days">{courier.days}</span>
                   </div>
                 </div>

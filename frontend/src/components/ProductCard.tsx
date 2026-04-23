@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { getProductImageUrl } from '../utils/imageOptimization';
+import { formatPriceHUF } from '../utils/currency';
 
 type ProductCardProps = {
   product: any;
@@ -120,7 +121,7 @@ function ProductCard({
         <span className="product-category">{product.categoryLabel || product.category}</span>
       </div>
       <div className="product-body">
-        <div className="price">{Number(product.price).toFixed(2)}</div>
+        <div className="price">{formatPriceHUF(Number(product.price))}</div>
         {typeof product.stock === 'number' && <div className="stock">{isOutOfStock ? t('products.outOfStock') : `${t('products.stock')}: ${product.stock}`}</div>}
       </div>
       <div className="product-actions">

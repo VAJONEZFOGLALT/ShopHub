@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useCart } from '../../contexts/CartContext';
+import { formatPriceHUF } from '../../utils/currency';
 
 interface CartModalProps {
   isOpen: boolean;
@@ -73,7 +74,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
                 <div key={item.productId} className="cart-item">
                   <div className="cart-item-info">
                     <div className="cart-item-name">{item.name}</div>
-                    <div className="cart-item-price">${item.price.toFixed(2)}</div>
+                    <div className="cart-item-price">{formatPriceHUF(item.price)}</div>
                   </div>
                   <div className="cart-item-actions">
                     <div className="cart-item-quantity">
@@ -91,7 +92,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
                         +
                       </button>
                     </div>
-                    <div className="cart-item-subtotal">${(item.price * item.quantity).toFixed(2)}</div>
+                    <div className="cart-item-subtotal">{formatPriceHUF(item.price * item.quantity)}</div>
                     <button 
                       className="cart-item-remove" 
                       onClick={() => handleRemove(item.productId)}
@@ -109,7 +110,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
             <>
               <div className="cart-total">
                 <span>{t('cart.total')}</span>
-                <span className="cart-total-amount">${total.toFixed(2)}</span>
+                <span className="cart-total-amount">{formatPriceHUF(total)}</span>
               </div>
 
               <div className="cart-actions">

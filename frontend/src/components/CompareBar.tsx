@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatPriceHUF } from '../utils/currency';
 
 export default function CompareBar({
   items,
@@ -67,7 +68,7 @@ export default function CompareBar({
                   <div className="compare-row">
                     <div className="compare-cell">{t('products.price')}</div>
                     {items.map((item) => (
-                      <div key={item.id} className="compare-cell">${Number(item.price).toFixed(2)}</div>
+                      <div key={item.id} className="compare-cell">{formatPriceHUF(Number(item.price))}</div>
                     ))}
                   </div>
                   <div className="compare-row">
