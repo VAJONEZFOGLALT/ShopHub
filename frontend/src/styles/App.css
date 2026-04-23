@@ -217,6 +217,128 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
 .danger { background: var(--danger); color: var(--bg); border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-weight: 600; }
 .danger:hover { background: var(--danger-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(153, 153, 153, 0.3); }
 
+/* Fulfilled / unfulfilled action button in admin orders */
+.fulfilled { background: var(--success); color: var(--bg); border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-weight: 600; }
+.fulfilled:hover { background: var(--success); filter: brightness(0.95); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(30, 120, 80, 0.18); }
+
+/* Ensure table action buttons have consistent spacing */
+td > button { margin-left: 6px; }
+
+/* Styled select controls inside admin views */
+.app .view select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: var(--surface-hover) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c7d0d8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>") no-repeat right 10px center;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 36px 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-weight: 600;
+  font-size: 0.95em;
+}
+.app .view select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+.app .view td select {
+  padding: 6px 28px;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+.app .view select:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Style file input's browse button to match site buttons */
+.app .view input[type="file"] {
+  color: var(--text);
+  font-size: 0.95em;
+}
+.app .view input[type="file"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  max-width: 260px;
+}
+.app .view input[type="file"]::file-selector-button,
+.app .view input[type="file"]::-webkit-file-upload-button {
+  background: var(--primary);
+  color: var(--bg);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  flex: 0 0 auto;
+  min-width: 110px;
+}
+.app .view input[type="file"]::file-selector-button:hover,
+.app .view input[type="file"]::-webkit-file-upload-button:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+/* Filename area: prevent overflow and show ellipsis */
+.app .view input[type="file"]::-webkit-file-upload-text,
+.app .view input[type="file"]::file-selector-button + span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Ensure file input smaller in table rows */
+.app .view td input[type="file"] {
+  max-width: 180px;
+}
+.app .view td input[type="file"]::file-selector-button,
+.app .view td input[type="file"]::-webkit-file-upload-button {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.9em;
+  min-width: 80px;
+}
+
+/* Custom file picker used in admin tables: hidden input + styled button + filename */
+.file-picker { display: inline-flex; align-items: center; gap: 10px; max-width: 320px; }
+.file-picker button { background: var(--surface-hover); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.95em; }
+.file-picker button:hover { background: var(--primary-hover); color: var(--bg); transform: translateY(-1px); }
+.file-picker .filename { display: inline-block; max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.9em; color: var(--muted); }
+.file-picker .filename.no-file { color: var(--text); opacity: 0.6; }
+
+/* Subtle / dimmed visual state for buttons that remain functional */
+.subtle {
+  opacity: 0.6;
+  filter: grayscale(0.06);
+  transform: none !important;
+  box-shadow: none !important;
+}
+.subtle:hover { opacity: 0.85; transform: translateY(-1px); }
+
+/* Ensure admin / view buttons match primary button style */
+.app .view button:not(.modal-close):not(.wishlist-btn):not(.compare-toggle):not(.back-btn):not(.danger):not(.dropdown-item) {
+  background: var(--primary);
+  color: var(--bg);
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.18s;
+  font-size: 0.95em;
+}
+.app .view button:not(.modal-close):not(.wishlist-btn):not(.compare-toggle):not(.back-btn):not(.danger):not(.dropdown-item):hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(120, 120, 120, 0.18);
+}
+
+/* Small utility: make stat item actions slightly different (rounded cards) */
+.stat-item-action { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); padding: 14px; text-align: left; cursor: pointer; }
+.stat-item-action:hover { border-color: var(--primary); box-shadow: 0 8px 20px rgba(59, 130, 246, 0.08); transform: translateY(-2px); color: var(--primary); }
+
 /* Alerts */
 .error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid var(--danger); padding: 14px; border-radius: 8px; margin-bottom: 16px; font-weight: 500; }
 .success { background: var(--success-light); color: #6ee7b7; border: 1px solid var(--success); padding: 14px; border-radius: 8px; margin-bottom: 16px; font-weight: 500; }
@@ -1707,6 +1829,29 @@ tfoot tr { border-top: 2px solid var(--border); font-weight: 700; background: va
   background: var(--primary-light);
   transform: translateX(-4px);
 }
+
+/* In light theme, make the back button white */
+[data-theme="light"] .back-btn {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* Theme toggle button in header */
+.mode-toggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1em;
+  transition: all 0.15s;
+}
+.mode-toggle:hover { background: var(--surface-hover); color: var(--text); transform: translateY(-2px); border-color: var(--primary); }
+
+/* Hide built-in placeholder mode-switch if present elsewhere */
+.mode-switch { display: inline-flex; }
 
 .category-header h1 { 
   margin: 0; 

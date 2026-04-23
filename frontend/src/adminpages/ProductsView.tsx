@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../services/api';
 
 export default function ProductsView() {
@@ -143,6 +143,28 @@ export default function ProductsView() {
     }
   }
 
+  function FilePicker({ accept, onSelect, currentName, dimmed }: { accept?: string; onSelect: (f: File | null) => void; currentName?: string | null; dimmed?: boolean }) {
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    return (
+      <div className="file-picker">
+        <input
+          ref={el => { inputRef.current = el; }}
+          type="file"
+          accept={accept}
+          style={{ display: 'none' }}
+          onChange={e => {
+            const file = e.target.files?.[0] ?? null;
+            onSelect(file);
+          }}
+        />
+        <button type="button" className={dimmed ? 'subtle' : undefined} onClick={() => inputRef.current?.click()}>
+          Fajl kivalaszt
+        </button>
+        <span className="filename">{currentName ?? 'No file selected'}</span>
+      </div>
+    );
+  }
+
   return (
     <div className="view">
       <h2>Products</h2>
@@ -245,17 +267,16 @@ export default function ProductsView() {
                   <td>{p.stock}</td>
                   <td>
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                      <input
-                        type="file"
+                      <FilePicker
                         accept="image/*"
-                        onChange={e => {
-                          const file = e.target.files?.[0] ?? null;
-                          setSelectedFiles(prev => ({ ...prev, [p.id]: file }));
-                        }}
+                        currentName={selectedFiles[p.id]?.name ?? null}
+                        dimmed={!!p.image}
+                        onSelect={file => setSelectedFiles(prev => ({ ...prev, [p.id]: file }))}
                       />
                       <button
                         onClick={() => onUploadImage(p.id)}
                         disabled={!!uploading[p.id]}
+                        className={p.image ? 'subtle' : undefined}
                       >
                         {uploading[p.id] ? 'Uploading…' : 'Upload Image'}
                       </button>
