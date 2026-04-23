@@ -5,6 +5,7 @@
   "scripts": {
     "postinstall": "node setup.js",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "predev:backend": "node scripts/kill-port.js 3000",
     "local:setup": "npm run db:generate && npm run db:migrate",
     "local:dev": "npm run local:setup && npm run dev",
     "dev:backend": "cd backend && npm run start:dev",

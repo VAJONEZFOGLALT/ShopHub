@@ -68,6 +68,7 @@ Mit csinál:
 Fontos: ez a flow nem futtat seedet, így a meglévő TiDB adatok érintetlenek maradnak.
 
 Ha a `3000` vagy `5173` port foglalt, állítsd át a portot `.env`-ben, vagy zárd be a korábban futó folyamatot.
+`npm run dev:backend` indítás előtt automatikusan felszabadítja a `3000` portot.
 
 ### Teljes alkalmazás
 
