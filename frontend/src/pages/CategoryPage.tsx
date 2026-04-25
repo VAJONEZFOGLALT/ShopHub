@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import ProductCard from '../components/ProductCard';
@@ -20,17 +20,6 @@ const getProductCategory = (product: any) => {
 
 const normalizeCategory = (value: string) => value.trim().toLowerCase();
 
-const parseOptionalQueryNumber = (value: string | null): number | null => {
-  if (value === null || value.trim() === '') {
-    return null;
-  }
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed)) {
-    return null;
-  }
-  return parsed;
-};
-
 const getSliderCeiling = (maxProductPrice: number) => {
   if (!Number.isFinite(maxProductPrice) || maxProductPrice <= 0) {
     return 1000;
@@ -44,16 +33,15 @@ const getSliderCeiling = (maxProductPrice: number) => {
 export default function CategoryPage() {
   const { t, i18n } = useTranslation();
   const { name } = useParams<{ name: string }>();
-  const [searchParams, setSearchParams] = useSearchParams();
   const decodedCategoryName = decodeURIComponent(name || '');
   const navigate = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'name');
-  const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
-  const [inStockOnly, setInStockOnly] = useState(searchParams.get('stock') === '1');
+  const [sortBy, setSortBy] = useState('name');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [inStockOnly, setInStockOnly] = useState(false);
   const { wishlistIds, handleToggleWishlist, isWishlistPending, isWishlistLoading } = useWishlist();
   const { compareIds, compareItems, toggleCompare, clearCompare, isComparePending, isCompareLoading } = useCompare();
 
@@ -169,63 +157,11 @@ export default function CategoryPage() {
   }, [products, decodedCategoryName]);
 
   useEffect(() => {
-    const minParam = parseOptionalQueryNumber(searchParams.get('min'));
-    const maxParam = parseOptionalQueryNumber(searchParams.get('max'));
-
-    const nextMin = minParam !== null && minParam >= 0
-      ? Math.min(minParam, maxPrice)
-      : 0;
-    const rawMax = maxParam !== null && maxParam >= 0
-      ? Math.min(maxParam, maxPrice)
-      : maxPrice;
-    const nextMax = rawMax < nextMin ? nextMin : rawMax;
-
-    // Keep URL-driven range in sync while clamping to the current category's max price.
-    setPriceRange([nextMin, nextMax]);
-    setSortBy(searchParams.get('sort') || 'name');
-    setSearchTerm(searchParams.get('q') || '');
-    setInStockOnly(searchParams.get('stock') === '1');
-  }, [decodedCategoryName, maxPrice, searchParams]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-
-    if (searchTerm.trim()) {
-      params.set('q', searchTerm.trim());
-    } else {
-      params.delete('q');
-    }
-
-    if (priceRange[0] > 0) {
-      params.set('min', String(priceRange[0]));
-    } else {
-      params.delete('min');
-    }
-
-    if (priceRange[1] < maxPrice) {
-      params.set('max', String(priceRange[1]));
-    } else {
-      params.delete('max');
-    }
-
-    if (sortBy !== 'name') {
-      params.set('sort', sortBy);
-    } else {
-      params.delete('sort');
-    }
-
-    if (inStockOnly) {
-      params.set('stock', '1');
-    } else {
-      params.delete('stock');
-    }
-
-    const current = searchParams.toString();
-    const next = params.toString();
-    if (next !== current) {
-      setSearchParams(params, { replace: true });
-    }
-  }, [inStockOnly, maxPrice, priceRange, searchParams, searchTerm, setSearchParams, sortBy]);
+    setPriceRange([0, maxPrice]);
+    setSortBy('name');
+    setSearchTerm('');
+    setInStockOnly(false);
+  }, [decodedCategoryName, maxPrice]);
 
   useEffect(() => {
     if (priceRange[1] > maxPrice) {
