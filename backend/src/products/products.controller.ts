@@ -10,12 +10,16 @@ import {
   UseInterceptors,
   Query,
   Header,
+  UseGuards,
+  Req,
+  ForbiddenException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('products')
 export class ProductsController {
@@ -24,8 +28,16 @@ export class ProductsController {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
+  private assertAdmin(req: any) {
+    if (req?.user?.role !== 'ADMIN') {
+      throw new ForbiddenException('Admin access required');
+    }
+  }
+
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
+  @UseGuards(AuthGuard('jwt'))
+  create(@Body() createProductDto: CreateProductDto, @Req() req: any) {
+    this.assertAdmin(req);
     return this.productsService.create(createProductDto);
   }
 
@@ -54,22 +66,29 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+  @UseGuards(AuthGuard('jwt'))
+  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto, @Req() req: any) {
+    this.assertAdmin(req);
     return this.productsService.update(+id, updateProductDto);
   }
 
   @Post(':id/image')
+  @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }))
   async uploadImage(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
+    @Req() req: any,
   ) {
+    this.assertAdmin(req);
     const upload = await this.cloudinaryService.uploadImage(file, 'products');
     return this.productsService.update(+id, { image: upload.url });
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  @UseGuards(AuthGuard('jwt'))
+  remove(@Param('id') id: string, @Req() req: any) {
+    this.assertAdmin(req);
     return this.productsService.remove(+id);
   }
 }

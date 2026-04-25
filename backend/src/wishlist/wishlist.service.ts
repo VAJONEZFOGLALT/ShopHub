@@ -5,6 +5,10 @@ import { PrismaService } from '../prisma.service';
 export class WishlistService {
 	constructor(private readonly prisma: PrismaService) {}
 
+	findOne(id: number) {
+		return this.prisma.wishlist.findUnique({ where: { id } });
+	}
+
 	findByUser(userId: number) {
 		return this.prisma.wishlist.findMany({
 			where: {
