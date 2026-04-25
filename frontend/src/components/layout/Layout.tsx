@@ -1,7 +1,7 @@
 import Navbar from './Navbar';
 import { useTranslation } from 'react-i18next';
 
-export default function Layout({ children, onAuth, onCart }: { children: React.ReactNode; onAuth?: () => void; onCart?: () => void }) {
+export default function Layout({ children, onAuth, onCart }: { children: React.ReactNode; onAuth?: (mode?: 'login' | 'register') => void; onCart?: () => void }) {
   const { t } = useTranslation();
   const year = new Date().getFullYear();
   return (

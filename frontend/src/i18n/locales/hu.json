@@ -204,7 +204,7 @@
     "addedToCart": "Hozzéadva a kosárhoz",
     "customerReviews": "Ügyféli vélemények",
     "noReviewsYet": "Még nincs értékelés. Légy az első!",
-    "writeReview": "Íraj véleményt",
+    "writeReview": "Írj véleményt",
     "writeFirstReview": "Az első vélemény megírása",
     "viewAllReviews": "Mind a(z) {{count}} vélemény megjelenítése",
     "reviews": "vélemény",
@@ -275,7 +275,9 @@
       "selectPickupPoint": "Válassz átvételi pontot/boxot a kiválasztott futárhoz.",
       "selectAddress": "Válassz szállítási címet.",
       "fillRequiredAddressFields": "Töltsd ki a szállítási cím kötelező mezőit.",
-      "emailDeliveryFailed": "Az e-mail nem ment ki: {{reason}}"
+      "emailDeliveryFailed": "Az e-mail nem ment ki: {{reason}}",
+      "loginRequired": "A rendelés leadásához be kell jelentkezned.",
+      "cartItemsUnavailable": "{{count}} termék már nem elérhető, ezért kikerült a kosárból. Ellenőrizd a rendelést újra."
     }
   },
   "auth": {

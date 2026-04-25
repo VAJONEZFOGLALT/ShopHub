@@ -25,7 +25,7 @@ const readCompareCount = (userId?: number): number => {
   }
 };
 
-export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart?: () => void }) {
+export default function Navbar({ onAuth, onCart }: { onAuth?: (mode?: 'login' | 'register') => void; onCart?: () => void }) {
   const { t, i18n } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -251,8 +251,8 @@ export default function Navbar({ onAuth, onCart }: { onAuth?: () => void; onCart
                   </>
                 ) : (
                   <>
-                    <button className="dropdown-item" onClick={() => { onAuth?.(); setShowUser(false); }}>{t('common.login')}</button>
-                    <button className="dropdown-item" onClick={() => { onAuth?.(); setShowUser(false); }}>{t('common.register')}</button>
+                    <button className="dropdown-item" onClick={() => { onAuth?.('login'); setShowUser(false); }}>{t('common.login')}</button>
+                    <button className="dropdown-item" onClick={() => { onAuth?.('register'); setShowUser(false); }}>{t('common.register')}</button>
                   </>
                 )}
               </div>

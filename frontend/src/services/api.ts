@@ -87,6 +87,20 @@ const getCurrentLanguage = () => {
   return 'hu';
 };
 
+const normalizeReview = (review: any) => {
+  const userName = String(
+    review?.userName
+      || review?.user?.username
+      || review?.user?.name
+      || ''
+  ).trim();
+
+  return {
+    ...review,
+    userName,
+  };
+};
+
 const processQueue = (err: Error | null, token: string | null) => {
   failedQueue.forEach(p => {
     if (err) {
@@ -380,11 +394,11 @@ export const api = {
   // Reviews
   getReviews: async () => {
     const data = await request<any[]>('/reviews');
-    return data;
+    return Array.isArray(data) ? data.map(normalizeReview) : [];
   },
   getProductReviews: async (productId: number) => {
     const data = await request<any[]>(`/reviews/product/${productId}`);
-    return data;
+    return Array.isArray(data) ? data.map(normalizeReview) : [];
   },
   getAverageRating: async (productId: number) => {
     const data = await request<{ average: number; count: number }>(`/reviews/product/${productId}/average`);

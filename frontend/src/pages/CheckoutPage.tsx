@@ -332,19 +332,28 @@ export default function CheckoutPage({ onSuccess }: { onSuccess?: (id: number) =
         return;
       }
 
-      let userId: number;
-      if (user?.id) {
-        userId = user.id;
-      } else {
-        const u = await api.createUser(newUser);
-        userId = u.id;
+      if (!user?.id) {
+        setError(t('checkout.errors.loginRequired'));
+        return;
       }
 
+      const userId = user.id;
+
       const orderItems = items.map(i => ({ productId: i.productId, quantity: i.quantity }));
+      const latestProducts = await api.getProducts(i18n.language, { forceRefresh: true });
+      const availableProductIds = new Set(latestProducts.map((product: any) => Number(product.id)));
+      const missingItems = items.filter((item) => !availableProductIds.has(Number(item.productId)));
+
+      if (missingItems.length > 0) {
+        missingItems.forEach((item) => remove(item.productId));
+        setError(t('checkout.errors.cartItemsUnavailable', { count: missingItems.length }));
+        return;
+      }
+
       const selectedAddress = addresses.find(a => a.id === selectedAddr);
       const shipping = needsPickup
         ? `PICKUP | ${courier} | ${pickupPointCode || 'N/A'} | ${pickupPointLabel}`
-        : `ADDRESS | ${courier} | ${formatAddressSingleLine(user ? selectedAddress || {} : guestAddress)}`;
+        : `ADDRESS | ${courier} | ${formatAddressSingleLine(user ? selectedAddress || {} : guestAddress, { includeFullName: true })}`;
 
       const selectedLanguage = i18n.resolvedLanguage?.toLowerCase().startsWith('en') ? 'en' : 'hu';
       const order = await api.createOrder({ userId, items: orderItems, courier, shippingAddress: shipping, language: selectedLanguage });
