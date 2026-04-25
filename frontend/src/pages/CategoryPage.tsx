@@ -158,12 +158,23 @@ export default function CategoryPage() {
   }, [products, decodedCategoryName]);
 
   useEffect(() => {
-    // Reset price range to the current category max to avoid stale limits (e.g. old max=1000 URL param).
-    setPriceRange([0, maxPrice]);
+    const minParam = Number(searchParams.get('min'));
+    const maxParam = Number(searchParams.get('max'));
+
+    const nextMin = Number.isFinite(minParam) && minParam >= 0
+      ? Math.min(minParam, maxPrice)
+      : 0;
+    const rawMax = Number.isFinite(maxParam) && maxParam >= 0
+      ? Math.min(maxParam, maxPrice)
+      : maxPrice;
+    const nextMax = rawMax < nextMin ? nextMin : rawMax;
+
+    // Keep URL-driven range in sync while clamping to the current category's max price.
+    setPriceRange([nextMin, nextMax]);
     setSortBy(searchParams.get('sort') || 'name');
     setSearchTerm(searchParams.get('q') || '');
     setInStockOnly(searchParams.get('stock') === '1');
-  }, [decodedCategoryName, maxPrice]);
+  }, [decodedCategoryName, maxPrice, searchParams]);
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
@@ -174,9 +185,17 @@ export default function CategoryPage() {
       params.delete('q');
     }
 
-    // Keep category URLs stable and avoid stale filter carry-over between categories.
-    params.delete('min');
-    params.delete('max');
+    if (priceRange[0] > 0) {
+      params.set('min', String(priceRange[0]));
+    } else {
+      params.delete('min');
+    }
+
+    if (priceRange[1] < maxPrice) {
+      params.set('max', String(priceRange[1]));
+    } else {
+      params.delete('max');
+    }
 
     if (sortBy !== 'name') {
       params.set('sort', sortBy);

@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('orders')
 export class OrdersController {
@@ -23,8 +24,20 @@ export class OrdersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ordersService.findOne(+id);
+  @UseGuards(AuthGuard('jwt'))
+  async findOne(@Param('id') id: string, @Req() req: any) {
+    const order = await this.ordersService.findOne(+id);
+    if (!order) {
+      throw new NotFoundException(`Order with id ${id} not found`);
+    }
+
+    const currentUser = req.user;
+    const isAdmin = currentUser?.role === 'ADMIN';
+    if (!isAdmin && Number(order.userId) !== Number(currentUser?.id)) {
+      throw new ForbiddenException('You are not allowed to view this order');
+    }
+
+    return order;
   }
 
   @Patch(':id')

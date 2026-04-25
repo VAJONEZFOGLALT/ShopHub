@@ -43,6 +43,7 @@
       "userId": "Felhasználó azonosító",
       "userName": "Felhasználó neve",
       "productId": "Termék azonosító",
+      "quantity": "Mennyiség",
       "orderId": "Rendelés azonosító",
       "username": "Felhasználónév",
       "email": "E-mail",

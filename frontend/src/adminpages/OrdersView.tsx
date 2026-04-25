@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
+import { formatPriceHUF } from '../utils/currency';
 
 type OrderItemInput = { productId: number; quantity: number };
 
@@ -18,6 +19,17 @@ export default function OrdersView() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const skeletonRows = Array.from({ length: 5 });
+
+  const getProductLabel = (productId: number, fallbackName?: string) => {
+    if (fallbackName && fallbackName.trim().length > 0) {
+      return fallbackName;
+    }
+    const product = products.find((p: any) => p.id === productId);
+    if (product?.name) {
+      return product.name;
+    }
+    return `#${productId}`;
+  };
 
   async function load() {
     setLoading(true);
@@ -140,7 +152,14 @@ export default function OrdersView() {
             <div key={idx} className="item-row">
               <label>
                 <span>{t('admin.common.productId')}</span>
-                <input type="number" value={it.productId} onChange={e => updateItem(idx, { productId: Number(e.target.value) })} required />
+                <select value={it.productId > 0 ? it.productId : ''} onChange={e => updateItem(idx, { productId: Number(e.target.value) })} required>
+                  <option value="" disabled>{t('admin.common.productId')}</option>
+                  {products.map((product: any) => (
+                    <option key={product.id} value={product.id}>
+                      {product.id} - {product.name}
+                    </option>
+                  ))}
+                </select>
               </label>
               <label>
                 <span>{t('admin.common.quantity')}</span>
@@ -213,17 +232,16 @@ export default function OrdersView() {
                       {Array.isArray(o.orderItems) && o.orderItems.length > 0 ? (
                         <ul style={{margin:0,padding:0,listStyle:'none'}}>
                           {o.orderItems.map((item: any) => {
-                            const product = products.find((p: any) => p.id === item.productId);
                             return (
                               <li key={item.id}>
-                                {product ? product.name : `ID: ${item.productId}`} (x{item.quantity})
+                                {getProductLabel(item.productId, item.product?.name)} (x{item.quantity})
                               </li>
                             );
                           })}
                         </ul>
                       ) : <span className="muted">{t('admin.common.noItems')}</span>}
                     </td>
-                    <td>{typeof o.totalPrice === 'number' ? o.totalPrice.toFixed(2) : '-'}</td>
+                    <td>{typeof o.totalPrice === 'number' ? formatPriceHUF(Number(o.totalPrice)) : '-'}</td>
                     <td>
                       <select
                         value={(o.status || 'PENDING').toUpperCase()}

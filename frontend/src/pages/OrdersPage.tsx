@@ -88,7 +88,10 @@ export default function OrdersPage() {
     return <LoadingSpinner fullScreen={true} />;
   }
 
-  const getProductName = (productId: number) => {
+  const getProductName = (productId: number, fallbackName?: string) => {
+    if (fallbackName && fallbackName.trim().length > 0) {
+      return fallbackName;
+    }
     const product = products.find((item: any) => item.id === productId);
     return product ? product.name : `#${productId}`;
   };
@@ -176,7 +179,7 @@ export default function OrdersPage() {
                           {items.map((item: any, idx: number) => (
                             <div key={item.id} className="item-inline">
                               <span className="item-badge">{item.quantity}×</span>
-                              <span className="item-name">{getProductName(item.productId)}</span>
+                              <span className="item-name">{getProductName(item.productId, item.product?.name)}</span>
                               {idx < items.length - 1 && <span className="item-sep">•</span>}
                             </div>
                           ))}
