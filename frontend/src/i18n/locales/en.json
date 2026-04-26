@@ -207,6 +207,7 @@
     "writeReview": "Write a Review",
     "writeFirstReview": "Write the First Review",
     "viewAllReviews": "View All {{count}} Reviews",
+    "reviewBy": "by {{name}}",
     "reviews": "reviews",
     "logInToCompare": "Please log in to compare products",
     "compare": "Compare",

@@ -274,7 +274,7 @@ export default function ProductDetailPage() {
                       <span className="review-rating">★ {rev.rating}</span>
                     </div>
                     <p className="review-comment-preview">{rev.comment}</p>
-                    <div className="review-meta">by {rev.userName}</div>
+                    <div className="review-meta">{t('products.reviewBy', { name: rev.userName })}</div>
                   </div>
                 ))}
               </div>

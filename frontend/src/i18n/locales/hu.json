@@ -207,6 +207,7 @@
     "writeReview": "Írj véleményt",
     "writeFirstReview": "Az első vélemény megírása",
     "viewAllReviews": "Mind a(z) {{count}} vélemény megjelenítése",
+    "reviewBy": "{{name}} által",
     "reviews": "vélemény",
     "logInToCompare": "Kérjük jelentkezzen be az összehasonlításhoz",
     "compare": "Összehasonlítás",
